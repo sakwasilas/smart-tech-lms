@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Teacher</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4f9;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+            color: white !important;
+        }
+
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+
+        .navbar-custom .nav-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-nav-light {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .btn-nav-light:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-nav-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-nav-danger:hover {
+            background: #c0392b;
+            color: white;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            margin: 25px 0 30px 0;
+        }
+
+        .page-header h3 {
+            font-weight: 800;
+            color: #2d3436;
+            font-size: 1.6rem;
+        }
+
+        .page-header h3 i {
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .page-header p {
+            color: #636e72;
+            font-size: 0.95rem;
+            margin: 4px 0 0 0;
+        }
+
+        /* ===== CARDS ===== */
+        .card-modern {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .card-modern:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-modern .card-header-custom {
+            padding: 16px 24px;
+            font-weight: 700;
+            font-size: 1rem;
+            border-bottom: 2px solid #f0f4f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: white;
+        }
+
+        .card-modern .card-header-custom i {
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .card-modern .card-body-custom {
+            padding: 24px;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-control-modern {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .form-control-modern:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-control-modern:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .form-label-modern {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2d3436;
+            margin-bottom: 4px;
+        }
+
+        .form-label-modern i {
+            color: #667eea;
+            margin-right: 6px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e9ecef;
+            color: #2d3436;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-cancel:hover {
+            background: #dee2e6;
+            color: #2d3436;
+        }
+
+        /* ===== FLASH MESSAGES ===== */
+        .alert-custom {
+            border-radius: 12px;
+            padding: 14px 20px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-custom.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-custom.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-custom.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .card-modern .card-body-custom {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-custom .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .btn-nav {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+
+            .card-modern .card-body-custom {
+                padding: 12px;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c8d6e5;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8395a7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-graduation-cap"></i> Learning Management System
+            </a>
+
+            <div class="nav-buttons">
+                <a href="{{ url_for('teachers') }}" class="btn-nav btn-nav-light">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn-nav btn-nav-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="page-header">
+            <h3><i class="fas fa-user-edit"></i> Edit Teacher</h3>
+            <p>Update teacher information below.</p>
+        </div>
+
+        <!-- ===== FLASH MESSAGES ===== -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert-custom {{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- ===== EDIT FORM ===== -->
+                <div class="card-modern fade-in">
+                    <div class="card-header-custom">
+                        <span><i class="fas fa-user-graduate"></i> Edit Teacher</span>
+                        <span class="badge" style="background: #667eea; color: white; padding: 4px 14px; border-radius: 30px; font-size: 0.8rem;">
+                            ID: {{ teacher.id }}
+                        </span>
+                    </div>
+                    <div class="card-body-custom">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-user"></i> Full Name
+                                </label>
+                                <input type="text" name="fullname" class="form-control-modern" 
+                                       value="{{ teacher.fullname }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input type="email" name="email" class="form-control-modern" 
+                                       value="{{ teacher.email }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-phone"></i> Phone
+                                </label>
+                                <input type="text" name="phone" class="form-control-modern" 
+                                       value="{{ teacher.phone }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-chart-line"></i> Specialization
+                                </label>
+                                <input type="text" name="specialization" class="form-control-modern" 
+                                       value="{{ teacher.specialization or '' }}" 
+                                       placeholder="e.g., Python, Web Development, Data Science">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-toggle-on"></i> Status
+                                </label>
+                                <select name="status" class="form-control-modern">
+                                    <option value="Active" {% if teacher.status == 'Active' %}selected{% endif %}>
+                                        Active
+                                    </option>
+                                    <option value="Inactive" {% if teacher.status == 'Inactive' %}selected{% endif %}>
+                                        Inactive
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn-submit">
+                                        <i class="fas fa-save"></i> Update Teacher
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('teachers') }}" class="btn-cancel">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ===== TEACHER INFO CARD ===== -->
+                <div class="card-modern mt-4 fade-in">
+                    <div class="card-header-custom">
+                        <span><i class="fas fa-info-circle"></i> Teacher Information</span>
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted">ID</small>
+                                    <p class="fw-bold mb-0">#{{ teacher.id }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <small class="text-muted">Status</small>
+                                    <p class="fw-bold mb-0">
+                                        <span class="badge-status {% if teacher.status == 'Active' %}active{% else %}inactive{% endif %}">
+                                            {{ teacher.status }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div style="text-align: center; padding: 30px 0 20px 0; color: #b2bec3; font-size: 0.85rem; border-top: 1px solid #e9ecef; margin-top: 30px;">
+            <i class="fas fa-heart" style="color: #e74c3c;"></i> Learning Management System &copy; 2026 - All rights reserved
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

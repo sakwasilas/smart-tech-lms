@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CKEditor 5 CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f0f4f9; }
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-custom .navbar-brand i { margin-right: 10px; }
+        .btn-nav {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+        .btn-nav:hover { background: rgba(255,255,255,0.3); color: white; transform: translateY(-2px); }
+        .card-modern {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            background: white;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-modern .card-header-custom {
+            padding: 16px 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #f0f4f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+        .card-modern .card-header-custom i { color: #667eea; margin-right: 8px; }
+        .card-modern .card-body-custom { padding: 24px; }
+        .form-control-modern {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .form-control-modern:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4); color: white; }
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .table-modern thead th {
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border: none;
+        }
+        .table-modern tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f4f9;
+            vertical-align: middle;
+        }
+        .table-modern tbody tr:hover { background: #f8f9fa; }
+        .badge-status {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-status.active { background: #2ecc71; color: white; }
+        .badge-status.inactive { background: #e74c3c; color: white; }
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-action:hover { transform: translateY(-2px); }
+        .btn-warning-action { background: #f39c12; color: white; }
+        .btn-warning-action:hover { background: #d68910; color: white; }
+        .btn-danger-action { background: #e74c3c; color: white; }
+        .btn-danger-action:hover { background: #c0392b; color: white; }
+        .search-wrapper {
+            position: relative;
+        }
+        .search-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b2bec3;
+        }
+        .search-wrapper input {
+            padding-left: 40px;
+            border-radius: 30px;
+            border: 2px solid #e9ecef;
+            padding: 10px 16px 10px 40px;
+            width: 100%;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .search-wrapper input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+        .ck-editor__editable {
+            min-height: 250px !important;
+            border-radius: 0 0 10px 10px !important;
+        }
+        .ck-editor__top {
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .ck.ck-editor {
+            border-radius: 10px !important;
+            border: 2px solid #e9ecef !important;
+        }
+        .ck.ck-editor:focus-within {
+            border-color: #667eea !important;
+        }
+        @media (max-width: 768px) {
+            .card-modern .card-body-custom { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+            <i class="fas fa-graduation-cap"></i> LMS Admin
+        </a>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn-nav">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn-nav" style="background: rgba(231,76,60,0.8);">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <div class="row">
+        <!-- Add Module Form -->
+        <div class="col-lg-5">
+            <div class="card-modern">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-plus-circle"></i> Add Module</span>
+                </div>
+                <div class="card-body-custom">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('add_module') }}" enctype="multipart/form-data" id="moduleForm">
+                        <div class="mb-3">
+                            <label class="form-label">Course</label>
+                            <select name="course_id" class="form-control-modern" required>
+                                <option value="">Select Course</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Module Number</label>
+                            <input type="number" name="module_number" class="form-control-modern" placeholder="e.g., 1, 2, 3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Module Title</label>
+                            <input type="text" name="title" class="form-control-modern" placeholder="e.g., Introduction to Python" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control-modern" rows="3" placeholder="Module description"></textarea>
+                        </div>
+                        <!-- ===== CKEDITOR CONTENT FIELD ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">Module Content <small class="text-muted">(Rich Text)</small></label>
+                            <textarea name="content" id="content" rows="10" placeholder="Type your module content here..."></textarea>
+                            <small class="text-muted">Use the editor to format your content. You can add text, images, tables, and links.</small>
+                        </div>
+                        <!-- ===== END CKEDITOR ===== -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PDF File</label>
+                                <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Video File</label>
+                                <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Meeting Link</label>
+                            <input type="url" name="meeting_link" class="form-control-modern" placeholder="https://meet.google.com/...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-control-modern">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Add Module
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module List -->
+        <div class="col-lg-7">
+            <div class="card-modern">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-list"></i> Modules</span>
+                    <span class="badge" style="background: #667eea; color: white; padding: 4px 14px; border-radius: 30px;">
+                        {{ modules|length }} Total
+                    </span>
+                </div>
+                <div class="card-body-custom">
+                    <!-- Search -->
+                    <div class="search-wrapper mb-3">
+                        <i class="fas fa-search"></i>
+                        <form method="GET">
+                            <input type="text" name="search" class="form-control-modern" placeholder="Search modules by title..." value="{{ search or '' }}">
+                        </form>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Course</th>
+                                    <th>Module</th>
+                                    <th>Title</th>
+                                    <th>Resources</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if modules %}
+                                    {% for module in modules %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            <span class="badge bg-info">{{ module.course.course_name }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">Module {{ module.module_number }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ module.title }}</strong>
+                                            <br><small class="text-muted">{{ module.description[:40] }}{% if module.description|length > 40 %}...{% endif %}</small>
+                                            {% if module.content %}
+                                                <br><span class="badge" style="background: #6c5ce7;"><i class="fas fa-file-alt"></i> Has Content</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if module.content %}
+                                                <span class="badge" style="background: #6c5ce7; color: white;"><i class="fas fa-file-alt"></i></span>
+                                            {% endif %}
+                                            {% if module.pdf_file %}
+                                                <span class="badge bg-danger"><i class="fas fa-file-pdf"></i></span>
+                                            {% endif %}
+                                            {% if module.video_file %}
+                                                <span class="badge bg-primary"><i class="fas fa-video"></i></span>
+                                            {% endif %}
+                                            {% if module.meeting_link %}
+                                                <span class="badge bg-success"><i class="fas fa-video"></i></span>
+                                            {% endif %}
+                                            {% if not module.content and not module.pdf_file and not module.video_file and not module.meeting_link %}
+                                                <span class="badge bg-secondary">No resources</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge-status {{ module.status|lower }}">
+                                                {{ module.status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex gap-1 justify-content-center">
+                                                <a href="{{ url_for('edit_module', id=module.id) }}" class="btn-action btn-warning-action">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{{ url_for('delete_module', id=module.id) }}" class="btn-action btn-danger-action" onclick="return confirm('Delete this module?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="fas fa-cubes fa-2x d-block mb-2"></i>
+                                            No modules found.
+                                            <br>Add your first module using the form.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Initialize CKEditor
+    ClassicEditor
+        .create(document.querySelector('#content'), {
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'strikethrough',
+                    '|',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'outdent',
+                    'indent',
+                    '|',
+                    'blockQuote',
+                    'insertTable',
+                    'mediaEmbed',
+                    'link',
+                    '|',
+                    'undo',
+                    'redo',
+                    '|',
+                    'removeFormat'
+                ]
+            },
+            language: 'en',
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            }
+        })
+        .then(editor => {
+            console.log('CKEditor initialized successfully');
+        })
+        .catch(error => {
+            console.error('CKEditor initialization error:', error);
+        });
+</script>
+</body>
+</html>
