@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Manage Students</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center">
+
+        <h2>Manage Students</h2>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="btn btn-secondary">
+            Back Dashboard
+        </a>
+
+    </div>
+
+    <hr>
+
+    <!-- Bulk Action Form -->
+    <form method="POST" action="{{ url_for('mass_block_students') }}">
+
+        <div class="mb-3">
+
+            <button type="submit"
+                    class="btn btn-danger">
+                Block Selected
+            </button>
+
+            <button type="submit"
+                    formaction="{{ url_for('mass_unblock_students') }}"
+                    class="btn btn-primary">
+                Unblock Selected
+            </button>
+
+        </div>
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+
+            <tr>
+
+                <th width="40">
+                    <input type="checkbox" id="select_all">
+                </th>
+
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th width="420">Actions</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for student in students %}
+
+            <tr>
+
+                <td>
+                    <input type="checkbox"
+                           name="student_ids"
+                           value="{{ student.id }}">
+                </td>
+
+                <td>{{ student.id }}</td>
+
+                <td>{{ student.fullname }}</td>
+
+                <td>{{ student.email }}</td>
+
+                <td>{{ student.phone }}</td>
+
+                <td>
+
+                    {% if student.status == "Approved" %}
+
+                        <span class="badge bg-success">
+                            Approved
+                        </span>
+
+                    {% elif student.status == "Pending" %}
+
+                        <span class="badge bg-warning text-dark">
+                            Pending
+                        </span>
+
+                    {% elif student.status == "Rejected" %}
+
+                        <span class="badge bg-danger">
+                            Rejected
+                        </span>
+
+                    {% elif student.status == "Blocked" %}
+
+                        <span class="badge bg-dark">
+                            Blocked
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            {{ student.status }}
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <!-- APPROVE / REJECT -->
+
+                    {% if student.status == "Pending" %}
+
+                        <a href="{{ url_for('approve_student', id=student.id) }}"
+                           class="btn btn-success btn-sm">
+                            Approve
+                        </a>
+
+                        <a href="{{ url_for('reject_student', id=student.id) }}"
+                           class="btn btn-warning btn-sm">
+                            Reject
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- BLOCK -->
+
+                    {% if student.status == "Approved" %}
+
+                        <a href="{{ url_for('toggle_student', id=student.id) }}"
+                           class="btn btn-danger btn-sm">
+                            Block
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- UNBLOCK -->
+
+                    {% if student.status == "Blocked" %}
+
+                        <a href="{{ url_for('toggle_student', id=student.id) }}"
+                           class="btn btn-primary btn-sm">
+                            Unblock
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- APPROVE AGAIN -->
+
+                    {% if student.status == "Rejected" %}
+
+                        <a href="{{ url_for('approve_student', id=student.id) }}"
+                           class="btn btn-success btn-sm">
+                            Approve Again
+                        </a>
+
+                    {% endif %}
+
+
+                    <!-- EDIT -->
+
+                    <a href="{{ url_for('edit_student', id=student.id) }}"
+                       class="btn btn-info btn-sm">
+                        Edit
+                    </a>
+
+
+                    <!-- DELETE -->
+
+                    <a href="{{ url_for('delete_student', id=student.id) }}"
+                       class="btn btn-dark btn-sm"
+                       onclick="return confirm('Are you sure you want to delete this student?')">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </form>
+
+</div>
+
+
+<script>
+
+document.getElementById("select_all").addEventListener("click", function () {
+
+    let checkboxes = document.getElementsByName("student_ids");
+
+    for (let i = 0; i < checkboxes.length; i++) {
+
+        checkboxes[i].checked = this.checked;
+
+    }
+
+});
+
+</script>
+
+</body>
+
+</html>

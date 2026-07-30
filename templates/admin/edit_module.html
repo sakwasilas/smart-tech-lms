@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Module</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CKEditor 5 CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f9; }
+        
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-custom .navbar-brand i { margin-right: 10px; }
+        
+        .btn-nav {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+        .btn-nav:hover { background: rgba(255,255,255,0.3); color: white; transform: translateY(-2px); }
+        
+        .card-modern {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            background: white;
+            overflow: hidden;
+        }
+        .card-modern .card-header-custom {
+            padding: 16px 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #f0f4f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+        .card-modern .card-header-custom i { color: #667eea; margin-right: 8px; }
+        .card-modern .card-body-custom { padding: 24px; }
+        
+        .form-control-modern {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .form-control-modern:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #f39c12, #d68910);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(243, 156, 18, 0.4); color: white; }
+        
+        .btn-cancel {
+            background: #e9ecef;
+            color: #2d3436;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-cancel:hover { background: #dee2e6; color: #2d3436; }
+        
+        .current-file {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .current-file .file-name {
+            font-weight: 500;
+        }
+        .current-file .file-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .content-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-left: 3px solid #6c5ce7;
+        }
+        .content-preview .preview-label {
+            font-size: 0.8rem;
+            color: #636e72;
+            font-weight: 600;
+        }
+        .content-preview .preview-content {
+            font-size: 0.85rem;
+            color: #2d3436;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .ck-editor__editable {
+            min-height: 250px !important;
+            border-radius: 0 0 10px 10px !important;
+        }
+        .ck-editor__top {
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .ck.ck-editor {
+            border-radius: 10px !important;
+            border: 2px solid #e9ecef !important;
+        }
+        .ck.ck-editor:focus-within {
+            border-color: #667eea !important;
+        }
+        
+        @media (max-width: 768px) {
+            .card-modern .card-body-custom { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+            <i class="fas fa-graduation-cap"></i> LMS Admin
+        </a>
+        <div>
+            <a href="{{ url_for('modules') }}" class="btn-nav">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn-nav" style="background: rgba(231,76,60,0.8);">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card-modern">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-edit"></i> Edit Module</span>
+                    <span class="badge" style="background: #667eea; color: white; padding: 4px 14px; border-radius: 30px;">
+                        Module #{{ module.module_number }}
+                    </span>
+                </div>
+                <div class="card-body-custom">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" enctype="multipart/form-data" id="editModuleForm">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Course</label>
+                                <select name="course_id" class="form-control-modern" required>
+                                    {% for course in courses %}
+                                    <option value="{{ course.id }}" {% if course.id == module.course_id %}selected{% endif %}>
+                                        {{ course.course_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Module Number</label>
+                                <input type="number" name="module_number" class="form-control-modern" value="{{ module.module_number }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Module Title</label>
+                            <input type="text" name="title" class="form-control-modern" value="{{ module.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control-modern" rows="2">{{ module.description or '' }}</textarea>
+                        </div>
+
+                        <!-- ===== CKEDITOR CONTENT FIELD ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">Module Content <small class="text-muted">(Rich Text)</small></label>
+                            {% if module.content %}
+                            <div class="content-preview">
+                                <div class="preview-label">
+                                    <i class="fas fa-file-alt" style="color: #6c5ce7;"></i> Current Content Preview
+                                </div>
+                                <div class="preview-content">{{ module.content|striptags|truncate(200) }}</div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> No content currently. Use the editor below to add content.
+                            </div>
+                            {% endif %}
+                            <textarea name="content" id="content" rows="10">{{ module.content or '' }}</textarea>
+                            <small class="text-muted">Use the editor to format your content. You can add text, images, tables, and links.</small>
+                        </div>
+                        <!-- ===== END CKEDITOR ===== -->
+
+                        <hr>
+
+                        <!-- ===== PDF SECTION ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">PDF Notes</label>
+                            {% if module.pdf_file %}
+                            <div class="current-file">
+                                <span class="file-name">
+                                    <i class="fas fa-file-pdf text-danger"></i> {{ module.pdf_file }}
+                                </span>
+                                <span class="file-actions">
+                                    <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" 
+                                       target="_blank" 
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </span>
+                            </div>
+                            {% else %}
+                            <div class="text-muted small mb-2">No PDF uploaded</div>
+                            {% endif %}
+                            <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
+                            <small class="text-muted">Upload new PDF to replace (optional)</small>
+                        </div>
+
+                        <!-- ===== VIDEO SECTION ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">Video File</label>
+                            {% if module.video_file %}
+                            <div class="current-file">
+                                <span class="file-name">
+                                    <i class="fas fa-file-video text-primary"></i> {{ module.video_file }}
+                                </span>
+                                <span class="file-actions">
+                                    <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" 
+                                       target="_blank" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </span>
+                            </div>
+                            {% else %}
+                            <div class="text-muted small mb-2">No video uploaded</div>
+                            {% endif %}
+                            <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
+                            <small class="text-muted">Upload new video to replace (optional)</small>
+                        </div>
+
+                        <!-- ===== MEETING LINK SECTION ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">Meeting Link</label>
+                            <input type="url" name="meeting_link" class="form-control-modern" 
+                                   value="{{ module.meeting_link or '' }}" 
+                                   placeholder="https://meet.google.com/...">
+                            <small class="text-muted">Current: {{ module.meeting_link or 'No link set' }}</small>
+                        </div>
+
+                        <!-- ===== STATUS SECTION ===== -->
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-control-modern">
+                                <option value="Active" {% if module.status == 'Active' %}selected{% endif %}>Active</option>
+                                <option value="Inactive" {% if module.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                        </div>
+
+                        <!-- ===== BUTTONS ===== -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-submit">
+                                    <i class="fas fa-save"></i> Update Module
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ url_for('modules') }}" class="btn-cancel">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#content'), {
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'strikethrough',
+                    '|',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'outdent',
+                    'indent',
+                    '|',
+                    'blockQuote',
+                    'insertTable',
+                    'mediaEmbed',
+                    'link',
+                    '|',
+                    'undo',
+                    'redo',
+                    '|',
+                    'removeFormat'
+                ]
+            },
+            language: 'en',
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            }
+        })
+        .then(editor => {
+            console.log('CKEditor initialized successfully');
+        })
+        .catch(error => {
+            console.error('CKEditor initialization error:', error);
+        });
+</script>
+</body>
+</html>

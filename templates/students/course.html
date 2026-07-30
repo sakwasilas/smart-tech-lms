@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.course_name }} - Course Content</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .module-card {
+            transition: transform 0.2s;
+            border-left: 4px solid #0d6efd;
+        }
+        .module-card:hover {
+            transform: translateX(5px);
+        }
+        .module-card.locked {
+            border-left-color: #6c757d;
+            opacity: 0.7;
+        }
+        .module-card.completed {
+            border-left-color: #198754;
+        }
+        .module-number {
+            background: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .module-card.completed .module-number {
+            background: #198754;
+        }
+        .module-card.locked .module-number {
+            background: #6c757d;
+        }
+        .course-header {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .badge-resource {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        .resource-icons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .resource-icons .badge {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+        .meeting-link-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+        }
+        .meeting-link-btn:hover {
+            background: #128C7E;
+            color: white;
+        }
+        .btn-completed {
+            background: #198754;
+            color: white;
+            cursor: default;
+        }
+        .btn-completed:hover {
+            background: #198754;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+    <!-- Course Header -->
+    <div class="course-header">
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+            <div>
+                <h1><i class="fas fa-book-open me-2"></i>{{ course.course_name }}</h1>
+                <p class="mb-2">{{ course.description }}</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-clock me-1"></i> Duration: {{ course.duration }}
+                    </span>
+                    <span class="badge bg-light text-dark">
+                        <i class="fas fa-dollar-sign me-1"></i> Fee: ${{ course.fee }}
+                    </span>
+                    {% if course.meeting_link %}
+                    <a href="{{ course.meeting_link }}" target="_blank" class="badge meeting-link-btn">
+                        <i class="fas fa-video me-1"></i> Join Live Class
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{{ url_for('student_dashboard') }}" class="btn btn-light mt-2 mt-md-0">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Career Objectives -->
+    {% if course.career_objectives %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5><i class="fas fa-bullseye text-primary me-2"></i>Career Objectives</h5>
+            <p class="mb-0">{{ course.career_objectives }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Progress Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-chart-line text-primary me-2"></i>Your Progress</h5>
+                <span>{{ modules|selectattr('completed')|list|length }}/{{ modules|length }} Modules Completed</span>
+            </div>
+            <div class="progress mt-2" style="height: 10px;">
+                {% set completed_count = modules|selectattr('completed')|list|length %}
+                {% set total_count = modules|length %}
+                {% set percentage = (completed_count / total_count * 100)|round|int if total_count > 0 else 0 %}
+                <div class="progress-bar bg-success" role="progressbar" 
+                     style="width: {{ percentage }}%;" 
+                     aria-valuenow="{{ percentage }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+            <small class="text-muted">{{ percentage }}% Complete</small>
+        </div>
+    </div>
+
+    <!-- Modules List -->
+    <h4 class="mb-3"><i class="fas fa-list me-2"></i>Course Modules</h4>
+    
+    {% for module in modules %}
+    <div class="card module-card mb-3 
+        {% if module.completed %}completed{% endif %}
+        {% if module.locked %}locked{% endif %}">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <!-- Module Number -->
+                <div class="col-auto">
+                    <div class="module-number">
+                        {{ module.module_number }}
+                    </div>
+                </div>
+                
+                <!-- Module Info -->
+                <div class="col">
+                    <h5 class="mb-1">
+                        {{ module.title }}
+                        {% if module.completed %}
+                        <span class="badge bg-success ms-2">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                        {% endif %}
+                        {% if module.locked %}
+                        <span class="badge bg-secondary ms-2">
+                            <i class="fas fa-lock"></i> Locked
+                        </span>
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted small mb-2">{{ module.description }}</p>
+                    
+                    <!-- Resource Icons -->
+                    <div class="resource-icons">
+                        {% if module.pdf_file %}
+                        <span class="badge bg-danger badge-resource">
+                            <i class="fas fa-file-pdf"></i> PDF Notes
+                        </span>
+                        {% endif %}
+                        {% if module.video_file %}
+                        <span class="badge bg-primary badge-resource">
+                            <i class="fas fa-video"></i> Video
+                        </span>
+                        {% endif %}
+                        {% if module.meeting_link %}
+                        <span class="badge bg-success badge-resource">
+                            <i class="fas fa-video"></i> Live Class
+                        </span>
+                        {% endif %}
+                        {% if not module.pdf_file and not module.video_file and not module.meeting_link %}
+                        <span class="badge bg-secondary badge-resource">
+                            <i class="fas fa-file-alt"></i> No resources yet
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="col-auto">
+                    {% if module.completed %}
+                    <button class="btn btn-completed" disabled>
+                        <i class="fas fa-check-circle"></i> Completed
+                    </button>
+                    {% elif module.locked %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-lock"></i> Locked
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Start Learning
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+            <h5>No Modules Available</h5>
+            <p class="text-muted">This course doesn't have any modules yet. Check back later.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
