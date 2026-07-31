@@ -8,562 +8,400 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f0f4f9;
             min-height: 100vh;
         }
 
-        /* ===== NAVBAR ===== */
-        .navbar-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            padding: 14px 0;
-            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        /* ===== SPLIT LAYOUT ===== */
+        .dashboard-wrapper { display: flex; min-height: 100vh; }
+
+        /* LEFT PANEL - compact & clean */
+        .left-panel {
+            width: 260px;
+            min-height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e9eff6;
+            padding: 28px 16px 24px 20px;
+            position: sticky; top: 0; height: 100vh;
+            overflow-y: auto;
+            display: flex; flex-direction: column;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+        .left-panel .brand {
+            font-weight: 800; font-size: 1.2rem; color: #1a2639;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+        }
+        .left-panel .brand i { color: #4f6ef7; font-size: 1.4rem; }
+        .left-panel .user-badge {
+            background: #f0f4fe; border-radius: 40px; padding: 8px 16px;
+            font-size: 0.75rem; font-weight: 600; color: #1f2a44;
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 4px; margin-bottom: 28px;
+            border: 1px solid rgba(79,110,247,0.08);
+        }
+        .left-panel .user-badge i { color: #4f6ef7; }
+
+        .nav-left {
+            display: flex; flex-direction: column; gap: 4px; flex:1;
+        }
+        .nav-left .nav-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 10px 16px; border-radius: 16px;
+            font-weight: 600; font-size: 0.85rem;
+            color: #3a4b62; transition: all 0.15s ease;
+            text-decoration: none; background: transparent;
+        }
+        .nav-left .nav-item i { width: 22px; font-size: 1rem; color: #7b8ba3; }
+        .nav-left .nav-item:hover { background: #f0f4fe; color: #1a2639; }
+        .nav-left .nav-item:hover i { color: #4f6ef7; }
+        .nav-left .nav-item.active {
+            background: #4f6ef7; color: #fff; box-shadow: 0 6px 16px rgba(79,110,247,0.25);
+        }
+        .nav-left .nav-item.active i { color: #fff; }
+        .nav-left .logout-item {
+            margin-top: auto; border-top: 1px solid #e9eff6; padding-top: 18px;
+        }
+        .nav-left .logout-item .nav-item { color: #b13a4f; }
+        .nav-left .logout-item .nav-item i { color: #b13a4f; }
+        .nav-left .logout-item .nav-item:hover { background: #fee9ec; color: #a12d40; }
+
+        /* RIGHT PANEL - main content */
+        .right-panel {
+            flex: 1; padding: 28px 32px 30px 32px;
+            background: #f4f8fe; min-width: 0;
         }
 
-        .navbar-custom .navbar-brand {
-            font-weight: 800;
-            font-size: 1.3rem;
-            letter-spacing: 0.5px;
-            color: white !important;
-        }
-
-        .navbar-custom .navbar-brand i {
-            margin-right: 10px;
-            font-size: 1.4rem;
-        }
-
-        .navbar-custom .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .btn-back {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: none;
-            color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-back:hover {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-logout {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: none;
-            color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* ===== COURSE HEADER ===== */
-        .course-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px 35px;
-            border-radius: 16px;
-            margin: 25px 0 30px 0;
-            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
-        }
-
-        .course-header h1 {
-            font-weight: 800;
-            font-size: 2rem;
-        }
-
-        .course-header p {
-            opacity: 0.9;
-            font-size: 1rem;
-            margin: 8px 0 15px 0;
-        }
-
-        .course-header .badge-light {
-            background: rgba(255, 255, 255, 0.2) !important;
-            color: white !important;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            border-radius: 30px;
-        }
-
-        .course-header .badge-light i {
-            margin-right: 6px;
-        }
-
-        .course-header .meeting-link-btn {
-            background: #25D366;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .course-header .meeting-link-btn:hover {
-            background: #128C7E;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Badge Styles */
-        .badge-free {
-            background: #2ecc71;
-            color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .badge-paid {
-            background: #f39c12;
-            color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .badge-status {
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-status.active {
-            background: #2ecc71;
-            color: white;
-        }
-
-        /* ===== CARD STYLES ===== */
-        .card-custom {
-            background: white;
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-            margin-bottom: 25px;
+        /* ===== COURSE HERO ===== */
+        .course-hero {
+            background: linear-gradient(135deg, #4f6ef7 0%, #7c4d9e 100%);
+            border-radius: 28px;
+            padding: 32px 36px;
+            color: #fff;
+            margin-bottom: 28px;
+            position: relative;
             overflow: hidden;
         }
+        .course-hero::after {
+            content: '';
+            position: absolute;
+            right: -60px; top: -60px;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .course-hero .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 18px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            margin-bottom: 12px;
+        }
+        .course-hero h1 {
+            font-weight: 800;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .course-hero h1 i { margin-right: 12px; opacity: 0.8; }
+        .course-hero .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 28px;
+            margin-top: 14px;
+            font-size: 0.9rem;
+            opacity: 0.95;
+        }
+        .course-hero .hero-meta span i { margin-right: 8px; }
+        .course-hero .hero-meta .badge-free {
+            background: #2edb7a;
+            color: #0f2a1e;
+            padding: 2px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .course-hero .hero-meta .badge-code {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 16px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-weight: 600;
+        }
+        .course-hero .hero-meta .badge-paid {
+            background: #f5b342;
+            color: #281e0a;
+            padding: 2px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .btn-live {
+            background: #25D366;
+            color: #fff;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-live:hover { background: #128C7E; color: #fff; transform: translateY(-2px); }
 
-        .card-custom .card-header-custom {
+        /* ===== PROGRESS CARD ===== */
+        .progress-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+        }
+        .progress-card h4 {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a2639;
+            margin-bottom: 12px;
+        }
+        .progress-card h4 i { color: #4f6ef7; margin-right: 10px; }
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background: #e9eff6;
+        }
+        .progress-bar {
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4f6ef7, #7c4d9e);
+            transition: width 0.6s ease;
+        }
+        .progress-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #5d6a7a;
+        }
+        .progress-stats span i { margin-right: 6px; width: 18px; }
+        .progress-stats .stat-num { font-weight: 700; color: #1a2639; }
+
+        /* ===== MODULES LIST ===== */
+        .modules-card {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        .modules-card .card-header {
             padding: 18px 24px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-bottom: 1px solid #e9ecef;
+            background: #fafcff;
+            border-bottom: 2px solid #f0f4fc;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .card-custom .card-header-custom h5 {
+        .modules-card .card-header h5 {
             font-weight: 700;
-            color: #2d3436;
+            color: #1a2639;
             margin: 0;
         }
+        .modules-card .card-header h5 i { color: #4f6ef7; margin-right: 10px; }
+        .modules-card .card-body { padding: 20px 24px; }
 
-        .card-custom .card-header-custom h5 i {
-            color: #667eea;
-            margin-right: 10px;
+        /* Module Item */
+        .module-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 14px 16px;
+            background: #f8faff;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            border-left: 4px solid #4f6ef7;
         }
-
-        .card-custom .card-body-custom {
-            padding: 20px 24px;
-        }
-
-        /* ===== MODULE CARD ===== */
-        .module-card {
-            transition: all 0.3s;
-            border: none;
-            border-radius: 12px;
-            background: #f8f9fa;
-            margin-bottom: 12px;
-            border-left: 4px solid #667eea;
-            overflow: hidden;
-        }
-
-        .module-card:hover {
-            transform: translateX(5px);
-            background: #e9ecef;
-        }
-
-        .module-card.locked {
-            border-left-color: #b2bec3;
-            opacity: 0.7;
-        }
-
-        .module-card.completed {
-            border-left-color: #2ecc71;
-        }
+        .module-item:hover { background: #f0f4fe; transform: translateX(4px); }
+        .module-item.completed { border-left-color: #2edb7a; }
+        .module-item.locked { border-left-color: #cbd5e1; opacity: 0.7; }
 
         .module-number {
-            background: #667eea;
-            color: white;
+            background: #4f6ef7;
+            color: #fff;
+            width: 36px; height: 36px;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             flex-shrink: 0;
         }
+        .module-item.completed .module-number { background: #2edb7a; }
+        .module-item.locked .module-number { background: #cbd5e1; }
 
-        .module-card.completed .module-number {
-            background: #2ecc71;
-        }
-
-        .module-card.locked .module-number {
-            background: #b2bec3;
-        }
-
-        .module-card h5 {
-            font-weight: 700;
-            color: #2d3436;
+        .module-info { flex: 1; min-width: 0; }
+        .module-info h6 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1a2639;
             margin: 0;
         }
-
-        .module-card .text-muted {
-            font-size: 0.85rem;
-            margin: 4px 0 0 0;
+        .module-info .module-desc {
+            font-size: 0.8rem;
+            color: #5d6a7a;
+            margin: 2px 0 6px 0;
         }
-
-        /* Resource Icons */
-        .resource-icons {
+        .module-info .resource-badges {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 8px;
+            gap: 4px;
         }
-
-        .resource-icons .badge {
-            font-size: 0.75rem;
-            padding: 5px 12px;
-            border-radius: 20px;
+        .module-info .resource-badges .badge {
+            font-size: 0.6rem;
+            padding: 3px 10px;
+            border-radius: 30px;
             font-weight: 600;
         }
+        .badge-pdf { background: #e9546b; color: #fff; }
+        .badge-video { background: #4f6ef7; color: #fff; }
+        .badge-live { background: #25D366; color: #fff; }
 
-        .resource-icons .badge.bg-danger {
-            background: #e74c3c !important;
-        }
-
-        .resource-icons .badge.bg-primary {
-            background: #667eea !important;
-        }
-
-        .resource-icons .badge.bg-success {
-            background: #2ecc71 !important;
-        }
-
-        .resource-icons .badge.bg-secondary {
-            background: #b2bec3 !important;
-        }
-
-        /* Buttons */
-        .btn-learn {
-            padding: 8px 20px;
+        .module-action { flex-shrink: 0; }
+        .btn-module {
+            padding: 8px 18px;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             font-weight: 700;
-            font-size: 0.85rem;
-            transition: all 0.3s;
+            font-size: 0.8rem;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
+            white-space: nowrap;
         }
-
-        .btn-learn.primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+        .btn-module.primary {
+            background: linear-gradient(135deg, #4f6ef7, #7c4d9e);
+            color: #fff;
         }
-
-        .btn-learn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-
-        .btn-learn.completed {
-            background: #2ecc71;
-            color: white;
+        .btn-module.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,110,247,0.3); color: #fff; }
+        .btn-module.completed {
+            background: #2edb7a;
+            color: #0f2a1e;
             cursor: default;
         }
-
-        .btn-learn.completed:hover {
-            transform: none;
-            box-shadow: none;
-            color: white;
-        }
-
-        .btn-learn.locked {
-            background: #b2bec3;
-            color: white;
+        .btn-module.locked {
+            background: #cbd5e1;
+            color: #5d6a7a;
             cursor: not-allowed;
         }
-
-        .btn-learn.locked:hover {
-            transform: none;
-            box-shadow: none;
-            color: white;
+        .btn-module.retake {
+            background: #f0f4fe;
+            color: #4f6ef7;
+            border: 1px solid #4f6ef7;
         }
+        .btn-module.retake:hover { background: #4f6ef7; color: #fff; transform: translateY(-2px); }
 
-        /* ===== PROGRESS BAR ===== */
-        .progress-container {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 24px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-            margin-bottom: 25px;
-        }
-
-        .progress-container h6 {
-            font-weight: 700;
-            color: #2d3436;
-            margin-bottom: 10px;
-        }
-
-        .progress-container h6 i {
-            color: #667eea;
-            margin-right: 10px;
-        }
-
-        .progress {
-            height: 12px;
-            border-radius: 10px;
-            background: #e9ecef;
-        }
-
-        .progress-bar {
-            border-radius: 10px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            transition: width 0.6s ease;
-        }
-
-        .progress-stats {
+        /* Retake notice */
+        .retake-notice {
             display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #636e72;
-            flex-wrap: wrap;
-            gap: 10px;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            color: #9aabbe;
+            padding: 8px 16px;
+            background: #f8faff;
+            border-radius: 12px;
+            margin-top: 12px;
         }
-
-        .progress-stats span i {
-            margin-right: 4px;
-        }
+        .retake-notice i { color: #4f6ef7; }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
-            text-align: center;
-            padding: 40px 20px;
+            text-align: center; padding: 40px 20px;
         }
+        .empty-state i { font-size: 2.8rem; color: #b2bec3; margin-bottom: 12px; }
+        .empty-state h5 { color: #1a2639; font-weight: 700; }
 
-        .empty-state i {
-            font-size: 3rem;
-            color: #b2bec3;
-            margin-bottom: 15px;
-        }
-
-        .empty-state h5 {
-            color: #2d3436;
-            font-weight: 700;
-        }
-
-        .empty-state p {
-            color: #636e72;
-        }
-
-        /* ===== FLASH MESSAGES ===== */
+        /* ===== FLASH ===== */
         .alert-custom {
-            border-radius: 12px;
-            padding: 14px 20px;
-            border: none;
-            margin-bottom: 20px;
+            border-radius: 16px; padding: 12px 20px; border: none; margin-bottom: 20px;
         }
+        .alert-custom.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-custom.danger { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .alert-custom.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
 
-        .alert-custom.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center; padding: 24px 0 6px 0;
+            color: #9aabbe; font-size: 0.75rem;
+            border-top: 1px solid #e4ecf5; margin-top: 32px;
         }
-
-        .alert-custom.danger {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        .alert-custom.warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 4px solid #ffc107;
-        }
-
-        .alert-custom.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-left: 4px solid #17a2b8;
-        }
+        .footer i { color: #e9546b; }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .course-header {
-                padding: 20px;
+        @media (max-width: 992px) {
+            .dashboard-wrapper { flex-direction: column; }
+            .left-panel {
+                width: 100%; min-height: auto; height: auto; position: relative;
+                border-right: none; border-bottom: 1px solid #e9eff6;
+                padding: 14px 20px; flex-direction: row; flex-wrap: wrap;
+                align-items: center; gap: 8px;
             }
-
-            .course-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .course-header .d-flex {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .module-card .row {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 12px;
-            }
-
-            .module-card .col-auto {
-                width: 100%;
-            }
-
-            .module-number {
-                width: 35px;
-                height: 35px;
-                font-size: 0.8rem;
-            }
-
-            .resource-icons {
-                margin-top: 5px;
-            }
-
-            .btn-learn {
-                width: 100%;
-                text-align: center;
-            }
-
-            .progress-stats {
-                flex-direction: column;
-                gap: 5px;
-            }
+            .left-panel .brand { margin-bottom: 0; }
+            .left-panel .user-badge { margin-bottom: 0; margin-top: 0; }
+            .nav-left { flex-direction: row; flex-wrap: wrap; gap: 4px; width: 100%; margin-top: 4px; }
+            .nav-left .nav-item { padding: 6px 14px; font-size: 0.75rem; }
+            .nav-left .logout-item { border-top: none; padding-top: 0; }
+            .right-panel { padding: 18px 14px; }
+            .course-hero { padding: 24px 20px; }
+            .course-hero h1 { font-size: 1.6rem; }
+            .module-item { flex-wrap: wrap; }
+            .module-action { width: 100%; }
+            .btn-module { width: 100%; text-align: center; }
+        }
+        @media (max-width: 576px) {
+            .course-hero h1 { font-size: 1.3rem; }
+            .course-hero .hero-meta { gap: 8px; font-size: 0.8rem; }
+            .module-item { padding: 12px; }
+            .progress-stats { gap: 8px; font-size: 0.7rem; }
         }
 
-        @media (max-width: 480px) {
-            .navbar-custom .navbar-brand {
-                font-size: 1rem;
-            }
-
-            .btn-back, .btn-logout {
-                font-size: 0.7rem;
-                padding: 4px 12px;
-            }
-
-            .course-header .badge-light {
-                font-size: 0.7rem;
-                padding: 4px 10px;
-            }
-
-            .card-custom .card-body-custom {
-                padding: 15px;
-            }
-        }
-
-        /* ===== ANIMATIONS ===== */
-        .fade-in {
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f0f4f9;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #c8d6e5;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #8395a7;
-        }
+        .fade-in { animation: fadeUp 0.4s ease forwards; opacity:0; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- ===== NAVBAR ===== -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('student_dashboard') }}">
-                <i class="fas fa-graduation-cap"></i> Learning Management System
-            </a>
+<div class="dashboard-wrapper">
 
-            <div class="user-info">
-                <a href="{{ url_for('student_dashboard') }}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Dashboard
-                </a>
-                <a href="{{ url_for('logout') }}" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+    <!-- ===== LEFT PANEL ===== -->
+    <aside class="left-panel">
+        <div class="brand"><i class="fas fa-graduation-cap"></i> LMS</div>
+        <div class="user-badge"><i class="fas fa-user-circle"></i> {{ session.email or 'student@email.com' }}</div>
+        <nav class="nav-left">
+            <a href="{{ url_for('student_dashboard') }}" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-item active"><i class="fas fa-book-open"></i> My Courses</a>
+            <a href="#" class="nav-item"><i class="fas fa-credit-card"></i> Payments</a>
+            <a href="#" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <div class="logout-item">
+                <a href="{{ url_for('logout') }}" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </aside>
 
-    <div class="container mt-4">
+    <!-- ===== RIGHT PANEL ===== -->
+    <main class="right-panel">
 
-        <!-- ===== FLASH MESSAGES ===== -->
+        <!-- FLASH MESSAGES -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -575,160 +413,109 @@
         {% endif %}
         {% endwith %}
 
-        <!-- ===== COURSE HEADER ===== -->
-        <div class="course-header fade-in">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                <div>
-                    <h1><i class="fas fa-book-open me-2"></i>{{ course.course_name }}</h1>
-                    <p class="mb-2">{{ course.description or 'No description available.' }}</p>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <span class="badge badge-light">
-                            <i class="fas fa-clock me-1"></i> Duration: {{ course.duration or 'N/A' }}
-                        </span>
-                        
-                        <!-- Free/Paid Fee Display -->
-                        {% if is_free %}
-                            <span class="badge badge-light" style="background: #2ecc71 !important; color: white !important;">
-                                <i class="fas fa-gift me-1"></i> FREE COURSE
-                            </span>
-                        {% else %}
-                            <span class="badge badge-light">
-                                <i class="fas fa-dollar-sign me-1"></i> Fee: Ksh {{ course.fee }}
-                            </span>
-                            <span class="badge badge-light" style="background: #f39c12 !important; color: white !important;">
-                                <i class="fas fa-credit-card me-1"></i> PAID COURSE
-                            </span>
-                        {% endif %}
-                        
-                        <span class="badge badge-light">
-                            <i class="fas fa-code me-1"></i> {{ course.course_code }}
-                        </span>
-                        
-                        {% if course.meeting_link %}
-                        <a href="{{ course.meeting_link }}" target="_blank" class="meeting-link-btn">
-                            <i class="fas fa-video me-1"></i> Join Live Class
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="d-flex gap-2 flex-wrap">
-                    <span class="badge-status active"><i class="fas fa-check-circle"></i> Active</span>
-                </div>
+        <!-- ===== COURSE HERO ===== -->
+        <div class="course-hero fade-in">
+            <div class="hero-badge"><i class="fas fa-graduation-cap"></i> ENROLLED · ACTIVE</div>
+            <h1><i class="fas fa-code"></i> {{ course.course_name }}</h1>
+            <p style="opacity:0.85; font-size:1rem; max-width:80%;">
+                {{ course.description or 'No description available.' }}
+            </p>
+            <div class="hero-meta">
+                <span><i class="fas fa-clock"></i> Duration: {{ course.duration or '4 weeks' }}</span>
+                {% if is_free %}
+                    <span><span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span></span>
+                {% else %}
+                    <span><span class="badge-paid"><i class="fas fa-credit-card"></i> Ksh {{ course.fee }}</span></span>
+                {% endif %}
+                <span><span class="badge-code"><i class="fas fa-code"></i> {{ course.course_code or 'p1001' }}</span></span>
+                <span><i class="fas fa-flag"></i> Status: <span style="color:#2edb7a; font-weight:700;">Active</span></span>
+                {% if course.meeting_link %}
+                    <a href="{{ course.meeting_link }}" target="_blank" class="btn-live">
+                        <i class="fas fa-video"></i> Join Live Class
+                    </a>
+                {% endif %}
             </div>
-
-            <!-- Career Objectives -->
             {% if course.career_objectives %}
-            <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.2);">
-                <small><i class="fas fa-bullseye me-2"></i> {{ course.career_objectives }}</small>
+            <div style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.15); font-size:0.85rem; opacity:0.9;">
+                <i class="fas fa-bullseye me-2"></i> {{ course.career_objectives }}
             </div>
             {% endif %}
         </div>
 
-        <!-- ===== PROGRESS BAR ===== -->
-        <div class="progress-container fade-in">
-            <h6><i class="fas fa-chart-line"></i> Your Progress</h6>
-            {% set completed_count = modules|selectattr('completed')|list|length %}
-            {% set total_count = modules|length %}
-            {% set percentage = (completed_count / total_count * 100)|round|int if total_count > 0 else 0 %}
-            
+        <!-- ===== PROGRESS ===== -->
+        {% set completed_count = modules|selectattr('completed')|list|length %}
+        {% set total_count = modules|length %}
+        {% set percentage = (completed_count / total_count * 100)|round|int if total_count > 0 else 0 %}
+
+        <div class="progress-card fade-in">
+            <h4><i class="fas fa-chart-line"></i> Your Progress</h4>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" 
-                     style="width: {{ percentage }}%;" 
-                     aria-valuenow="{{ percentage }}" 
-                     aria-valuemin="0" 
-                     aria-valuemax="100">
-                </div>
+                <div class="progress-bar" role="progressbar" style="width: {{ percentage }}%;" 
+                     aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
             <div class="progress-stats">
-                <span><i class="fas fa-check-circle text-success"></i> {{ completed_count }} Completed</span>
-                <span><i class="fas fa-play-circle text-primary"></i> {{ modules|rejectattr('completed')|rejectattr('locked')|list|length }} In Progress</span>
-                <span><i class="fas fa-lock text-secondary"></i> {{ modules|selectattr('locked')|list|length }} Locked</span>
-                <span><i class="fas fa-list"></i> {{ total_count }} Total Modules</span>
+                <span><i class="fas fa-check-circle" style="color:#2edb7a;"></i> <span class="stat-num">{{ completed_count }}</span> Completed</span>
+                <span><i class="fas fa-play-circle" style="color:#4f6ef7;"></i> <span class="stat-num">{{ modules|rejectattr('completed')|rejectattr('locked')|list|length }}</span> In Progress</span>
+                <span><i class="fas fa-lock" style="color:#cbd5e1;"></i> <span class="stat-num">{{ modules|selectattr('locked')|list|length }}</span> Locked</span>
+                <span><i class="fas fa-layer-group"></i> <span class="stat-num">{{ total_count }}</span> Total Modules</span>
                 <span><strong>{{ percentage }}% Complete</strong></span>
             </div>
         </div>
 
-        <!-- ===== MODULES LIST ===== -->
-        <div class="card-custom fade-in">
-            <div class="card-header-custom">
+        <!-- ===== MODULES ===== -->
+        <div class="modules-card fade-in">
+            <div class="card-header">
                 <h5><i class="fas fa-list"></i> Course Modules</h5>
-                <span class="badge bg-primary rounded-pill">{{ modules|length }}</span>
+                <span class="badge bg-primary rounded-pill">{{ total_count }}</span>
             </div>
-            <div class="card-body-custom">
+            <div class="card-body">
                 {% if modules %}
                     {% for module in modules %}
-                    <div class="module-card 
+                    <div class="module-item 
                         {% if module.completed %}completed{% endif %}
                         {% if module.locked %}locked{% endif %}">
-                        <div class="row align-items-center g-3 p-3">
-                            <!-- Module Number -->
-                            <div class="col-auto">
-                                <div class="module-number">
-                                    {{ module.module_number }}
-                                </div>
-                            </div>
-                            
-                            <!-- Module Info -->
-                            <div class="col">
-                                <h5>
-                                    {{ module.title }}
-                                    {% if module.completed %}
-                                    <span class="badge bg-success ms-2">
-                                        <i class="fas fa-check-circle"></i> Completed
-                                    </span>
-                                    {% endif %}
-                                    {% if module.locked %}
-                                    <span class="badge bg-secondary ms-2">
-                                        <i class="fas fa-lock"></i> Locked
-                                    </span>
-                                    {% endif %}
-                                </h5>
-                                <p class="text-muted">{{ module.description or 'No description available.' }}</p>
-                                
-                                <!-- Resource Icons -->
-                                <div class="resource-icons">
-                                    {% if module.pdf_file %}
-                                    <span class="badge bg-danger">
-                                        <i class="fas fa-file-pdf"></i> PDF Notes
-                                    </span>
-                                    {% endif %}
-                                    {% if module.video_file %}
-                                    <span class="badge bg-primary">
-                                        <i class="fas fa-video"></i> Video
-                                    </span>
-                                    {% endif %}
-                                    {% if module.meeting_link %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-video"></i> Live Class
-                                    </span>
-                                    {% endif %}
-                                    {% if not module.pdf_file and not module.video_file and not module.meeting_link %}
-                                    <span class="badge bg-secondary">
-                                        <i class="fas fa-file-alt"></i> No resources yet
-                                    </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <!-- Action Button -->
-                            <div class="col-auto">
+                        <div class="module-number">{{ module.module_number or loop.index }}</div>
+                        <div class="module-info">
+                            <h6>
+                                {{ module.title }}
                                 {% if module.completed %}
-                                    <button class="btn-learn completed" disabled>
-                                        <i class="fas fa-check-circle"></i> Completed
-                                    </button>
-                                {% elif module.locked %}
-                                    <button class="btn-learn locked" disabled>
-                                        <i class="fas fa-lock"></i> Locked
-                                    </button>
-                                {% else %}
-                                    <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn-learn primary">
-                                        <i class="fas fa-play"></i> Start Learning
-                                    </a>
+                                    <span class="badge bg-success ms-1" style="font-size:0.6rem;"><i class="fas fa-check-circle"></i> Done</span>
+                                {% endif %}
+                                {% if module.locked %}
+                                    <span class="badge bg-secondary ms-1" style="font-size:0.6rem;"><i class="fas fa-lock"></i> Locked</span>
+                                {% endif %}
+                            </h6>
+                            <div class="module-desc">{{ module.description or 'No description available.' }}</div>
+                            <div class="resource-badges">
+                                {% if module.pdf_file %}<span class="badge badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>{% endif %}
+                                {% if module.video_file %}<span class="badge badge-video"><i class="fas fa-video"></i> Video</span>{% endif %}
+                                {% if module.meeting_link %}<span class="badge badge-live"><i class="fas fa-video"></i> Live</span>{% endif %}
+                                {% if not module.pdf_file and not module.video_file and not module.meeting_link %}
+                                    <span class="badge bg-secondary" style="font-size:0.6rem;"><i class="fas fa-file-alt"></i> No resources</span>
                                 {% endif %}
                             </div>
                         </div>
+                        <div class="module-action">
+                            {% if module.completed %}
+                                <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn-module retake">
+                                    <i class="fas fa-undo-alt"></i> Retake
+                                </a>
+                            {% elif module.locked %}
+                                <button class="btn-module locked" disabled><i class="fas fa-lock"></i> Locked</button>
+                            {% else %}
+                                <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn-module primary">
+                                    <i class="fas fa-play"></i> Start
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endfor %}
+
+                    <!-- Retake notice -->
+                    <div class="retake-notice">
+                        <i class="fas fa-infinity"></i> You can retake any module as many times as you want — unlimited retakes!
+                    </div>
+
                 {% else %}
                     <div class="empty-state">
                         <i class="fas fa-folder-open"></i>
@@ -739,13 +526,13 @@
             </div>
         </div>
 
-        <!-- ===== FOOTER ===== -->
-        <div style="text-align: center; padding: 30px 0 20px 0; color: #b2bec3; font-size: 0.85rem; border-top: 1px solid #e9ecef; margin-top: 30px;">
-            <i class="fas fa-heart" style="color: #e74c3c;"></i> Learning Management System &copy; 2026 - All rights reserved
+        <div class="footer">
+            <i class="fas fa-heart"></i> Learning Management System &copy; 2026 — All rights reserved
         </div>
 
-    </div>
+    </main>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
