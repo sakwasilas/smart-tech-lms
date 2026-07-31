@@ -107,20 +107,33 @@
         .course-hero h1 {
             font-weight: 800;
             font-size: 2.2rem;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
         .course-hero h1 i { margin-right: 12px; opacity: 0.8; }
-        .course-hero .hero-meta {
+
+        /* ===== META STRIP - directly below title ===== */
+        .meta-strip {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px 28px;
-            margin-top: 14px;
-            font-size: 0.9rem;
-            opacity: 0.95;
+            align-items: center;
+            gap: 12px 20px;
+            margin: 8px 0 14px 0;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.10);
+            border-radius: 16px;
+            backdrop-filter: blur(4px);
         }
-        .course-hero .hero-meta span i { margin-right: 8px; }
-        .course-hero .hero-meta .badge-free {
+        .meta-strip .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.95);
+        }
+        .meta-strip .meta-item i { font-size: 0.9rem; opacity: 0.8; }
+        .meta-strip .badge-free {
             background: #2edb7a;
             color: #0f2a1e;
             padding: 2px 16px;
@@ -128,14 +141,7 @@
             font-weight: 700;
             font-size: 0.75rem;
         }
-        .course-hero .hero-meta .badge-code {
-            background: rgba(255,255,255,0.15);
-            padding: 2px 16px;
-            border-radius: 40px;
-            font-family: monospace;
-            font-weight: 600;
-        }
-        .course-hero .hero-meta .badge-paid {
+        .meta-strip .badge-paid {
             background: #f5b342;
             color: #281e0a;
             padding: 2px 16px;
@@ -143,6 +149,32 @@
             font-weight: 700;
             font-size: 0.75rem;
         }
+        .meta-strip .badge-code {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 16px;
+            border-radius: 40px;
+            font-family: monospace;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .meta-strip .badge-status {
+            padding: 2px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            background: rgba(46, 219, 122, 0.25);
+            color: #2edb7a;
+            border: 1px solid rgba(46, 219, 122, 0.3);
+        }
+        .meta-strip .badge-status i { margin-right: 4px; }
+
+        .course-hero .hero-description {
+            opacity: 0.9;
+            font-size: 1rem;
+            margin: 6px 0 0 0;
+            max-width: 80%;
+        }
+
         .btn-live {
             background: #25D366;
             color: #fff;
@@ -156,6 +188,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            margin-left: auto;
         }
         .btn-live:hover { background: #128C7E; color: #fff; transform: translateY(-2px); }
 
@@ -364,13 +397,16 @@
             .right-panel { padding: 18px 14px; }
             .course-hero { padding: 24px 20px; }
             .course-hero h1 { font-size: 1.6rem; }
+            .course-hero .hero-description { max-width: 100%; }
+            .meta-strip { flex-wrap: wrap; gap: 8px 14px; }
+            .btn-live { margin-left: 0; }
             .module-item { flex-wrap: wrap; }
             .module-action { width: 100%; }
             .btn-module { width: 100%; text-align: center; }
         }
         @media (max-width: 576px) {
             .course-hero h1 { font-size: 1.3rem; }
-            .course-hero .hero-meta { gap: 8px; font-size: 0.8rem; }
+            .meta-strip .meta-item { font-size: 0.75rem; }
             .module-item { padding: 12px; }
             .progress-stats { gap: 8px; font-size: 0.7rem; }
         }
@@ -416,27 +452,37 @@
         <!-- ===== COURSE HERO ===== -->
         <div class="course-hero fade-in">
             <div class="hero-badge"><i class="fas fa-graduation-cap"></i> ENROLLED · ACTIVE</div>
+
+            <!-- TITLE -->
             <h1><i class="fas fa-code"></i> {{ course.course_name }}</h1>
-            <p style="opacity:0.85; font-size:1rem; max-width:80%;">
-                {{ course.description or 'No description available.' }}
-            </p>
-            <div class="hero-meta">
-                <span><i class="fas fa-clock"></i> Duration: {{ course.duration or '4 weeks' }}</span>
+
+            <!-- ===== META STRIP - directly below title ===== -->
+            <div class="meta-strip">
+                <span class="meta-item"><i class="fas fa-clock"></i> Duration: {{ course.duration or '4 weeks' }}</span>
+
                 {% if is_free %}
-                    <span><span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span></span>
+                    <span class="meta-item"><span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span></span>
                 {% else %}
-                    <span><span class="badge-paid"><i class="fas fa-credit-card"></i> Ksh {{ course.fee }}</span></span>
+                    <span class="meta-item"><span class="badge-paid"><i class="fas fa-credit-card"></i> Ksh {{ course.fee }}</span></span>
                 {% endif %}
-                <span><span class="badge-code"><i class="fas fa-code"></i> {{ course.course_code or 'p1001' }}</span></span>
-                <span><i class="fas fa-flag"></i> Status: <span style="color:#2edb7a; font-weight:700;">Active</span></span>
+
+                <span class="meta-item"><span class="badge-code"><i class="fas fa-code"></i> {{ course.course_code or 'p1001' }}</span></span>
+
+                <span class="meta-item"><span class="badge-status"><i class="fas fa-check-circle"></i> Active</span></span>
+
                 {% if course.meeting_link %}
                     <a href="{{ course.meeting_link }}" target="_blank" class="btn-live">
                         <i class="fas fa-video"></i> Join Live Class
                     </a>
                 {% endif %}
             </div>
+
+            <!-- Description -->
+            <p class="hero-description">{{ course.description or 'No description available.' }}</p>
+
+            <!-- Career Objectives -->
             {% if course.career_objectives %}
-            <div style="margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.15); font-size:0.85rem; opacity:0.9;">
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.12); font-size:0.85rem; opacity:0.9;">
                 <i class="fas fa-bullseye me-2"></i> {{ course.career_objectives }}
             </div>
             {% endif %}
