@@ -168,11 +168,50 @@
         }
         .meta-strip .badge-status i { margin-right: 4px; }
 
-        .course-hero .hero-description {
-            opacity: 0.9;
+        /* ===== DESCRIPTION & OBJECTIVES - BULLET STYLE ===== */
+        .course-description-section {
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-top: 10px;
+            backdrop-filter: blur(4px);
+        }
+        .course-description-section .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .course-description-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .course-description-section ul li {
+            padding: 4px 0 4px 28px;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        .course-description-section ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 4px;
+            color: #2edb7a;
+            font-weight: 700;
             font-size: 1rem;
-            margin: 6px 0 0 0;
-            max-width: 80%;
+        }
+        .course-description-section ul li i {
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        .course-description-section .bullet-icon {
+            color: #2edb7a;
+            margin-right: 10px;
         }
 
         .btn-live {
@@ -397,7 +436,6 @@
             .right-panel { padding: 18px 14px; }
             .course-hero { padding: 24px 20px; }
             .course-hero h1 { font-size: 1.6rem; }
-            .course-hero .hero-description { max-width: 100%; }
             .meta-strip { flex-wrap: wrap; gap: 8px 14px; }
             .btn-live { margin-left: 0; }
             .module-item { flex-wrap: wrap; }
@@ -409,6 +447,7 @@
             .meta-strip .meta-item { font-size: 0.75rem; }
             .module-item { padding: 12px; }
             .progress-stats { gap: 8px; font-size: 0.7rem; }
+            .course-description-section ul li { font-size: 0.85rem; padding-left: 22px; }
         }
 
         .fade-in { animation: fadeUp 0.4s ease forwards; opacity:0; }
@@ -477,15 +516,38 @@
                 {% endif %}
             </div>
 
-            <!-- Description -->
-            <p class="hero-description">{{ course.description or 'No description available.' }}</p>
+            <!-- ===== DESCRIPTION & OBJECTIVES - BULLET FORMAT ===== -->
+            <div class="course-description-section">
+                <span class="section-label"><i class="fas fa-info-circle"></i> About this course</span>
+                <ul>
+                    {% if course.description %}
+                        <!-- Split description by newlines or periods to create bullet points -->
+                        {% set lines = course.description.split('.') %}
+                        {% for line in lines %}
+                            {% if line.strip()|length > 0 %}
+                                <li>{{ line.strip() }}{% if not loop.last %}.{% endif %}</li>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <li>No description available for this course.</li>
+                    {% endif %}
+                </ul>
 
-            <!-- Career Objectives -->
-            {% if course.career_objectives %}
-            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.12); font-size:0.85rem; opacity:0.9;">
-                <i class="fas fa-bullseye me-2"></i> {{ course.career_objectives }}
+                {% if course.career_objectives %}
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.10);">
+                    <span class="section-label"><i class="fas fa-bullseye"></i> What you'll learn</span>
+                    <ul>
+                        {% set objectives = course.career_objectives.split('.') %}
+                        {% for obj in objectives %}
+                            {% if obj.strip()|length > 0 %}
+                                <li><i class="fas fa-check-circle bullet-icon"></i> {{ obj.strip() }}{% if not loop.last %}.{% endif %}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
+
         </div>
 
         <!-- ===== PROGRESS ===== -->
