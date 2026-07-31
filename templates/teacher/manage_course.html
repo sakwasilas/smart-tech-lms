@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Course - {{ course.course_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4f9;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .course-header {
+            background: white;
+            border-radius: 16px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin: 25px 0 30px 0;
+            border-left: 6px solid #636e72;
+        }
+
+        .course-header h2 {
+            font-weight: 800;
+            color: #2d3436;
+        }
+
+        .course-header .course-meta {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 15px 0 0 0;
+            padding: 15px 0 0 0;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .badge-free {
+            background: #2ecc71;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-paid {
+            background: #f39c12;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .section-card .section-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-card .section-header h5 {
+            font-weight: 700;
+            color: #2d3436;
+            margin: 0;
+        }
+
+        .section-card .section-header h5 i {
+            color: #636e72;
+            margin-right: 10px;
+        }
+
+        .section-card .section-body {
+            padding: 20px;
+        }
+
+        .btn-action {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-action.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-action.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-action.success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-action.success:hover {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-action.warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-action.warning:hover {
+            background: #d68910;
+            color: white;
+        }
+
+        .btn-action.danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-action.danger:hover {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-action.secondary {
+            background: #b2bec3;
+            color: white;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .table-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .table-item:hover {
+            background: #e9ecef;
+        }
+
+        .table-item .item-info h6 {
+            font-weight: 600;
+            color: #2d3436;
+            margin: 0;
+        }
+
+        .table-item .item-info small {
+            color: #636e72;
+        }
+
+        .table-item .item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            color: #b2bec3;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #636e72;
+            margin: 0;
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            padding: 14px 20px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-custom.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-custom.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-custom.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-custom.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            .course-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+            }
+
+            .quick-actions .btn {
+                width: 100%;
+            }
+
+            .table-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .table-item .item-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .course-header .course-meta {
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-custom .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .btn-back, .btn-logout {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c8d6e5;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8395a7;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('teacher_dashboard') }}">
+                <i class="fas fa-chalkboard-teacher"></i> Teacher Portal
+            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('teacher_dashboard') }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert-custom {{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Course Header -->
+        <div class="course-header fade-in">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <h2><i class="fas fa-book" style="color: #636e72;"></i> {{ course.course_name }}</h2>
+                    <div class="course-meta">
+                        <span><i class="fas fa-code"></i> {{ course.course_code }}</span>
+                        <span><i class="fas fa-clock"></i> {{ course.duration or 'N/A' }}</span>
+                        {% if is_free %}
+                            <span><span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span></span>
+                            <span style="color: #2ecc71; font-weight: 700;"><i class="fas fa-gift"></i> FREE</span>
+                        {% else %}
+                            <span><span class="badge-paid"><i class="fas fa-credit-card"></i> PAID COURSE</span></span>
+                            <span><i class="fas fa-dollar-sign"></i> Ksh {{ course.fee }}</span>
+                        {% endif %}
+                        <span><i class="fas fa-users"></i> {{ enrolled_students|length }} Students</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> Active</span>
+                </div>
+            </div>
+            {% if course.description %}
+            <p class="mt-2 text-muted">{{ course.description }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="section-body">
+                <div class="quick-actions">
+                    <a href="{{ url_for('teacher_add_module', course_id=course.id) }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Module
+                    </a>
+                    <a href="{{ url_for('teacher_add_assignment', course_id=course.id) }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Assignment
+                    </a>
+                    <a href="{{ url_for('teacher_create_quiz', course_id=course.id) }}" class="btn btn-info">
+                        <i class="fas fa-plus"></i> Create Quiz
+                    </a>
+                    <a href="{{ url_for('teacher_student_progress', course_id=course.id) }}" class="btn btn-warning">
+                        <i class="fas fa-chart-line"></i> View Progress
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modules -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h5><i class="fas fa-list"></i> Modules</h5>
+                <span class="badge bg-secondary">{{ modules|length }}</span>
+            </div>
+            <div class="section-body">
+                {% if modules %}
+                    {% for module in modules %}
+                    <div class="table-item">
+                        <div class="item-info">
+                            <h6>Module {{ module.module_number }}: {{ module.title }}</h6>
+                            <small>
+                                <i class="fas fa-{% if module.status == 'Active' %}check-circle text-success{% else %}times-circle text-danger{% endif %}"></i>
+                                {{ module.status }}
+                            </small>
+                        </div>
+                        <div class="item-actions">
+                            <a href="{{ url_for('teacher_edit_module', module_id=module.id) }}" class="btn-action warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('teacher_delete_module', module_id=module.id) }}" class="btn-action danger" onclick="return confirm('Delete this module?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No modules added yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Assignments -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h5><i class="fas fa-tasks"></i> Assignments</h5>
+                <span class="badge bg-secondary">{{ assignments|length }}</span>
+            </div>
+            <div class="section-body">
+                {% if assignments %}
+                    {% for assignment in assignments %}
+                    <div class="table-item">
+                        <div class="item-info">
+                            <h6>{{ assignment.title }}</h6>
+                            <small>
+                                <i class="fas fa-upload"></i> {{ assignment.submission_count }} Submissions |
+                                <i class="fas fa-check"></i> {{ assignment.graded_count }} Graded |
+                                <i class="fas fa-{% if assignment.status == 'Active' %}check-circle text-success{% else %}times-circle text-danger{% endif %}"></i>
+                                {{ assignment.status }}
+                            </small>
+                        </div>
+                        <div class="item-actions">
+                            <a href="{{ url_for('teacher_assignment_submissions', assignment_id=assignment.id) }}" class="btn-action primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>No assignments added yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quizzes -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h5><i class="fas fa-question-circle"></i> Quizzes</h5>
+                <span class="badge bg-secondary">{{ quizzes|length }}</span>
+            </div>
+            <div class="section-body">
+                {% if quizzes %}
+                    {% for quiz in quizzes %}
+                    <div class="table-item">
+                        <div class="item-info">
+                            <h6>{{ quiz.title }}</h6>
+                            <small>
+                                <i class="fas fa-users"></i> {{ quiz.attempt_count }} Attempts |
+                                <i class="fas fa-{% if quiz.status == 'Active' %}check-circle text-success{% else %}times-circle text-danger{% endif %}"></i>
+                                {{ quiz.status }}
+                            </small>
+                        </div>
+                        <div class="item-actions">
+                            <a href="{{ url_for('teacher_quiz_attempts', quiz_id=quiz.id) }}" class="btn-action primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-question-circle"></i>
+                        <p>No quizzes added yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Students Enrolled -->
+        <div class="section-card fade-in">
+            <div class="section-header">
+                <h5><i class="fas fa-users"></i> Students Enrolled</h5>
+                <span class="badge bg-secondary">{{ enrolled_students|length }}</span>
+            </div>
+            <div class="section-body">
+                {% if enrolled_students %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Enrolled Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrolled_students %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ enrollment.student.fullname }}</td>
+                                    <td>{{ enrollment.student.email }}</td>
+                                    <td>{{ enrollment.date_enrolled }}</td>
+                                    <td>
+                                        {% if enrollment.payment_status == 'Paid' %}
+                                            <span class="badge bg-success">Paid</span>
+                                        {% elif course.is_free %}
+                                            <span class="badge bg-info">Free Access</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No students enrolled yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 30px 0 20px 0; color: #b2bec3; font-size: 0.85rem; border-top: 1px solid #e9ecef; margin-top: 30px;">
+            <i class="fas fa-heart" style="color: #e74c3c;"></i> Teacher Portal &copy; 2026 - All rights reserved
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

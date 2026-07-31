@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz - {{ quiz.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4f9;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .btn-nav {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            color: white;
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        .btn-logout:hover {
+            background: rgba(231, 76, 60, 1);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 25px auto;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .quiz-card .quiz-header {
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 25px;
+        }
+
+        .quiz-card .quiz-header h3 {
+            font-weight: 800;
+            color: #2d3436;
+            margin: 0;
+        }
+
+        .quiz-card .quiz-header .meta {
+            color: #636e72;
+            font-size: 0.9rem;
+            margin: 5px 0 0 0;
+        }
+
+        .quiz-card .quiz-header .meta i {
+            margin-right: 6px;
+            color: #667eea;
+        }
+
+        .quiz-card .quiz-header .course-type {
+            margin-top: 10px;
+        }
+
+        .badge-free {
+            background: #2ecc71;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-paid {
+            background: #f39c12;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Question Styles */
+        .question-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .question-item:hover {
+            background: #f1f3f5;
+        }
+
+        .question-item .question-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-item .question-text {
+            font-weight: 600;
+            color: #2d3436;
+            margin: 10px 0 15px 0;
+            font-size: 1.05rem;
+        }
+
+        .question-item .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .question-item .options .form-check {
+            padding: 12px 18px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .question-item .options .form-check:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .question-item .options .form-check-input:checked + .form-check-label {
+            font-weight: 600;
+        }
+
+        .question-item .options .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .question-item .options .form-check-label {
+            cursor: pointer;
+            color: #2d3436;
+        }
+
+        /* Points Badge */
+        .points-badge {
+            background: #e9ecef;
+            color: #636e72;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Timer */
+        .timer-container {
+            background: white;
+            border-radius: 16px;
+            padding: 15px 25px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .timer-container .timer {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .timer-container .timer.warning {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .progress-indicator {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .progress-indicator strong {
+            color: #2d3436;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-submit:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Alert Styles */
+        .alert-custom {
+            border-radius: 12px;
+            padding: 14px 20px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-custom.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-custom.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-custom.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-custom.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quiz-card {
+                padding: 20px;
+                margin: 15px;
+            }
+
+            .quiz-card .quiz-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .question-item .question-text {
+                font-size: 0.95rem;
+            }
+
+            .timer-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .timer-container .timer {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-custom .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .btn-nav, .btn-logout {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+
+            .quiz-card .quiz-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .question-item {
+                padding: 15px;
+            }
+
+            .question-item .options .form-check {
+                padding: 10px 14px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c8d6e5;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8395a7;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('student_dashboard') }}">
+                <i class="fas fa-graduation-cap"></i> Learning Management System
+            </a>
+            <div>
+                <a href="{{ url_for('access_course', course_id=quiz.course_id) }}" class="btn-nav">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert-custom {{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="quiz-container">
+
+            <!-- Timer -->
+            <div class="timer-container fade-in">
+                <div>
+                    <i class="fas fa-clock" style="color: #667eea;"></i>
+                    <span class="timer" id="timer">00:00</span>
+                </div>
+                <div class="progress-indicator">
+                    <i class="fas fa-list-check"></i>
+                    Question <strong id="current-q">0</strong> of <strong>{{ questions|length }}</strong>
+                </div>
+                <div>
+                    <span class="badge bg-primary">
+                        <i class="fas fa-star"></i> {{ quiz.passing_score }}% to Pass
+                    </span>
+                </div>
+            </div>
+
+            <!-- Quiz Card -->
+            <div class="quiz-card fade-in">
+                <div class="quiz-header">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <h3><i class="fas fa-question-circle" style="color: #667eea;"></i> {{ quiz.title }}</h3>
+                            <div class="meta">
+                                <i class="fas fa-book"></i> {{ quiz.course.course_name }}
+                                <i class="fas fa-clock ms-3"></i> Time Limit: {{ quiz.time_limit }} minutes
+                            </div>
+                            <div class="course-type">
+                                {% if quiz.course.is_free %}
+                                    <span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span>
+                                {% else %}
+                                    <span class="badge-paid"><i class="fas fa-credit-card"></i> PAID COURSE</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="points-badge"><i class="fas fa-star"></i> {{ questions|length }} Questions</span>
+                        </div>
+                    </div>
+                    {% if quiz.description %}
+                    <p class="mt-2 text-muted">{{ quiz.description }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Quiz Form -->
+                <form method="POST" id="quizForm">
+                    {% for question in questions %}
+                    <div class="question-item" data-q="{{ loop.index }}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="question-number">Question {{ loop.index }} of {{ questions|length }}</span>
+                            <span class="points-badge">{{ question.points }} point{% if question.points > 1 %}s{% endif %}</span>
+                        </div>
+                        <div class="question-text">{{ question.question }}</div>
+                        <div class="options">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}_a" value="A" required>
+                                <label class="form-check-label" for="q{{ question.id }}_a">
+                                    <strong>A.</strong> {{ question.option_a }}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}_b" value="B" required>
+                                <label class="form-check-label" for="q{{ question.id }}_b">
+                                    <strong>B.</strong> {{ question.option_b }}
+                                </label>
+                            </div>
+                            {% if question.option_c %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}_c" value="C" required>
+                                <label class="form-check-label" for="q{{ question.id }}_c">
+                                    <strong>C.</strong> {{ question.option_c }}
+                                </label>
+                            </div>
+                            {% endif %}
+                            {% if question.option_d %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="q{{ question.id }}_d" value="D" required>
+                                <label class="form-check-label" for="q{{ question.id }}_d">
+                                    <strong>D.</strong> {{ question.option_d }}
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn-submit" id="submitQuiz">
+                            <i class="fas fa-paper-plane"></i> Submit Quiz
+                        </button>
+                        <p class="text-muted text-center small mt-2">
+                            <i class="fas fa-info-circle"></i> Once submitted, you cannot change your answers.
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Warning -->
+            <div class="alert-custom info">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Please answer all questions before submitting. Unanswered questions will be marked as incorrect.
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 30px 0 20px 0; color: #b2bec3; font-size: 0.85rem; border-top: 1px solid #e9ecef; margin-top: 30px;">
+            <i class="fas fa-heart" style="color: #e74c3c;"></i> Learning Management System &copy; 2026 - All rights reserved
+        </div>
+
+    </div>
+
+    <script>
+        // Timer Functionality
+        let timeLimit = {{ quiz.time_limit }};
+        let timeLeft = timeLimit * 60;
+        const timerElement = document.getElementById('timer');
+        const submitBtn = document.getElementById('submitQuiz');
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            if (timeLeft < 60) {
+                timerElement.classList.add('warning');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = '00:00';
+                alert('Time is up! Your quiz will be submitted automatically.');
+                document.getElementById('quizForm').submit();
+            }
+
+            timeLeft--;
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Track answered questions
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const currentQDisplay = document.getElementById('current-q');
+        let answeredCount = 0;
+
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const questionGroup = this.name;
+                const questionItems = document.querySelectorAll(`input[name="${questionGroup}"]`);
+                const answered = Array.from(questionItems).some(input => input.checked);
+
+                if (answered) {
+                    answeredCount++;
+                } else {
+                    answeredCount--;
+                }
+
+                currentQDisplay.textContent = answeredCount;
+            });
+        });
+
+        // Confirm before submitting
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            const totalQuestions = {{ questions|length }};
+            if (answeredCount < totalQuestions) {
+                const confirmSubmit = confirm(
+                    `You have answered ${answeredCount} out of ${totalQuestions} questions. 
+                    Unanswered questions will be marked incorrect. 
+                    Are you sure you want to submit?`
+                );
+                if (!confirmSubmit) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Prevent page refresh
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'You have an ongoing quiz. Are you sure you want to leave?';
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
