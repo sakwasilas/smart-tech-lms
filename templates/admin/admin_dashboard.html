@@ -1,800 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LMS · Admin dashboard</title>
-  <!-- Bootstrap 5 + Icons + Fonts -->
+  <title>LMS · split dashboard</title>
+  <!-- Bootstrap + Icons + Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ----- global reset & fonts ----- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f4f7fc;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f2f6fc;
       min-height: 100vh;
     }
 
-    /* ----- navbar (glassmorphic) ----- */
-    .navbar-custom {
-      background: linear-gradient(145deg, #5b6fd8 0%, #7c4d9e 100%) !important;
-      padding: 12px 0;
-      box-shadow: 0 8px 30px rgba(91, 111, 216, 0.35);
+    /* ----- split layout (left small, right big) ----- */
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    /* LEFT PANEL – small, sticky, glassmorphic */
+    .left-panel {
+      width: 280px;
+      min-height: 100vh;
+      background: linear-gradient(170deg, #ffffff 0%, #f8fbff 100%);
+      backdrop-filter: blur(6px);
+      border-right: 1px solid rgba(200, 215, 235, 0.4);
+      padding: 28px 16px 28px 18px;
       position: sticky;
       top: 0;
-      z-index: 1050;
-      backdrop-filter: blur(4px);
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 4px 0 30px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
     }
 
-    .navbar-custom .navbar-brand {
+    .left-panel .brand {
       font-weight: 800;
-      font-size: 1.2rem;
-      letter-spacing: -0.2px;
-      color: #fff !important;
-    }
-
-    .navbar-custom .navbar-brand i {
-      margin-right: 10px;
       font-size: 1.3rem;
+      color: #1a2639;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .left-panel .brand i {
+      color: #5b6fd8;
+      font-size: 1.5rem;
+    }
+    .left-panel .user-badge {
+      background: #eef3fc;
+      border-radius: 60px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #2d4059;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(91, 111, 216, 0.1);
+    }
+    .left-panel .user-badge i {
+      color: #5b6fd8;
     }
 
-    .navbar-custom .user-info {
+    /* left nav */
+    .nav-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .nav-left .nav-item {
       display: flex;
       align-items: center;
       gap: 14px;
-    }
-
-    .navbar-custom .user-info .user-email {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .navbar-custom .user-info .user-email i {
-      margin-right: 6px;
-    }
-
-    .btn-logout {
-      background: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #fff;
-      padding: 5px 18px;
-      border-radius: 40px;
-      font-size: 0.75rem;
+      padding: 12px 16px;
+      border-radius: 18px;
       font-weight: 600;
-      transition: all 0.25s ease;
+      font-size: 0.9rem;
+      color: #3a4b62;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      background: transparent;
+      border: none;
     }
-
-    .btn-logout:hover {
-      background: rgba(255, 255, 255, 0.3);
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    .nav-left .nav-item i {
+      width: 22px;
+      font-size: 1.1rem;
+      color: #7b8ba3;
+      transition: 0.2s;
     }
-
-    /* ----- page header ----- */
-    .page-header {
-      margin: 28px 0 20px 0;
-    }
-
-    .page-header h2 {
-      font-weight: 800;
+    .nav-left .nav-item:hover {
+      background: #e6edf9;
       color: #1a2639;
-      font-size: 1.8rem;
-      letter-spacing: -0.3px;
     }
-
-    .page-header h2 i {
+    .nav-left .nav-item:hover i {
       color: #5b6fd8;
-      margin-right: 10px;
+    }
+    .nav-left .nav-item.active {
+      background: #5b6fd8;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(91, 111, 216, 0.25);
+    }
+    .nav-left .nav-item.active i {
+      color: #fff;
+    }
+    .nav-left .logout-item {
+      margin-top: auto;
+      border-top: 1px solid #e4ecf5;
+      padding-top: 20px;
+    }
+    .nav-left .logout-item .nav-item {
+      color: #b13a4f;
+    }
+    .nav-left .logout-item .nav-item i {
+      color: #b13a4f;
+    }
+    .nav-left .logout-item .nav-item:hover {
+      background: #fee9ec;
+      color: #a12d40;
     }
 
-    .page-header p {
-      color: #5d6a7a;
-      font-size: 0.95rem;
-      margin-top: 2px;
+    /* RIGHT PANEL – big, fluid */
+    .right-panel {
+      flex: 1;
+      padding: 28px 30px 30px 30px;
+      background: #f2f6fc;
+      min-width: 0;
     }
 
-    /* ----- stat cards (soft gradients + shadow) ----- */
+    /* --- cards & components (refined) --- */
     .stat-card {
       border: none;
       border-radius: 24px;
-      padding: 20px 18px;
-      transition: all 0.25s ease;
-      position: relative;
-      overflow: hidden;
-      height: 100%;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
-    }
-
-    .stat-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
-    }
-
-    .stat-card .stat-icon {
-      position: absolute;
-      right: 14px;
-      top: 14px;
-      font-size: 2.8rem;
-      opacity: 0.12;
-    }
-
-    .stat-card .stat-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 4px;
-      opacity: 0.75;
-    }
-
-    .stat-card .stat-value {
-      font-size: 2.1rem;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .stat-card .stat-sub {
-      font-size: 0.65rem;
-      opacity: 0.7;
-      margin-top: 2px;
-    }
-
-    .stat-card .stat-change {
-      font-size: 0.7rem;
-      font-weight: 600;
-      margin-top: 6px;
-      display: inline-block;
-      padding: 2px 14px;
-      border-radius: 30px;
-      background: rgba(255, 255, 255, 0.18);
-      color: #fff;
-    }
-
-    .stat-card .stat-change.down {
-      background: rgba(255, 80, 80, 0.2);
-      color: #ffb3b3;
-    }
-
-    /* card color variants */
-    .stat-card.purple {
-      background: linear-gradient(145deg, #6c7eea, #8b5fc7);
-      color: #fff;
-    }
-
-    .stat-card.blue {
-      background: linear-gradient(145deg, #4b9dfa, #47d0fd);
-      color: #fff;
-    }
-
-    .stat-card.green {
-      background: linear-gradient(145deg, #3edb7a, #2ee6c0);
-      color: #13242e;
-    }
-
-    .stat-card.orange {
-      background: linear-gradient(145deg, #f0936b, #f5576c);
-      color: #fff;
-    }
-
-    .stat-card.cyan {
-      background: linear-gradient(145deg, #4b9dfa, #47d0fd);
-      color: #fff;
-    }
-
-    .stat-card.pink {
-      background: linear-gradient(145deg, #ea7ac4, #d45b8f);
-      color: #fff;
-    }
-
-    .stat-card.gold {
-      background: linear-gradient(145deg, #f5a623, #f8d43a);
-      color: #1e2a3a;
-    }
-
-    .stat-card.teal {
-      background: linear-gradient(145deg, #11a085, #2ddf9a);
-      color: #0f2626;
-    }
-
-    /* ----- modern card wrapper ----- */
-    .card-modern {
-      border: none;
-      border-radius: 24px;
-      background: #ffffff;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
-      transition: all 0.25s ease;
-      overflow: hidden;
-    }
-
-    .card-modern:hover {
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.07);
-    }
-
-    .card-modern .card-header-custom {
-      padding: 16px 24px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      border-bottom: 2px solid #f0f4fc;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #fafcff;
-    }
-
-    .card-modern .card-header-custom i {
-      font-size: 1.2rem;
-      color: #5b6fd8;
-    }
-
-    .card-modern .card-body-custom {
-      padding: 24px;
-    }
-
-    /* ----- quick action buttons (soft outline) ----- */
-    .btn-action {
-      padding: 12px 10px;
-      border-radius: 18px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border: 1.5px solid #e6edf5;
-      background: #fff;
-      color: #1f2a3f;
+      padding: 18px 16px;
       transition: all 0.2s ease;
-      width: 100%;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-action:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
-      text-decoration: none;
-      border-color: #b0c6e0;
-    }
-
-    .btn-action.btn-primary-action {
-      border-color: #6c7eea;
-      color: #5b6fd8;
-    }
-
-    .btn-action.btn-primary-action:hover {
-      background: #6c7eea;
-      color: #fff;
-    }
-
-    .btn-action.btn-success-action {
-      border-color: #3edb7a;
-      color: #1e9b5a;
-    }
-
-    .btn-action.btn-success-action:hover {
-      background: #3edb7a;
-      color: #fff;
-    }
-
-    .btn-action.btn-warning-action {
-      border-color: #f5a623;
-      color: #b87a14;
-    }
-
-    .btn-action.btn-warning-action:hover {
-      background: #f5a623;
-      color: #fff;
-    }
-
-    .btn-action.btn-info-action {
-      border-color: #4b9dfa;
-      color: #2a75c7;
-    }
-
-    .btn-action.btn-info-action:hover {
-      background: #4b9dfa;
-      color: #fff;
-    }
-
-    .btn-action.btn-danger-action {
-      border-color: #e9546b;
-      color: #b93b4f;
-    }
-
-    .btn-action.btn-danger-action:hover {
-      background: #e9546b;
-      color: #fff;
-    }
-
-    /* ----- tables (modern) ----- */
-    .table-modern {
-      border-radius: 18px;
+      position: relative;
       overflow: hidden;
-    }
-
-    .table-modern thead {
-      background: linear-gradient(145deg, #5b6fd8, #7c4d9e);
-      color: #fff;
-    }
-
-    .table-modern thead th {
-      font-weight: 600;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      padding: 14px 20px;
-      border: none;
-    }
-
-    .table-modern tbody td {
-      padding: 12px 20px;
-      border-bottom: 1px solid #edf2f9;
-      font-weight: 500;
-    }
-
-    .table-modern tbody tr:hover {
-      background: #f4f8ff;
-    }
-
-    .badge-count {
-      background: #6c7eea;
-      color: #fff;
-      padding: 4px 16px;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    .badge-success {
-      background: #2edb7a;
-      color: #0f2a1e;
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-
-    .badge-warning {
-      background: #f5b342;
-      color: #281e0a;
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-
-    .badge-danger {
-      background: #e9546b;
-      color: #fff;
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-
-    /* ----- chart cards ----- */
-    .chart-card {
-      border: none;
-      border-radius: 24px;
-      background: #fff;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
-      transition: all 0.25s ease;
       height: 100%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
     }
-
-    .chart-card:hover {
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.07);
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0,0,0,0.05); }
+    .stat-card .stat-icon {
+      position: absolute; right: 12px; top: 12px;
+      font-size: 2.2rem; opacity: 0.12;
     }
+    .stat-card .stat-label {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; opacity: 0.7;
+    }
+    .stat-card .stat-value {
+      font-size: 1.7rem; font-weight: 800; line-height: 1.2;
+    }
+    .stat-card .stat-change {
+      font-size: 0.6rem; font-weight: 600; margin-top: 4px;
+      display: inline-block; padding: 2px 12px; border-radius: 30px;
+      background: rgba(255,255,255,0.2); color: #fff;
+    }
+    .stat-card.purple { background: linear-gradient(145deg, #6c7eea, #8b5fc7); color: #fff; }
+    .stat-card.blue { background: linear-gradient(145deg, #4b9dfa, #47d0fd); color: #fff; }
+    .stat-card.green { background: linear-gradient(145deg, #3edb7a, #2ee6c0); color: #13242e; }
+    .stat-card.orange { background: linear-gradient(145deg, #f0936b, #f5576c); color: #fff; }
+    .stat-card.cyan { background: linear-gradient(145deg, #4b9dfa, #47d0fd); color: #fff; }
+    .stat-card.pink { background: linear-gradient(145deg, #ea7ac4, #d45b8f); color: #fff; }
+    .stat-card.gold { background: linear-gradient(145deg, #f5a623, #f8d43a); color: #1e2a3a; }
+    .stat-card.teal { background: linear-gradient(145deg, #11a085, #2ddf9a); color: #0f2626; }
 
-    .chart-card .card-header-custom {
-      padding: 16px 20px;
-      font-weight: 700;
-      font-size: 0.9rem;
+    .card-modern {
+      border: none; border-radius: 24px; background: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      transition: 0.2s ease; overflow: hidden;
+    }
+    .card-modern:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.04); }
+    .card-modern .card-header-custom {
+      padding: 14px 20px; font-weight: 700; font-size: 0.9rem;
       border-bottom: 2px solid #f0f4fc;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; gap: 10px;
       background: #fafcff;
     }
+    .card-modern .card-header-custom i { color: #5b6fd8; font-size: 1.1rem; }
+    .card-modern .card-body-custom { padding: 20px; }
 
-    .chart-card .card-header-custom i {
-      color: #5b6fd8;
-      margin-right: 8px;
+    .btn-action {
+      padding: 10px 8px; border-radius: 18px; font-weight: 600;
+      font-size: 0.8rem; border: 1.5px solid #e6edf5; background: #fff;
+      color: #1f2a3f; transition: 0.2s; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none;
     }
+    .btn-action:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,0.03);
+      border-color: #b0c6e0; text-decoration: none; }
+    .btn-action.btn-primary-action { border-color: #6c7eea; color: #5b6fd8; }
+    .btn-action.btn-primary-action:hover { background: #6c7eea; color: #fff; }
+    .btn-action.btn-success-action { border-color: #3edb7a; color: #1e9b5a; }
+    .btn-action.btn-success-action:hover { background: #3edb7a; color: #fff; }
+    .btn-action.btn-warning-action { border-color: #f5a623; color: #b87a14; }
+    .btn-action.btn-warning-action:hover { background: #f5a623; color: #fff; }
+    .btn-action.btn-info-action { border-color: #4b9dfa; color: #2a75c7; }
+    .btn-action.btn-info-action:hover { background: #4b9dfa; color: #fff; }
+    .btn-action.btn-danger-action { border-color: #e9546b; color: #b93b4f; }
+    .btn-action.btn-danger-action:hover { background: #e9546b; color: #fff; }
 
-    .chart-card .card-header-custom .badge-total {
-      background: #eef3fc;
-      color: #1f2a3f;
-      padding: 2px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
+    .table-modern thead { background: linear-gradient(145deg, #5b6fd8, #7c4d9e); color: #fff; }
+    .table-modern thead th { font-weight: 600; font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.5px; padding: 12px 18px; border: none; }
+    .table-modern tbody td { padding: 10px 18px; border-bottom: 1px solid #edf2f9; font-weight: 500; }
+    .table-modern tbody tr:hover { background: #f4f8ff; }
+    .badge-count { background: #6c7eea; color: #fff; padding: 3px 16px; border-radius: 40px;
+      font-size: 0.7rem; font-weight: 700; }
+    .badge-success { background: #2edb7a; color: #0f2a1e; padding: 3px 14px; border-radius: 40px;
+      font-size: 0.65rem; font-weight: 700; }
+    .badge-warning { background: #f5b342; color: #281e0a; padding: 3px 14px; border-radius: 40px;
+      font-size: 0.65rem; font-weight: 700; }
+    .badge-danger { background: #e9546b; color: #fff; padding: 3px 14px; border-radius: 40px;
+      font-size: 0.65rem; font-weight: 700; }
 
-    .chart-card .card-body-custom {
-      padding: 20px;
-    }
+    .chart-container { position: relative; height: 250px; width: 100%; }
+    .chart-container-sm { height: 200px; }
 
-    .chart-container {
-      position: relative;
-      height: 270px;
-      width: 100%;
-    }
+    .table-payments { font-size: 0.8rem; }
+    .table-payments thead { background: #f4f8ff; }
+    .table-payments thead th { font-weight: 700; font-size: 0.65rem; text-transform: uppercase;
+      letter-spacing: 0.4px; padding: 10px 14px; border-bottom: 2px solid #e2ebf6; }
+    .table-payments tbody td { padding: 8px 14px; border-bottom: 1px solid #ecf2fa; }
 
-    .chart-container-sm {
-      height: 210px;
-    }
+    .footer { text-align: center; padding: 20px 0 6px 0; color: #9aabbe;
+      font-size: 0.75rem; border-top: 1px solid #e4ecf5; margin-top: 28px; }
+    .footer i { color: #e9546b; }
 
-    /* ----- recent payments table ----- */
-    .table-payments {
-      font-size: 0.85rem;
-    }
-
-    .table-payments thead {
-      background: #f4f8ff;
-    }
-
-    .table-payments thead th {
-      font-weight: 700;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 12px 16px;
-      border-bottom: 2px solid #e2ebf6;
-    }
-
-    .table-payments tbody td {
-      padding: 10px 16px;
-      border-bottom: 1px solid #ecf2fa;
-    }
-
-    .table-payments tbody tr:hover {
-      background: #f4f8ff;
-    }
-
-    /* ----- footer ----- */
-    .footer {
-      text-align: center;
-      padding: 28px 0 18px 0;
-      color: #9aabbe;
-      font-size: 0.8rem;
-      border-top: 1px solid #e4ecf5;
-      margin-top: 32px;
-    }
-
-    .footer i {
-      color: #e9546b;
-    }
-
-    /* ----- responsive adjustments ----- */
-    @media (max-width: 768px) {
-      .navbar-custom .navbar-brand {
-        font-size: 1rem;
+    /* responsive */
+    @media (max-width: 992px) {
+      .dashboard-wrapper { flex-direction: column; }
+      .left-panel {
+        width: 100%; min-height: auto; height: auto; position: relative;
+        border-right: none; border-bottom: 1px solid rgba(200,215,235,0.4);
+        padding: 16px 20px; flex-direction: row; flex-wrap: wrap;
+        align-items: center; gap: 10px;
       }
-      .navbar-custom .user-info .user-email {
-        font-size: 0.7rem;
-      }
-      .btn-logout {
-        font-size: 0.65rem;
-        padding: 4px 12px;
-      }
-      .page-header h2 {
-        font-size: 1.5rem;
-      }
-      .stat-card .stat-value {
-        font-size: 1.7rem;
-      }
-      .stat-card .stat-icon {
-        font-size: 2.2rem;
-        right: 10px;
-        top: 10px;
-      }
-      .btn-action {
-        font-size: 0.8rem;
-        padding: 10px 8px;
-      }
-      .chart-container {
-        height: 210px;
-      }
-      .table-modern thead th,
-      .table-modern tbody td {
-        padding: 10px 12px;
-        font-size: 0.75rem;
-      }
+      .left-panel .brand { margin-bottom: 0; }
+      .left-panel .user-badge { margin-bottom: 0; margin-top: 0; }
+      .nav-left { flex-direction: row; flex-wrap: wrap; gap: 4px; margin-top: 6px; width: 100%; }
+      .nav-left .nav-item { padding: 8px 14px; font-size: 0.8rem; }
+      .nav-left .logout-item { border-top: none; padding-top: 0; margin-top: 0; }
+      .right-panel { padding: 20px 16px; }
+    }
+    @media (max-width: 576px) {
+      .left-panel .brand { font-size: 1rem; }
+      .nav-left .nav-item { font-size: 0.7rem; padding: 6px 12px; gap: 8px; }
+      .stat-card .stat-value { font-size: 1.3rem; }
+      .chart-container { height: 180px; }
     }
 
-    @media (max-width: 480px) {
-      .navbar-custom .user-info {
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-      }
-      .navbar-custom .user-info .user-email {
-        font-size: 0.65rem;
-      }
-      .stat-card .stat-value {
-        font-size: 1.4rem;
-      }
-      .chart-container {
-        height: 180px;
-      }
-    }
-
-    /* ----- fade-in animation ----- */
-    .fade-in {
-      animation: fadeUp 0.5s ease forwards;
-      opacity: 0;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-in:nth-child(1) {
-      animation-delay: 0.02s;
-    }
-    .fade-in:nth-child(2) {
-      animation-delay: 0.06s;
-    }
-    .fade-in:nth-child(3) {
-      animation-delay: 0.1s;
-    }
-    .fade-in:nth-child(4) {
-      animation-delay: 0.14s;
-    }
-    .fade-in:nth-child(5) {
-      animation-delay: 0.18s;
-    }
-    .fade-in:nth-child(6) {
-      animation-delay: 0.22s;
-    }
-    .fade-in:nth-child(7) {
-      animation-delay: 0.26s;
-    }
-    .fade-in:nth-child(8) {
-      animation-delay: 0.30s;
-    }
-    .fade-in:nth-child(9) {
-      animation-delay: 0.34s;
-    }
-    .fade-in:nth-child(10) {
-      animation-delay: 0.38s;
-    }
-
-    /* scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #eef3fc;
-      border-radius: 12px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #c6d5e8;
-      border-radius: 12px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #9aafca;
-    }
+    .fade-in { animation: fadeUp 0.4s ease forwards; opacity:0; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in:nth-child(1) { animation-delay:0.02s; }
+    .fade-in:nth-child(2) { animation-delay:0.05s; }
+    .fade-in:nth-child(3) { animation-delay:0.08s; }
+    .fade-in:nth-child(4) { animation-delay:0.11s; }
+    .fade-in:nth-child(5) { animation-delay:0.14s; }
+    .fade-in:nth-child(6) { animation-delay:0.17s; }
+    .fade-in:nth-child(7) { animation-delay:0.20s; }
+    .fade-in:nth-child(8) { animation-delay:0.23s; }
+    .fade-in:nth-child(9) { animation-delay:0.26s; }
   </style>
 </head>
-
 <body>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container">
-      <a class="navbar-brand" href="#">
-        <i class="fas fa-graduation-cap"></i> LMS · admin
-      </a>
-      <div class="user-info">
-        <span class="user-email">
-          <i class="fas fa-user-circle"></i> {{ session.email }}
-        </span>
-        <a href="{{ url_for('logout') }}" class="btn-logout">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </a>
-      </div>
+<div class="dashboard-wrapper">
+
+  <!-- ===== LEFT PANEL (small) ===== -->
+  <aside class="left-panel">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i> LMS
     </div>
-  </nav>
-
-  <div class="container">
-
-    <!-- ===== HEADER ===== -->
-    <div class="page-header">
-      <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
-      <p>Welcome back, {{ session.email }} · full overview of your learning platform</p>
+    <div class="user-badge">
+      <i class="fas fa-user-circle"></i> {{ session.email }}
     </div>
 
-    <!-- ===== STAT CARDS ===== -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card purple fade-in">
-          <i class="fas fa-users stat-icon"></i>
-          <div class="stat-label">Total Users</div>
-          <div class="stat-value">{{ total_users }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> active</span>
-        </div>
+    <nav class="nav-left">
+      <a href="#" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <a href="{{ url_for('teachers') }}" class="nav-item"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+      <a href="{{ url_for('manage_students') }}" class="nav-item"><i class="fas fa-user-graduate"></i> Students</a>
+      <a href="{{ url_for('courses') }}" class="nav-item"><i class="fas fa-book"></i> Courses</a>
+      <a href="{{ url_for('modules') }}" class="nav-item"><i class="fas fa-cubes"></i> Modules</a>
+      <a href="{{ url_for('assign_teacher', course_id=1) }}" class="nav-item"><i class="fas fa-user-plus"></i> Assign</a>
+      <a href="{{ url_for('admin_announcements_list') }}" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+      <a href="{{ url_for('admin_verify_payments') }}" class="nav-item"><i class="fas fa-credit-card"></i> Verify</a>
+      <div class="logout-item">
+        <a href="{{ url_for('logout') }}" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card blue fade-in">
-          <i class="fas fa-user-graduate stat-icon"></i>
-          <div class="stat-label">Students</div>
-          <div class="stat-value">{{ total_students }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> enrolled</span>
-        </div>
-      </div>
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card green fade-in">
-          <i class="fas fa-chalkboard-teacher stat-icon"></i>
-          <div class="stat-label">Teachers</div>
-          <div class="stat-value">{{ total_teachers }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> active</span>
-        </div>
-      </div>
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card orange fade-in">
-          <i class="fas fa-book stat-icon"></i>
-          <div class="stat-label">Courses</div>
-          <div class="stat-value">{{ total_courses }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> active</span>
-        </div>
-      </div>
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card cyan fade-in">
-          <i class="fas fa-cubes stat-icon"></i>
-          <div class="stat-label">Modules</div>
-          <div class="stat-value">{{ total_modules }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> total</span>
-        </div>
-      </div>
-      <div class="col-lg-2 col-md-4 col-6">
-        <div class="stat-card pink fade-in">
-          <i class="fas fa-clock stat-icon"></i>
-          <div class="stat-label">Pending students</div>
-          <div class="stat-value">{{ pending_students }}</div>
-          <span class="stat-change down"><i class="fas fa-exclamation-circle"></i> awaiting</span>
-        </div>
+    </nav>
+  </aside>
+
+  <!-- ===== RIGHT PANEL (big) ===== -->
+  <main class="right-panel">
+
+    <!-- header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 class="fw-bold mb-0" style="color:#1a2639;"><i class="fas fa-chart-line me-2" style="color:#5b6fd8;"></i>Analytics overview</h4>
+        <p class="text-muted small">Welcome back, {{ session.email }} — all key metrics</p>
       </div>
     </div>
 
-    <!-- ===== PAYMENT STATS ===== -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-card gold fade-in">
-          <i class="fas fa-dollar-sign stat-icon"></i>
-          <div class="stat-label">Total Revenue</div>
-          <div class="stat-value">Ksh{{ "%.2f"|format(total_revenue) }}</div>
-          <span class="stat-change"><i class="fas fa-arrow-up"></i> collected</span>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-card teal fade-in">
-          <i class="fas fa-credit-card stat-icon"></i>
-          <div class="stat-label">Total Payments</div>
-          <div class="stat-value">{{ total_payments }}</div>
-          <span class="stat-sub">transactions</span>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-card green fade-in">
-          <i class="fas fa-check-circle stat-icon"></i>
-          <div class="stat-label">Paid</div>
-          <div class="stat-value">{{ paid_payments }}</div>
-          <span class="stat-change"><i class="fas fa-check"></i> successful</span>
-        </div>
-      </div>
-      <div class="col-lg-3 col-md-6">
-        <div class="stat-card pink fade-in">
-          <i class="fas fa-hourglass-half stat-icon"></i>
-          <div class="stat-label">Pending Payments</div>
-          <div class="stat-value">{{ pending_payments }}</div>
-          <span class="stat-change down"><i class="fas fa-clock"></i> awaiting</span>
-        </div>
-      </div>
+    <!-- stats row 1 (6 cards) -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card purple fade-in"><i class="fas fa-users stat-icon"></i><div class="stat-label">Users</div><div class="stat-value">{{ total_users }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> active</span></div></div>
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card blue fade-in"><i class="fas fa-user-graduate stat-icon"></i><div class="stat-label">Students</div><div class="stat-value">{{ total_students }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> enrolled</span></div></div>
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card green fade-in"><i class="fas fa-chalkboard-teacher stat-icon"></i><div class="stat-label">Teachers</div><div class="stat-value">{{ total_teachers }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> active</span></div></div>
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card orange fade-in"><i class="fas fa-book stat-icon"></i><div class="stat-label">Courses</div><div class="stat-value">{{ total_courses }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> active</span></div></div>
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card cyan fade-in"><i class="fas fa-cubes stat-icon"></i><div class="stat-label">Modules</div><div class="stat-value">{{ total_modules }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> total</span></div></div>
+      <div class="col-lg-2 col-md-4 col-6"><div class="stat-card pink fade-in"><i class="fas fa-clock stat-icon"></i><div class="stat-label">Pending</div><div class="stat-value">{{ pending_students }}</div><span class="stat-change" style="background:rgba(255,255,255,0.2);color:#fff;"><i class="fas fa-exclamation-circle"></i> awaiting</span></div></div>
     </div>
 
-    <!-- ===== QUICK ACTIONS ===== -->
-    <div class="card-modern mb-4 fade-in">
-      <div class="card-header-custom">
-        <i class="fas fa-bolt"></i> Quick actions
-      </div>
+    <!-- payment stats row -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-3 col-md-6"><div class="stat-card gold fade-in"><i class="fas fa-dollar-sign stat-icon"></i><div class="stat-label">Revenue</div><div class="stat-value">Ksh{{ "%.2f"|format(total_revenue) }}</div><span class="stat-change"><i class="fas fa-arrow-up"></i> collected</span></div></div>
+      <div class="col-lg-3 col-md-6"><div class="stat-card teal fade-in"><i class="fas fa-credit-card stat-icon"></i><div class="stat-label">Payments</div><div class="stat-value">{{ total_payments }}</div><span class="stat-sub">transactions</span></div></div>
+      <div class="col-lg-3 col-md-6"><div class="stat-card green fade-in"><i class="fas fa-check-circle stat-icon"></i><div class="stat-label">Paid</div><div class="stat-value">{{ paid_payments }}</div><span class="stat-change"><i class="fas fa-check"></i> successful</span></div></div>
+      <div class="col-lg-3 col-md-6"><div class="stat-card pink fade-in"><i class="fas fa-hourglass-half stat-icon"></i><div class="stat-label">Pending pay</div><div class="stat-value">{{ pending_payments }}</div><span class="stat-change" style="background:rgba(255,255,255,0.2);color:#fff;"><i class="fas fa-clock"></i> awaiting</span></div></div>
+    </div>
+
+    <!-- quick actions (compact) -->
+    <div class="card-modern mb-3 fade-in">
+      <div class="card-header-custom"><i class="fas fa-bolt"></i> Quick actions</div>
       <div class="card-body-custom">
+        <div class="row g-2">
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('teachers') }}" class="btn-action btn-primary-action"><i class="fas fa-chalkboard-teacher"></i> Teachers</a></div>
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('manage_students') }}" class="btn-action btn-success-action"><i class="fas fa-user-graduate"></i> Students</a></div>
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('courses') }}" class="btn-action btn-warning-action"><i class="fas fa-book"></i> Courses</a></div>
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('modules') }}" class="btn-action btn-info-action"><i class="fas fa-cubes"></i> Modules</a></div>
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('assign_teacher', course_id=1) }}" class="btn-action btn-danger-action"><i class="fas fa-user-plus"></i> Assign</a></div>
+          <div class="col-lg-2 col-md-4 col-6"><a href="{{ url_for('admin_verify_payments') }}" class="btn-action btn-primary-action"><i class="fas fa-credit-card"></i> Verify</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- system overview table + charts row -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-5">
+        <div class="card-modern fade-in">
+          <div class="card-header-custom"><i class="fas fa-server"></i> System overview</div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="table-responsive">
+              <table class="table table-modern mb-0">
+                <thead><tr><th>Item</th><th>Total</th></tr></thead>
+                <tbody>
+                  <tr><td><i class="fas fa-users me-2" style="color:#6c7eea;"></i> Users</td><td><span class="badge-count">{{ total_users }}</span></td></tr>
+                  <tr><td><i class="fas fa-user-graduate me-2" style="color:#4b9dfa;"></i> Students</td><td><span class="badge-count">{{ total_students }}</span></td></tr>
+                  <tr><td><i class="fas fa-chalkboard-teacher me-2" style="color:#3edb7a;"></i> Teachers</td><td><span class="badge-count">{{ total_teachers }}</span></td></tr>
+                  <tr><td><i class="fas fa-book me-2" style="color:#f0936b;"></i> Courses</td><td><span class="badge-count">{{ total_courses }}</span></td></tr>
+                  <tr><td><i class="fas fa-cubes me-2" style="color:#4b9dfa;"></i> Modules</td><td><span class="badge-count">{{ total_modules }}</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
         <div class="row g-3">
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('teachers') }}" class="btn-action btn-primary-action"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+          <div class="col-md-6">
+            <div class="chart-card fade-in">
+              <div class="card-header-custom"><span><i class="fas fa-users"></i> Users</span></div>
+              <div class="card-body-custom"><div class="chart-container chart-container-sm"><canvas id="userDistributionChart"></canvas></div></div>
+            </div>
           </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('manage_students') }}" class="btn-action btn-success-action"><i class="fas fa-user-graduate"></i> Students</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('courses') }}" class="btn-action btn-warning-action"><i class="fas fa-book"></i> Courses</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('modules') }}" class="btn-action btn-info-action"><i class="fas fa-cubes"></i> Modules</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('assign_teacher', course_id=1) }}" class="btn-action btn-danger-action"><i class="fas fa-user-plus"></i> Assign</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('admin_announcements_list') }}" class="btn-action btn-primary-action"><i class="fas fa-bullhorn"></i> Announcements</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <a href="{{ url_for('admin_verify_payments') }}" class="btn-action btn-success-action"><i class="fas fa-credit-card"></i> Verify payments</a>
+          <div class="col-md-6">
+            <div class="chart-card fade-in">
+              <div class="card-header-custom"><span><i class="fas fa-credit-card"></i> Payment status</span></div>
+              <div class="card-body-custom"><div class="chart-container chart-container-sm"><canvas id="paymentStatusChart"></canvas></div></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== SYSTEM OVERVIEW TABLE ===== -->
-    <div class="card-modern fade-in">
-      <div class="card-header-custom">
-        <i class="fas fa-server"></i> System overview
-      </div>
-      <div class="card-body-custom" style="padding:0;">
-        <div class="table-responsive">
-          <table class="table table-modern mb-0">
-            <thead>
-              <tr><th><i class="fas fa-tag me-2"></i> Item</th><th><i class="fas fa-chart-bar me-2"></i> Total</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><i class="fas fa-users me-2" style="color:#6c7eea;"></i> Total Users</td><td><span class="badge-count">{{ total_users }}</span></td></tr>
-              <tr><td><i class="fas fa-user-graduate me-2" style="color:#4b9dfa;"></i> Students</td><td><span class="badge-count">{{ total_students }}</span></td></tr>
-              <tr><td><i class="fas fa-chalkboard-teacher me-2" style="color:#3edb7a;"></i> Teachers</td><td><span class="badge-count">{{ total_teachers }}</span></td></tr>
-              <tr><td><i class="fas fa-book me-2" style="color:#f0936b;"></i> Courses</td><td><span class="badge-count">{{ total_courses }}</span></td></tr>
-              <tr><td><i class="fas fa-cubes me-2" style="color:#4b9dfa;"></i> Modules</td><td><span class="badge-count">{{ total_modules }}</span></td></tr>
-              <tr><td><i class="fas fa-clock me-2" style="color:#d45b8f;"></i> Pending Students</td><td><span class="badge-count" style="background:#d45b8f;">{{ pending_students }}</span></td></tr>
-              <tr><td><i class="fas fa-dollar-sign me-2" style="color:#f5a623;"></i> Revenue</td><td><span class="badge-count" style="background:#f5a623;">Ksh{{ "%.2f"|format(total_revenue) }}</span></td></tr>
-              <tr><td><i class="fas fa-credit-card me-2" style="color:#11a085;"></i> Payments</td><td><span class="badge-count" style="background:#11a085;">{{ total_payments }}</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== CHARTS SECTION ===== -->
-    <div class="mt-4">
-      <h4 class="mb-2"><i class="fas fa-chart-line" style="color:#5b6fd8;"></i> Analytics &amp; insights</h4>
-      <p class="text-muted small">Visual representation of your platform data</p>
-    </div>
-
-    <!-- row 1 -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-6">
-        <div class="chart-card fade-in">
-          <div class="card-header-custom"><span><i class="fas fa-users"></i> User distribution</span><span class="badge-total">Total {{ total_users }}</span></div>
-          <div class="card-body-custom"><div class="chart-container"><canvas id="userDistributionChart"></canvas></div></div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="chart-card fade-in">
-          <div class="card-header-custom"><span><i class="fas fa-dollar-sign"></i> Payment revenue</span><span class="badge-total">Ksh{{ "%.2f"|format(total_revenue) }}</span></div>
-          <div class="card-body-custom"><div class="chart-container"><canvas id="paymentChart"></canvas></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- row 2 -->
-    <div class="row g-4 mb-4">
+    <!-- charts row 2 (3 small) -->
+    <div class="row g-3 mb-3">
       <div class="col-lg-4">
         <div class="chart-card fade-in">
           <div class="card-header-custom"><span><i class="fas fa-user-graduate"></i> Student status</span></div>
@@ -803,24 +396,21 @@
       </div>
       <div class="col-lg-4">
         <div class="chart-card fade-in">
-          <div class="card-header-custom"><span><i class="fas fa-chart-bar"></i> System radar</span></div>
+          <div class="card-header-custom"><span><i class="fas fa-chart-bar"></i> Radar</span></div>
           <div class="card-body-custom"><div class="chart-container chart-container-sm"><canvas id="systemOverviewChart"></canvas></div></div>
         </div>
       </div>
       <div class="col-lg-4">
         <div class="chart-card fade-in">
-          <div class="card-header-custom"><span><i class="fas fa-credit-card"></i> Payment status</span><span class="badge-total">{{ total_payments }}</span></div>
-          <div class="card-body-custom"><div class="chart-container chart-container-sm"><canvas id="paymentStatusChart"></canvas></div></div>
+          <div class="card-header-custom"><span><i class="fas fa-dollar-sign"></i> Revenue</span></div>
+          <div class="card-body-custom"><div class="chart-container chart-container-sm"><canvas id="paymentChart"></canvas></div></div>
         </div>
       </div>
     </div>
 
-    <!-- ===== RECENT PAYMENTS ===== -->
+    <!-- recent payments -->
     <div class="card-modern fade-in">
-      <div class="card-header-custom">
-        <i class="fas fa-receipt"></i> Recent payments
-        <span class="ms-auto badge bg-primary">{{ recent_payments|length }} latest</span>
-      </div>
+      <div class="card-header-custom"><i class="fas fa-receipt"></i> Recent payments <span class="ms-auto badge bg-primary">{{ recent_payments|length }} latest</span></div>
       <div class="card-body-custom" style="padding:0;">
         <div class="table-responsive">
           <table class="table table-payments mb-0">
@@ -846,7 +436,7 @@
                 </tr>
                 {% endfor %}
               {% else %}
-                <tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-receipt fa-2x d-block mb-2"></i>No payments recorded yet.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-receipt fa-2x d-block mb-2"></i>No payments yet.</td></tr>
               {% endif %}
             </tbody>
           </table>
@@ -854,176 +444,89 @@
       </div>
     </div>
 
-    <!-- ===== FOOTER ===== -->
-    <div class="footer">
-      <i class="fas fa-heart"></i> Learning Management System &copy; 2026 — all rights reserved
-    </div>
+    <div class="footer"><i class="fas fa-heart"></i> LMS &copy; 2026 — split dashboard</div>
+  </main>
+</div>
 
-  </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. user distribution
+  new Chart(document.getElementById('userDistributionChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Students', 'Teachers', 'Pending'],
+      datasets: [{ data: [{{ total_students }}, {{ total_teachers }}, {{ pending_students }}],
+        backgroundColor: ['#4b9dfa', '#3edb7a', '#d45b8f'], borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom',
+          labels: { padding: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 10, weight: '600' } } },
+        tooltip: { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)'; } } } },
+      cutout: '60%' }
+  });
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
+  // 2. payment status
+  new Chart(document.getElementById('paymentStatusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Verified', 'Pending'],
+      datasets: [{ data: [{{ paid_payments }}, {{ pending_payments }}],
+        backgroundColor: ['#2edb7a', '#f5b342'], borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom',
+          labels: { padding: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 10, weight: '600' } } },
+        tooltip: { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)'; } } } },
+      cutout: '60%' }
+  });
 
-      // 1. User distribution (doughnut)
-      const ctx1 = document.getElementById('userDistributionChart').getContext('2d');
-      new Chart(ctx1, {
-        type: 'doughnut',
-        data: {
-          labels: ['Students', 'Teachers', 'Pending'],
-          datasets: [{
-            data: [{{ total_students }}, {{ total_teachers }}, {{ pending_students }}],
-            backgroundColor: ['#4b9dfa', '#3edb7a', '#d45b8f'],
-            borderWidth: 3,
-            borderColor: '#fff',
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 14, usePointStyle: true, pointStyle: 'circle',
-                font: { family: 'Inter', size: 11, weight: '600' } } },
-            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: 'Inter', size: 13, weight: '700' },
-              bodyFont: { family: 'Inter', size: 12 }, padding: 12, cornerRadius: 12,
-              callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a, b) => a + b, 0); let pct = ((
-                      ctx.parsed / total) * 100).toFixed(1); return ctx.label + ': ' + ctx.parsed + ' (' + pct +
-                  '%)'; } } }
-          },
-          cutout: '65%'
-        }
-      });
+  // 3. student status (pie)
+  new Chart(document.getElementById('studentStatusChart'), {
+    type: 'pie',
+    data: {
+      labels: ['Active', 'Pending', 'Blocked'],
+      datasets: [{ data: [{{ total_students - pending_students }}, {{ pending_students }}, 0],
+        backgroundColor: ['#3edb7a', '#ea7ac4', '#e9546b'], borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom',
+          labels: { padding: 10, usePointStyle: true, pointStyle: 'circle', font: { size: 10, weight: '600' } } },
+        tooltip: { callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return ctx.label + ': ' + ctx.parsed + ' (' + ((ctx.parsed/total)*100).toFixed(1) + '%)'; } } } } }
+  });
 
-      // 2. Payment revenue (bar)
-      const ctx2 = document.getElementById('paymentChart').getContext('2d');
-      new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: ['Revenue'],
-          datasets: [{
-            label: 'Total Revenue',
-            data: [{{ total_revenue }}],
-            backgroundColor: ['rgba(245, 166, 35, 0.85)'],
-            borderColor: ['#f5a623'],
-            borderWidth: 2,
-            borderRadius: 10,
-            barThickness: 70
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)',
-              titleFont: { family: 'Inter', size: 13, weight: '700' }, bodyFont: { family: 'Inter', size: 12 },
-              padding: 12, cornerRadius: 12, callbacks: { label: function(ctx) { return 'Ksh ' + ctx.parsed.y
-                    .toFixed(2); } } } },
-          scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter',
-                  size: 11 }, callback: function(v) { return 'Ksh ' + v; } } }, x: { grid: { display: false },
-              ticks: { font: { family: 'Inter', size: 12, weight: '600' } } } }
-        }
-      });
+  // 4. radar
+  new Chart(document.getElementById('systemOverviewChart'), {
+    type: 'radar',
+    data: {
+      labels: ['Users', 'Students', 'Teachers', 'Courses', 'Modules'],
+      datasets: [{ label: 'Metrics', data: [{{ total_users }}, {{ total_students }}, {{ total_teachers }},
+          {{ total_courses }}, {{ total_modules }}],
+        backgroundColor: 'rgba(91,111,216,0.12)', borderColor: '#5b6fd8', borderWidth: 2,
+        pointBackgroundColor: '#5b6fd8', pointBorderColor: '#fff', pointBorderWidth: 1.5, pointRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { r: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' },
+          pointLabels: { font: { size: 9, weight: '600' } },
+          ticks: { font: { size: 8 }, stepSize: Math.max(1, Math.floor({{ total_users }}/5)) } } } }
+  });
 
-      // 3. Student status (pie)
-      const ctx3 = document.getElementById('studentStatusChart').getContext('2d');
-      new Chart(ctx3, {
-        type: 'pie',
-        data: {
-          labels: ['Active', 'Pending', 'Blocked'],
-          datasets: [{
-            data: [{{ total_students - pending_students }}, {{ pending_students }}, 0],
-            backgroundColor: ['#3edb7a', '#ea7ac4', '#e9546b'],
-            borderWidth: 2,
-            borderColor: '#fff',
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'circle',
-                font: { family: 'Inter', size: 10, weight: '600' } } },
-            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: 'Inter', size: 13, weight: '700' },
-              bodyFont: { family: 'Inter', size: 12 }, padding: 12, cornerRadius: 12,
-              callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a, b) => a + b, 0); let pct = ((
-                      ctx.parsed / total) * 100).toFixed(1); return ctx.label + ': ' + ctx.parsed + ' (' + pct +
-                  '%)'; } } }
-          }
-        }
-      });
-
-      // 4. System overview (radar)
-      const ctx4 = document.getElementById('systemOverviewChart').getContext('2d');
-      new Chart(ctx4, {
-        type: 'radar',
-        data: {
-          labels: ['Users', 'Students', 'Teachers', 'Courses', 'Modules'],
-          datasets: [{
-            label: 'Metrics',
-            data: [{{ total_users }}, {{ total_students }}, {{ total_teachers }}, {{ total_courses }},
-              {{ total_modules }}
-            ],
-            backgroundColor: 'rgba(91, 111, 216, 0.15)',
-            borderColor: '#5b6fd8',
-            borderWidth: 3,
-            pointBackgroundColor: '#5b6fd8',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.8)',
-              titleFont: { family: 'Inter', size: 13, weight: '700' }, bodyFont: { family: 'Inter', size: 12 },
-              padding: 12, cornerRadius: 12 } },
-          scales: {
-            r: {
-              beginAtZero: true,
-              grid: { color: 'rgba(0,0,0,0.06)' },
-              pointLabels: { font: { family: 'Inter', size: 10, weight: '600' } },
-              ticks: { font: { family: 'Inter', size: 9 }, stepSize: Math.max(1, Math.floor({{ total_users }} /
-                  5)) }
-            }
-          }
-        }
-      });
-
-      // 5. Payment status (doughnut)
-      const ctx5 = document.getElementById('paymentStatusChart').getContext('2d');
-      new Chart(ctx5, {
-        type: 'doughnut',
-        data: {
-          labels: ['Verified', 'Pending'],
-          datasets: [{
-            data: [{{ paid_payments }}, {{ pending_payments }}],
-            backgroundColor: ['#2edb7a', '#f5b342'],
-            borderWidth: 2,
-            borderColor: '#fff',
-            hoverOffset: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'circle',
-                font: { family: 'Inter', size: 10, weight: '600' } } },
-            tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: 'Inter', size: 13, weight: '700' },
-              bodyFont: { family: 'Inter', size: 12 }, padding: 12, cornerRadius: 12,
-              callbacks: { label: function(ctx) { let total = ctx.dataset.data.reduce((a, b) => a + b, 0); let pct = ((
-                      ctx.parsed / total) * 100).toFixed(1); return ctx.label + ': ' + ctx.parsed + ' (' + pct +
-                  '%)'; } } }
-          },
-          cutout: '60%'
-        }
-      });
-
-    });
-  </script>
+  // 5. revenue bar (simplified)
+  new Chart(document.getElementById('paymentChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Revenue'],
+      datasets: [{ label: 'Total', data: [{{ total_revenue }}],
+        backgroundColor: ['rgba(245,166,35,0.8)'], borderColor: ['#f5a623'], borderWidth: 2,
+        borderRadius: 8, barThickness: 50 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: function(ctx) { return 'Ksh ' + ctx.parsed.y.toFixed(2); } } } },
+      scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' },
+          ticks: { font: { size: 10 }, callback: function(v) { return 'Ksh '+v; } } },
+        x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } } } }
+  });
+});
+</script>
 </body>
-
 </html>
