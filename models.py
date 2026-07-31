@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, UniqueConstraint, Text, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, UniqueConstraint, Text, Boolean, DateTime, Numeric
 from sqlalchemy.orm import relationship
 from connections import Base
 from datetime import datetime
@@ -108,12 +108,12 @@ class CourseTeacher(Base):
     assigned_date = Column(String(30), default=datetime.now().strftime("%Y-%m-%d"))
     status = Column(String(20), default="Active")
 
-    course = relationship("Course", back_populates="teachers")
+    course = relationship("Course", back_populates="course_teachers")
     teacher = relationship("Teacher", back_populates="course_assignments")
 
 
 # =====================================
-# COURSES TABLE
+# COURSES TABLE - MERGED WITH is_free
 # =====================================
 
 class Course(Base):
@@ -123,7 +123,8 @@ class Course(Base):
     course_name = Column(String(100), unique=True, nullable=False)
     course_code = Column(String(20), unique=True)
     duration = Column(String(50))
-    fee = Column(Float, nullable=False)
+    fee = Column(Float, nullable=False, default=0.00)
+    is_free = Column(Boolean, default=False)  # <-- ADD THIS LINE
     description = Column(Text)
     career_objectives = Column(Text)  # Career objectives ONLY at course level
     prerequisites = Column(Text)
@@ -131,18 +132,21 @@ class Course(Base):
     status = Column(String(20), default="Active")
     created_at = Column(String(30), default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
+    # Relationships
     enrollments = relationship("Enrollment", back_populates="course", cascade="all, delete-orphan")
     modules = relationship("Module", back_populates="course", cascade="all, delete-orphan")
     assignments = relationship("Assignment", back_populates="course", cascade="all, delete-orphan")
     quizzes = relationship("Quiz", back_populates="course", cascade="all, delete-orphan")
     announcements = relationship("Announcement", back_populates="course", cascade="all, delete-orphan")
-    teachers = relationship("CourseTeacher", back_populates="course", cascade="all, delete-orphan")
+    course_teachers = relationship("CourseTeacher", back_populates="course", cascade="all, delete-orphan")
 
-    def __init__(self, course_name, duration, fee, description, career_objectives, meeting_link=None, status="Active", prerequisites=None, course_code=None):
+    def __init__(self, course_name, duration, fee, description, career_objectives, 
+                 meeting_link=None, status="Active", prerequisites=None, course_code=None, is_free=False):
         self.course_name = course_name
         self.course_code = course_code or course_name[:5].upper()
         self.duration = duration
         self.fee = fee
+        self.is_free = is_free  # <-- ADD THIS
         self.description = description
         self.career_objectives = career_objectives
         self.prerequisites = prerequisites
@@ -203,8 +207,7 @@ class Module(Base):
     module_number = Column(Integer, nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text)
-    # career_objectives = Column(Text)  # REMOVED - Career objectives only at course level
-    content = Column(Text)  # Rich text content from editor
+    content = Column(Text)  # HTML content from editor
     pdf_file = Column(String(255))
     video_file = Column(String(255))
     meeting_link = Column(String(500))
@@ -214,23 +217,12 @@ class Module(Base):
     course = relationship("Course", back_populates="modules")
     progress = relationship("StudentModuleProgress", back_populates="module", cascade="all, delete-orphan")
 
-    def __init__(
-        self,
-        course_id,
-        module_number,
-        title,
-        description=None,
-        content=None,
-        pdf_file=None,
-        video_file=None,
-        meeting_link=None,
-        status="Active"
-    ):
+    def __init__(self, course_id, module_number, title, description=None, content=None, 
+                 pdf_file=None, video_file=None, meeting_link=None, status="Active"):
         self.course_id = course_id
         self.module_number = module_number
         self.title = title
         self.description = description
-        # self.career_objectives = career_objectives  # REMOVED
         self.content = content
         self.pdf_file = pdf_file
         self.video_file = video_file

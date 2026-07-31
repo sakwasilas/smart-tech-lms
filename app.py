@@ -200,7 +200,7 @@ def student_register():
 # ==================================================
 
 # ==================================================
-# STUDENT DASHBOARD
+# STUDENT DASHBOARD - Updated to show free/paid status
 # ==================================================
 
 @app.route("/student/dashboard")
@@ -228,10 +228,16 @@ def student_dashboard():
         ~Course.id.in_(enrolled_course_ids)
     ).all()
 
-    # My enrolled courses
+    # My enrolled courses with course details
     my_courses = db_session.query(Enrollment).filter_by(
         student_id=student.id
     ).all()
+    
+    # Add course info to each enrollment
+    for enrollment in my_courses:
+        enrollment.course = db_session.query(Course).filter_by(
+            id=enrollment.course_id
+        ).first()
 
     # Get notifications
     notifications = db_session.query(Notification).filter_by(
@@ -249,7 +255,7 @@ def student_dashboard():
 
 
 # ==================================================
-# ENROLL COURSE
+# ENROLL COURSE - Updated for Free/Paid courses
 # ==================================================
 
 @app.route("/enroll/<int:course_id>", methods=["POST"])
@@ -286,20 +292,52 @@ def enroll(course_id):
         flash("You are already enrolled in this course.", "warning")
         return redirect(url_for("student_dashboard"))
 
-    # Create enrollment
-    enrollment = Enrollment(
-        student_id=student.id,
-        course_id=course.id,
-        date_enrolled=datetime.now().strftime("%Y-%m-%d"),
-        payment_status="Pending",
-        status="Active"
-    )
-
-    db_session.add(enrollment)
-    db_session.commit()
-
-    flash("Successfully enrolled in course.", "success")
-    return redirect(url_for("student_dashboard"))
+    # Determine payment status based on course type
+    if course.is_free:
+        # FREE COURSE - Auto-approved
+        payment_status = "Paid"
+        
+        # Create enrollment
+        enrollment = Enrollment(
+            student_id=student.id,
+            course_id=course.id,
+            date_enrolled=datetime.now().strftime("%Y-%m-%d"),
+            payment_status=payment_status,
+            status="Active"
+        )
+        db_session.add(enrollment)
+        db_session.flush()  # Get enrollment.id
+        
+        # Create a dummy payment record for free courses
+        payment = Payment(
+            enrollment_id=enrollment.id,
+            amount=0,
+            phone="FREE_ENROLLMENT",
+            transaction_code=f"FREE_{course.id}_{student.id}_{int(datetime.now().timestamp())}",
+            status="Verified",
+            date_paid=datetime.now().strftime("%Y-%m-%d")
+        )
+        db_session.add(payment)
+        db_session.commit()
+        
+        flash("Successfully enrolled in free course!", "success")
+        # Redirect directly to course for free courses
+        return redirect(url_for("access_course", course_id=course.id))
+    
+    else:
+        # PAID COURSE - Requires payment verification
+        enrollment = Enrollment(
+            student_id=student.id,
+            course_id=course.id,
+            date_enrolled=datetime.now().strftime("%Y-%m-%d"),
+            payment_status="Pending",
+            status="Active"
+        )
+        db_session.add(enrollment)
+        db_session.commit()
+        
+        flash("Successfully enrolled in course. Please complete payment.", "success")
+        return redirect(url_for("student_dashboard"))
 
 
 # ==================================================
@@ -328,7 +366,7 @@ def payment_page(enrollment_id):
 
 
 # ==================================================
-# SUBMIT PAYMENT - UPDATED: Payment requires admin verification
+# SUBMIT PAYMENT - Payment requires admin verification
 # ==================================================
 
 @app.route("/submit_payment/<int:enrollment_id>", methods=["POST"])
@@ -374,12 +412,9 @@ def submit_payment(enrollment_id):
         amount=enrollment.course.fee,
         phone=phone,
         transaction_code=transaction_code,
-        status="Pending",  # Changed from "Paid" to "Pending"
+        status="Pending",
         date_paid=datetime.now().strftime("%Y-%m-%d")
     )
-
-    # DO NOT change enrollment payment status here - wait for admin verification
-    # enrollment.payment_status = "Paid"  # REMOVED
 
     db_session.add(payment)
     db_session.commit()
@@ -389,7 +424,7 @@ def submit_payment(enrollment_id):
 
 
 # ==================================================
-# ACCESS COURSE - Updated to check verification
+# ACCESS COURSE - Updated for Free/Paid courses
 # ==================================================
 
 @app.route("/course/<int:course_id>")
@@ -414,20 +449,6 @@ def access_course(course_id):
         flash("You are not enrolled in this course.", "warning")
         return redirect(url_for("student_dashboard"))
 
-    # Check if payment is verified
-    if enrollment.payment_status != "Paid":
-        # Check if there's a pending payment
-        pending_payment = db_session.query(Payment).filter_by(
-            enrollment_id=enrollment.id,
-            status="Pending"
-        ).first()
-        
-        if pending_payment:
-            flash("Your payment is pending verification. Please wait for admin approval.", "warning")
-        else:
-            flash("Please complete payment first.", "warning")
-        return redirect(url_for("student_dashboard"))
-
     course = db_session.query(Course).filter_by(
         id=course_id
     ).first()
@@ -435,6 +456,22 @@ def access_course(course_id):
     if not course:
         flash("Course not found.", "danger")
         return redirect(url_for("student_dashboard"))
+
+    # Check payment only for paid courses
+    if not course.is_free:
+        if enrollment.payment_status != "Paid":
+            # Check if there's a pending payment
+            pending_payment = db_session.query(Payment).filter_by(
+                enrollment_id=enrollment.id,
+                status="Pending"
+            ).first()
+            
+            if pending_payment:
+                flash("Your payment is pending verification. Please wait for admin approval.", "warning")
+            else:
+                flash("Please complete payment first.", "warning")
+            return redirect(url_for("student_dashboard"))
+    # If course is free, skip payment check
 
     modules = db_session.query(Module).filter_by(
         course_id=course_id
@@ -507,7 +544,8 @@ def access_course(course_id):
         modules=modules,
         assignments=assignments,
         quizzes=quizzes,
-        announcements=announcements
+        announcements=announcements,
+        is_free=course.is_free
     )
 
 
@@ -594,7 +632,7 @@ def admin_reject_payment(payment_id):
 
 
 # ==================================================
-# MODULE CONTENT - UPDATED WITH BETTER CHUNKING
+# MODULE CONTENT
 # ==================================================
 
 @app.route("/module_content/<int:module_id>")
@@ -784,7 +822,7 @@ def learn_module(module_id):
 
 
 # ==================================================
-# COMPLETE MODULE - Fixed to prevent retaking
+# COMPLETE MODULE
 # ==================================================
 
 @app.route("/complete_module/<int:module_id>")
@@ -1069,6 +1107,10 @@ def admin_dashboard():
     pending_students = db_session.query(Student).filter_by(
         status="Pending"
     ).count()
+    
+    # Count free vs paid courses
+    free_courses = db_session.query(Course).filter_by(is_free=True).count()
+    paid_courses = db_session.query(Course).filter_by(is_free=False).count()
 
     # Payment Statistics
     total_payments = db_session.query(Payment).count()
@@ -1098,7 +1140,9 @@ def admin_dashboard():
         total_revenue=total_revenue,
         paid_payments=paid_payments,
         pending_payments=pending_payments,
-        recent_payments=recent_payments
+        recent_payments=recent_payments,
+        free_courses=free_courses,
+        paid_courses=paid_courses
     )
 
 
@@ -1267,7 +1311,7 @@ def mass_unblock_students():
 
 
 # ==================================================
-# COURSE MANAGEMENT (ADMIN)
+# COURSE MANAGEMENT (ADMIN) - Updated with is_free
 # ==================================================
 
 @app.route("/courses")
@@ -1303,12 +1347,19 @@ def add_course():
         course_name = request.form.get("course_name")
         course_code = request.form.get("course_code")
         duration = request.form.get("duration")
-        fee = request.form.get("fee")
+        fee = request.form.get("fee", 0)
         description = request.form.get("description")
         career_objectives = request.form.get("career_objectives")
         prerequisites = request.form.get("prerequisites")
         meeting_link = request.form.get("meeting_link")
         status = request.form.get("status")
+        
+        # Handle the is_free checkbox
+        is_free = request.form.get("is_free") == "on"
+        
+        # If course is free, set fee to 0
+        if is_free:
+            fee = 0
 
         existing = db_session.query(Course).filter_by(course_name=course_name).first()
         if existing:
@@ -1324,7 +1375,8 @@ def add_course():
             career_objectives=career_objectives,
             prerequisites=prerequisites,
             meeting_link=meeting_link,
-            status=status
+            status=status,
+            is_free=is_free
         )
 
         db_session.add(course)
@@ -1353,12 +1405,20 @@ def edit_course(id):
         course.course_name = request.form.get("course_name")
         course.course_code = request.form.get("course_code")
         course.duration = request.form.get("duration")
-        course.fee = request.form.get("fee")
+        course.fee = request.form.get("fee", 0)
         course.description = request.form.get("description")
         course.career_objectives = request.form.get("career_objectives")
         course.prerequisites = request.form.get("prerequisites")
         course.meeting_link = request.form.get("meeting_link")
         course.status = request.form.get("status")
+        
+        # Handle the is_free checkbox
+        course.is_free = request.form.get("is_free") == "on"
+        
+        # If course is free, set fee to 0
+        if course.is_free:
+            course.fee = 0
+        
         db_session.commit()
         flash("Course updated successfully.", "success")
         return redirect(url_for("courses"))
@@ -1548,7 +1608,7 @@ def admin_announcements(course_id):
 
 
 # ==================================================
-# MODULE MANAGEMENT (ADMIN) - REMOVED CAREER OBJECTIVES
+# MODULE MANAGEMENT (ADMIN)
 # ==================================================
 
 @app.route("/modules", methods=["GET", "POST"])
@@ -1585,7 +1645,6 @@ def add_module():
     module_number = request.form.get("module_number")
     title = request.form.get("title")
     description = request.form.get("description")
-    # career_objectives = request.form.get("career_objectives")  # REMOVED
     content = request.form.get("content")
     status = request.form.get("status", "Active")
 
@@ -1635,7 +1694,6 @@ def add_module():
         module_number=module_number,
         title=title,
         description=description,
-        # career_objectives=career_objectives,  # REMOVED
         content=content,
         pdf_file=pdf_file,
         video_file=video_file,
@@ -1668,7 +1726,6 @@ def edit_module(id):
         module.module_number = request.form.get("module_number")
         module.title = request.form.get("title")
         module.description = request.form.get("description")
-        # module.career_objectives = request.form.get("career_objectives")  # REMOVED
         module.content = request.form.get("content")
         module.status = request.form.get("status")
 
@@ -1889,7 +1946,7 @@ def delete_teacher(id):
 # ==================================================
 
 # ==================================================
-# TEACHER DASHBOARD
+# TEACHER DASHBOARD - Updated for free/paid courses
 # ==================================================
 
 @app.route("/teacher_dashboard")
@@ -1923,16 +1980,29 @@ def teacher_dashboard():
     
     # Count statistics
     total_students = 0
+    total_free_students = 0
+    total_paid_students = 0
     total_modules = 0
     total_assignments = 0
     pending_submissions = 0
     pending_questions = 0
     
     for course in my_courses:
-        total_students += db_session.query(Enrollment).filter_by(
-            course_id=course.id,
-            payment_status="Paid"
-        ).count()
+        # For free courses, all enrolled students count
+        if course.is_free:
+            students = db_session.query(Enrollment).filter_by(
+                course_id=course.id
+            ).count()
+            total_free_students += students
+        else:
+            # For paid courses, only paid students count
+            students = db_session.query(Enrollment).filter_by(
+                course_id=course.id,
+                payment_status="Paid"
+            ).count()
+            total_paid_students += students
+        
+        total_students += students
         total_modules += db_session.query(Module).filter_by(
             course_id=course.id
         ).count()
@@ -1956,6 +2026,8 @@ def teacher_dashboard():
         teacher=teacher,
         my_courses=my_courses,
         total_students=total_students,
+        total_free_students=total_free_students,
+        total_paid_students=total_paid_students,
         total_modules=total_modules,
         total_assignments=total_assignments,
         pending_submissions=pending_submissions,
@@ -1964,7 +2036,7 @@ def teacher_dashboard():
 
 
 # ==================================================
-# TEACHER - MANAGE COURSE
+# TEACHER - MANAGE COURSE - Updated
 # ==================================================
 
 @app.route("/teacher/manage_course/<int:course_id>")
@@ -1993,10 +2065,17 @@ def manage_course_modules(course_id):
         course_id=course_id
     ).order_by(Quiz.id.desc()).all()
     
-    enrolled_students = db_session.query(Enrollment).filter_by(
-        course_id=course_id,
-        payment_status="Paid"
-    ).all()
+    # For paid courses, only count paid students
+    # For free courses, count all enrolled students
+    if course.is_free:
+        enrolled_students = db_session.query(Enrollment).filter_by(
+            course_id=course_id
+        ).all()
+    else:
+        enrolled_students = db_session.query(Enrollment).filter_by(
+            course_id=course_id,
+            payment_status="Paid"
+        ).all()
     
     for assignment in assignments:
         assignment.submission_count = db_session.query(AssignmentSubmission).filter_by(
@@ -2018,12 +2097,13 @@ def manage_course_modules(course_id):
         modules=modules,
         assignments=assignments,
         quizzes=quizzes,
-        enrolled_students=enrolled_students
+        enrolled_students=enrolled_students,
+        is_free=course.is_free
     )
 
 
 # ==================================================
-# TEACHER - ADD MODULE - REMOVED CAREER OBJECTIVES
+# TEACHER - ADD MODULE
 # ==================================================
 
 @app.route("/teacher/add_module/<int:course_id>", methods=["GET", "POST"])
@@ -2044,7 +2124,6 @@ def teacher_add_module(course_id):
         module_number = request.form.get("module_number")
         title = request.form.get("title")
         description = request.form.get("description")
-        # career_objectives = request.form.get("career_objectives")  # REMOVED
         content = request.form.get("content")
         status = request.form.get("status", "Active")
         
@@ -2090,7 +2169,6 @@ def teacher_add_module(course_id):
             module_number=module_number,
             title=title,
             description=description,
-            # career_objectives=career_objectives,  # REMOVED
             content=content,
             pdf_file=pdf_file,
             video_file=video_file,
@@ -2108,7 +2186,7 @@ def teacher_add_module(course_id):
 
 
 # ==================================================
-# TEACHER - EDIT MODULE - REMOVED CAREER OBJECTIVES
+# TEACHER - EDIT MODULE
 # ==================================================
 
 @app.route("/teacher/edit_module/<int:module_id>", methods=["GET", "POST"])
@@ -2129,7 +2207,6 @@ def teacher_edit_module(module_id):
         module.module_number = request.form.get("module_number")
         module.title = request.form.get("title")
         module.description = request.form.get("description")
-        # module.career_objectives = request.form.get("career_objectives")  # REMOVED
         module.content = request.form.get("content")
         module.status = request.form.get("status")
         
@@ -2454,7 +2531,7 @@ def teacher_answer_question(question_id):
 
 
 # ==================================================
-# TEACHER - VIEW STUDENT PROGRESS
+# TEACHER - VIEW STUDENT PROGRESS - Updated
 # ==================================================
 
 @app.route("/teacher/student_progress/<int:course_id>")
@@ -2471,10 +2548,16 @@ def teacher_student_progress(course_id):
         flash("Course not found.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
-    enrollments = db_session.query(Enrollment).filter_by(
-        course_id=course_id,
-        payment_status="Paid"
-    ).all()
+    # For paid courses, only show paid students
+    if course.is_free:
+        enrollments = db_session.query(Enrollment).filter_by(
+            course_id=course_id
+        ).all()
+    else:
+        enrollments = db_session.query(Enrollment).filter_by(
+            course_id=course_id,
+            payment_status="Paid"
+        ).all()
     
     # Get all modules for this course
     modules = db_session.query(Module).filter_by(course_id=course_id).all()
@@ -2491,7 +2574,8 @@ def teacher_student_progress(course_id):
     return render_template(
         "teacher/student_progress.html",
         course=course,
-        enrollments=enrollments
+        enrollments=enrollments,
+        is_free=course.is_free
     )
 
 

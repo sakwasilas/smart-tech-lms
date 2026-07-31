@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ module.title }} - Learning Content</title>
+    <title>{{ module.title }} - {{ course.course_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -15,603 +15,496 @@
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4f9;
             min-height: 100vh;
         }
 
-        .main-wrapper {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 16px;
+        /* ===== NAVBAR ===== */
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        /* ===== HEADER ===== */
-        .module-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 18px 24px;
-            color: white;
-            margin-bottom: 14px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .module-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 250px;
-            height: 250px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .module-header .header-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .module-header .badge-module {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-size: 0.6rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        .module-header .badge-completed {
-            background: #2ecc71;
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-size: 0.6rem;
-            font-weight: 700;
-            display: inline-block;
-            margin-left: 6px;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-        }
-
-        .module-header h1 {
-            font-size: 1.4rem;
+        .navbar-custom .navbar-brand {
             font-weight: 800;
-            margin: 6px 0 2px 0;
-            letter-spacing: -0.3px;
+            font-size: 1.3rem;
+            letter-spacing: 0.5px;
+            color: white !important;
         }
 
-        .module-header .course-name {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            margin: 0;
+        .navbar-custom .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.4rem;
         }
 
-        .module-header .btn-back {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: white;
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
+        .navbar-custom .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .module-header .btn-back:hover {
+        .btn-back {
             background: rgba(255, 255, 255, 0.2);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* ===== RESOURCE CARDS ===== */
-        .resource-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .resource-card {
-            background: white;
-            border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-left: 3px solid #e9ecef;
-            transition: all 0.3s;
-        }
-
-        .resource-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        .resource-card.video-card {
-            border-left-color: #4facfe;
-        }
-
-        .resource-card.live-card {
-            border-left-color: #43e97b;
-        }
-
-        .resource-card .resource-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .resource-card .resource-info .icon-wrapper {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-
-        .resource-card .resource-info .icon-wrapper.blue {
-            background: rgba(79, 172, 254, 0.12);
-            color: #4facfe;
-        }
-
-        .resource-card .resource-info .icon-wrapper.green {
-            background: rgba(67, 233, 123, 0.12);
-            color: #43e97b;
-        }
-
-        .resource-card .resource-info .icon-wrapper.gray {
-            background: rgba(0, 0, 0, 0.04);
-            color: #b2bec3;
-        }
-
-        .resource-card .resource-info .resource-label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #2d3436;
-        }
-
-        .resource-card .resource-info .resource-file {
-            font-size: 0.6rem;
-            color: #636e72;
-            opacity: 0.7;
-        }
-
-        .resource-card .resource-btn {
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.65rem;
+            backdrop-filter: blur(10px);
             border: none;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
             transition: all 0.3s;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .resource-card .resource-btn:hover {
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
             transform: translateY(-2px);
         }
 
-        .resource-btn-primary {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
             color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
         }
 
-        .resource-btn-primary:hover {
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
             color: white;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            transform: translateY(-2px);
         }
 
-        .resource-btn-success {
-            background: linear-gradient(135deg, #43e97b, #38f9d7);
-            color: white;
-        }
-
-        .resource-btn-success:hover {
-            color: white;
-            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
-        }
-
-        .resource-btn-disabled {
-            background: #e9ecef;
-            color: #adb5bd;
-            cursor: not-allowed;
-        }
-
-        .resource-btn-disabled:hover {
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* ===== CONTENT CARD ===== */
-        .content-card {
+        /* ===== MODULE HEADER ===== */
+        .module-header {
             background: white;
             border-radius: 16px;
-            padding: 24px 28px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
-            min-height: 250px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin: 25px 0 30px 0;
+            border-left: 6px solid #667eea;
         }
 
-        .content-card .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.06);
-        }
-
-        .content-card .content-header h5 {
-            font-size: 0.85rem;
-            font-weight: 700;
+        .module-header h2 {
+            font-weight: 800;
             color: #2d3436;
+            font-size: 1.8rem;
             margin: 0;
         }
 
-        .content-card .content-header h5 i {
+        .module-header .module-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 12px 0 0 0;
+            padding: 12px 0 0 0;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .module-header .module-meta span {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .module-header .module-meta span i {
             color: #667eea;
             margin-right: 6px;
         }
 
-        .page-indicator {
-            background: rgba(102, 126, 234, 0.06);
-            padding: 3px 14px;
-            border-radius: 50px;
+        /* Badge Styles */
+        .badge-free {
+            background: #2ecc71;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: 600;
-            color: #667eea;
+            font-weight: 700;
         }
 
-        .page-indicator i {
-            margin-right: 4px;
+        .badge-paid {
+            background: #f39c12;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
         }
 
-        /* Progress Bar */
-        .progress-mini {
-            height: 3px;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 2px;
-            overflow: hidden;
+        /* ===== CONTENT AREA ===== */
+        .content-area {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 40px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+            min-height: 400px;
+        }
+
+        .content-area .content-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #2d3436;
+        }
+
+        .content-area .content-text h1,
+        .content-area .content-text h2,
+        .content-area .content-text h3 {
+            font-weight: 700;
+            color: #2d3436;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-area .content-text h1 {
+            font-size: 2rem;
+        }
+        .content-area .content-text h2 {
+            font-size: 1.6rem;
+        }
+        .content-area .content-text h3 {
+            font-size: 1.3rem;
+        }
+
+        .content-area .content-text p {
             margin-bottom: 16px;
         }
 
-        .progress-mini .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 2px;
-            transition: width 0.6s ease;
+        .content-area .content-text ul,
+        .content-area .content-text ol {
+            margin-bottom: 16px;
+            padding-left: 25px;
         }
 
-        /* ===== CONTENT TEXT - CLEAN & READABLE ===== */
-        .content-text {
-            font-size: 0.95rem;
-            line-height: 1.9;
-            color: #2d3436;
-            min-height: 150px;
+        .content-area .content-text li {
+            margin-bottom: 6px;
         }
 
-        .content-text h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin: 0 0 10px 0;
-            color: #2d3436;
-            letter-spacing: -0.5px;
-        }
-
-        .content-text h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin: 14px 0 8px 0;
-            color: #667eea;
-        }
-
-        .content-text h3 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin: 12px 0 6px 0;
-            color: #2d3436;
-        }
-
-        .content-text h4 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #2d3436;
-            margin: 10px 0 4px 0;
-        }
-
-        .content-text p {
-            margin-bottom: 10px;
-            line-height: 1.9;
-        }
-
-        .content-text ul, .content-text ol {
-            padding-left: 22px;
-            margin: 8px 0 12px 0;
-        }
-
-        .content-text li {
-            margin-bottom: 5px;
-        }
-
-        .content-text strong {
-            color: #2d3436;
-            font-weight: 700;
-        }
-
-        .content-text .section-title {
-            background: rgba(102, 126, 234, 0.04);
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: 700;
-            color: #667eea;
-            display: inline-block;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .content-text .divider {
-            border: none;
-            border-top: 2px solid rgba(102, 126, 234, 0.06);
-            margin: 16px 0;
-        }
-
-        /* ===== PAGE NAVIGATION ===== */
-        .nav-section {
-            margin-top: 16px;
-            padding-top: 14px;
-            border-top: 2px solid rgba(102, 126, 234, 0.06);
-        }
-
-        .nav-section .btn-page {
-            font-size: 0.8rem;
-            padding: 8px 22px;
-            border-radius: 50px;
-            font-weight: 700;
-            transition: all 0.3s;
-            border: none;
-            min-width: 100px;
-        }
-
-        .nav-section .btn-page:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-page-prev {
-            background: rgba(0, 0, 0, 0.04);
-            color: #636e72;
-        }
-
-        .btn-page-prev:hover {
-            background: rgba(0, 0, 0, 0.07);
-            color: #2d3436;
-        }
-
-        .btn-page-next {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        .btn-page-next:hover {
-            color: white;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-page-prev:disabled,
-        .btn-page-next:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* ===== MODULE NAVIGATION ===== */
-        .module-nav {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 14px;
-        }
-
-        .module-nav .btn-mod {
-            font-size: 0.75rem;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-weight: 700;
-            border: none;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 80px;
-        }
-
-        .module-nav .btn-mod:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-mod-prev {
-            background: rgba(0, 0, 0, 0.04);
-            color: #636e72;
-        }
-
-        .btn-mod-prev:hover {
-            background: rgba(0, 0, 0, 0.07);
-            color: #2d3436;
-        }
-
-        .btn-mod-complete {
-            background: linear-gradient(135deg, #00b894, #00a381);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.2);
-        }
-
-        .btn-mod-complete:hover {
-            color: white;
-            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.3);
-        }
-
-        .btn-mod-complete.completed {
-            background: #2ecc71;
-            cursor: default;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
-        }
-
-        .btn-mod-complete.completed:hover {
-            transform: none;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
-        }
-
-        .btn-mod-next {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        .btn-mod-next:hover {
-            color: white;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-mod-prev:disabled,
-        .btn-mod-next:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* ===== VIDEO MODAL ===== */
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
+        .content-area .content-text img {
+            max-width: 100%;
             border-radius: 10px;
-            background: #000;
+            margin: 15px 0;
         }
 
-        .video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .content-area .content-text blockquote {
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 15px 0;
         }
 
-        .modal-content {
-            border-radius: 16px;
-            overflow: hidden;
+        .content-area .content-text code {
+            background: #f1f2f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .content-area .content-text pre {
+            background: #2d3436;
+            color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0 10px 0;
+        }
+
+        .pagination-nav .page-info {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .pagination-nav .page-info strong {
+            color: #2d3436;
+        }
+
+        .btn-page {
+            padding: 8px 20px;
             border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .modal-header {
-            border-bottom: none;
+        .btn-page.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-page.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-page.secondary {
+            background: #e9ecef;
+            color: #636e72;
+        }
+
+        .btn-page.secondary:hover {
+            background: #dee2e6;
+            color: #2d3436;
+        }
+
+        .btn-page:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-page:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== NAVIGATION BUTTONS ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .nav-buttons .btn {
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-complete-module {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-complete-module:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+
+        .btn-complete-module:disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+        }
+
+        .btn-complete-module:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== RESOURCES SECTION ===== */
+        .resources-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 25px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .resources-section h6 {
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 12px;
+        }
+
+        .resources-section h6 i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        .resource-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .resource-links a {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .resource-links a:hover {
+            transform: translateY(-2px);
+        }
+
+        .resource-links .pdf-link {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .resource-links .pdf-link:hover {
+            background: #c0392b;
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .resource-links .video-link {
+            background: #667eea;
+            color: white;
+        }
+
+        .resource-links .video-link:hover {
+            background: #5a67d8;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .resource-links .meeting-link {
+            background: #25D366;
+            color: white;
+        }
+
+        .resource-links .meeting-link:hover {
+            background: #128C7E;
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        /* ===== FLASH MESSAGES ===== */
+        .alert-custom {
+            border-radius: 12px;
             padding: 14px 20px;
+            border: none;
+            margin-bottom: 20px;
         }
 
-        .modal-body {
-            padding: 0 20px 20px 20px;
+        .alert-custom.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-custom.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-custom.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-custom.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .main-wrapper {
-                padding: 10px;
+            .module-header h2 {
+                font-size: 1.4rem;
             }
 
-            .module-header {
-                padding: 14px 16px;
-                border-radius: 12px;
+            .content-area {
+                padding: 20px;
             }
 
-            .module-header h1 {
-                font-size: 1.1rem;
+            .content-area .content-text {
+                font-size: 0.95rem;
             }
 
-            .content-card {
-                padding: 16px 18px;
-                border-radius: 12px;
+            .pagination-nav {
+                flex-direction: column;
+                text-align: center;
             }
 
-            .resource-cards {
-                grid-template-columns: 1fr;
-                gap: 8px;
+            .nav-buttons {
+                flex-direction: column;
             }
 
-            .content-text {
-                font-size: 0.9rem;
-                line-height: 1.7;
+            .nav-buttons .btn {
+                width: 100%;
+                text-align: center;
             }
 
-            .content-text h1 {
-                font-size: 1.2rem;
+            .btn-complete-module {
+                width: 100%;
+                text-align: center;
             }
 
-            .nav-section .btn-page {
-                font-size: 0.7rem;
-                padding: 6px 14px;
-                min-width: 70px;
+            .resources-section .resource-links {
+                flex-direction: column;
             }
 
-            .module-nav .btn-mod {
-                font-size: 0.7rem;
-                padding: 5px 12px;
-                min-width: 60px;
+            .resources-section .resource-links a {
+                text-align: center;
             }
         }
 
         @media (max-width: 480px) {
-            .module-header h1 {
-                font-size: 0.95rem;
+            .navbar-custom .navbar-brand {
+                font-size: 1rem;
             }
 
-            .module-header .btn-back {
-                font-size: 0.6rem;
-                padding: 3px 10px;
+            .btn-back, .btn-logout {
+                font-size: 0.7rem;
+                padding: 4px 12px;
             }
 
-            .content-card {
-                padding: 12px 14px;
+            .module-header {
+                padding: 18px;
             }
 
-            .content-text {
-                font-size: 0.85rem;
-                line-height: 1.6;
-            }
-
-            .module-nav {
-                flex-direction: column;
-            }
-
-            .module-nav .btn-mod {
-                flex: none;
-                width: 100%;
+            .content-area {
+                padding: 15px;
             }
         }
 
         /* ===== ANIMATIONS ===== */
         .fade-in {
-            animation: fadeInUp 0.4s ease-out forwards;
+            animation: fadeInUp 0.5s ease-out forwards;
             opacity: 0;
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(15px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -619,257 +512,190 @@
             }
         }
 
-        .fade-in:nth-child(1) { animation-delay: 0.05s; }
-        .fade-in:nth-child(2) { animation-delay: 0.1s; }
-        .fade-in:nth-child(3) { animation-delay: 0.15s; }
-
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.02);
+            background: #f0f4f9;
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #c8d6e5;
             border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8395a7;
         }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('student_dashboard') }}">
+                <i class="fas fa-graduation-cap"></i> Learning Management System
+            </a>
 
-    <!-- ===== MODULE HEADER ===== -->
-    <div class="module-header fade-in">
-        <div class="header-content">
-            <div class="d-flex justify-content-between align-items-start flex-wrap">
-                <div>
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="badge-module">
-                            <i class="fas fa-book"></i> Module {{ module.module_number }}
-                        </span>
-                        {% if completed %}
-                        <span class="badge-completed">
-                            <i class="fas fa-check-circle"></i> Completed
-                        </span>
-                        {% endif %}
-                    </div>
-                    <h1>{{ module.title }}</h1>
-                    <p class="course-name">{{ course.course_name }}</p>
-                </div>
+            <div class="user-info">
                 <a href="{{ url_for('access_course', course_id=course.id) }}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-arrow-left"></i> Back to Course
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- ===== RESOURCE CARDS ===== -->
-    <div class="resource-cards">
-        <!-- Video Card -->
-        <div class="resource-card fade-in {% if module.video_file %}video-card{% endif %}">
-            <div class="resource-info">
-                <div class="icon-wrapper {% if module.video_file %}blue{% else %}gray{% endif %}">
-                    <i class="fas fa-play-circle"></i>
-                </div>
+    <div class="container mt-4">
+
+        <!-- ===== FLASH MESSAGES ===== -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert-custom {{ category }}">
+                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- ===== MODULE HEADER ===== -->
+        <div class="module-header fade-in">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                 <div>
-                    <div class="resource-label">Video Tutorial</div>
-                    <div class="resource-file">
-                        {% if module.video_file %}
-                            {{ module.video_file }}
+                    <h2>
+                        <i class="fas fa-folder-open" style="color: #667eea;"></i>
+                        {{ module.title }}
+                    </h2>
+                    <div class="module-meta">
+                        <span><i class="fas fa-book"></i> {{ course.course_name }}</span>
+                        <span><i class="fas fa-hashtag"></i> Module {{ module.module_number }}</span>
+                        {% if course.is_free %}
+                            <span><span class="badge-free"><i class="fas fa-gift"></i> FREE COURSE</span></span>
                         {% else %}
-                            Not available
+                            <span><span class="badge-paid"><i class="fas fa-credit-card"></i> PAID COURSE</span></span>
+                        {% endif %}
+                        {% if completed %}
+                            <span><span class="badge bg-success"><i class="fas fa-check-circle"></i> Completed</span></span>
+                        {% else %}
+                            <span><span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> In Progress</span></span>
                         {% endif %}
                     </div>
                 </div>
             </div>
-            {% if module.video_file %}
-            <button class="resource-btn resource-btn-primary" data-bs-toggle="modal" data-bs-target="#videoModal">
-                <i class="fas fa-play"></i> Watch
-            </button>
-            {% else %}
-            <span class="resource-btn resource-btn-disabled">
-                <i class="fas fa-times"></i>
-            </span>
-            {% endif %}
         </div>
 
-        <!-- Live Class Card -->
-        <div class="resource-card fade-in {% if module.meeting_link %}live-card{% endif %}">
-            <div class="resource-info">
-                <div class="icon-wrapper {% if module.meeting_link %}green{% else %}gray{% endif %}">
-                    <i class="fas fa-video"></i>
-                </div>
-                <div>
-                    <div class="resource-label">Live Class</div>
-                    <div class="resource-file">
-                        {% if module.meeting_link %}
-                            Google Meet
-                        {% else %}
-                            Not scheduled
-                        {% endif %}
-                    </div>
-                </div>
+        <!-- ===== RESOURCES ===== -->
+        {% if module.pdf_file or module.video_file or module.meeting_link %}
+        <div class="resources-section fade-in">
+            <h6><i class="fas fa-paperclip"></i> Module Resources</h6>
+            <div class="resource-links">
+                {% if module.pdf_file %}
+                <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" target="_blank" class="pdf-link">
+                    <i class="fas fa-file-pdf"></i> Download PDF Notes
+                </a>
+                {% endif %}
+                {% if module.video_file %}
+                <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" target="_blank" class="video-link">
+                    <i class="fas fa-video"></i> Watch Video
+                </a>
+                {% endif %}
+                {% if module.meeting_link %}
+                <a href="{{ module.meeting_link }}" target="_blank" class="meeting-link">
+                    <i class="fas fa-video"></i> Join Live Class
+                </a>
+                {% endif %}
             </div>
-            {% if module.meeting_link %}
-            <a href="{{ module.meeting_link }}" target="_blank" class="resource-btn resource-btn-success">
-                <i class="fas fa-video"></i> Join
-            </a>
-            {% else %}
-            <span class="resource-btn resource-btn-disabled">
-                <i class="fas fa-times"></i>
-            </span>
-            {% endif %}
         </div>
-    </div>
+        {% endif %}
 
-    <!-- ===== CONTENT CARD ===== -->
-    <div class="content-card fade-in">
-        <div class="content-header">
-            <h5><i class="fas fa-file-alt"></i> Learning Content</h5>
-            <span class="page-indicator">
-                <i class="fas fa-book-open"></i> {{ current_page }} / {{ total_pages }}
-            </span>
-        </div>
-
-        <div class="progress-mini">
-            <div class="progress-fill" style="width: {{ (current_page / total_pages * 100)|round|int if total_pages > 0 else 0 }}%;"></div>
-        </div>
-
-        <div class="content-text">
-            {% if current_content and current_content.strip() %}
+        <!-- ===== CONTENT ===== -->
+        <div class="content-area fade-in">
+            <div class="content-text">
                 {{ current_content|safe }}
-            {% else %}
-                <div class="text-center py-4">
-                    <i class="fas fa-file-alt fa-2x text-muted mb-3" style="color: #667eea;"></i>
-                    <h6 style="font-weight: 700; color: #2d3436;">No Content Available</h6>
-                    <p class="text-muted small">{{ module.description or 'This module has no content to display.' }}</p>
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div class="pagination-nav">
+                <div>
+                    {% if has_previous %}
+                    <a href="{{ url_for('module_content', module_id=module.id, page=current_page-1) }}" class="btn-page primary">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </a>
+                    {% else %}
+                    <button class="btn-page secondary" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    {% endif %}
                 </div>
+
+                <div class="page-info">
+                    Page <strong>{{ current_page }}</strong> of <strong>{{ total_pages }}</strong>
+                </div>
+
+                <div>
+                    {% if has_next %}
+                    <a href="{{ url_for('module_content', module_id=module.id, page=current_page+1) }}" class="btn-page primary">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </a>
+                    {% else %}
+                    <button class="btn-page secondary" disabled>
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
             {% endif %}
         </div>
 
-        <!-- ===== PAGE NAVIGATION ===== -->
-        <div class="nav-section">
-            <div class="row g-2">
-                <div class="col-6">
-                    {% if has_previous %}
-                    <a href="{{ url_for('module_content', module_id=module.id, page=current_page - 1) }}"
-                       class="btn-page btn-page-prev w-100">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </a>
-                    {% else %}
-                    <button class="btn-page btn-page-prev w-100" disabled>
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    {% endif %}
-                </div>
-                <div class="col-6">
-                    {% if has_next %}
-                    <a href="{{ url_for('module_content', module_id=module.id, page=current_page + 1) }}"
-                       class="btn-page btn-page-next w-100">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </a>
-                    {% else %}
-                    <button class="btn-page btn-page-next w-100" disabled>
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
-                    {% endif %}
-                </div>
+        <!-- ===== NAVIGATION BUTTONS ===== -->
+        <div class="nav-buttons">
+            <div>
+                {% if previous_module %}
+                <a href="{{ url_for('module_content', module_id=previous_module.id) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Previous Module
+                </a>
+                {% endif %}
+            </div>
+
+            <div>
+                {% if not completed %}
+                <a href="{{ url_for('complete_module', module_id=module.id) }}" class="btn-complete-module"
+                   onclick="return confirm('Mark this module as completed?')">
+                    <i class="fas fa-check-circle"></i> Mark as Completed
+                </a>
+                {% endif %}
+            </div>
+
+            <div>
+                {% if next_module %}
+                <a href="{{ url_for('module_content', module_id=next_module.id) }}" class="btn btn-primary">
+                    Next Module <i class="fas fa-arrow-right"></i>
+                </a>
+                {% else %}
+                <a href="{{ url_for('access_course', course_id=course.id) }}" class="btn btn-success">
+                    <i class="fas fa-check"></i> Finish Course
+                </a>
+                {% endif %}
             </div>
         </div>
-    </div>
 
-    <!-- ===== MODULE NAVIGATION ===== -->
-    <div class="module-nav fade-in">
-        {% if previous_module %}
-        <a href="{{ url_for('module_content', module_id=previous_module.id) }}" class="btn-mod btn-mod-prev">
-            <i class="fas fa-arrow-left"></i> Previous
-        </a>
-        {% else %}
-        <button class="btn-mod btn-mod-prev" disabled>
-            <i class="fas fa-arrow-left"></i> Previous
-        </button>
-        {% endif %}
-
-        {% if not completed %}
-        <a href="{{ url_for('complete_module', module_id=module.id) }}" class="btn-mod btn-mod-complete">
-            <i class="fas fa-check-circle"></i> Complete
-        </a>
-        {% else %}
-        <button class="btn-mod btn-mod-complete completed" disabled>
-            <i class="fas fa-check-circle"></i> Completed ✓
-        </button>
-        {% endif %}
-
-        {% if next_module %}
-        <a href="{{ url_for('module_content', module_id=next_module.id) }}" class="btn-mod btn-mod-next">
-            Next <i class="fas fa-arrow-right"></i>
-        </a>
-        {% else %}
-        <button class="btn-mod btn-mod-next" disabled>
-            Next <i class="fas fa-arrow-right"></i>
-        </button>
-        {% endif %}
-    </div>
-
-</div>
-
-<!-- ===== VIDEO MODAL ===== -->
-{% if module.video_file %}
-<div class="modal fade" id="videoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6 class="modal-title">
-                    <i class="fas fa-video me-2" style="color:#667eea;"></i>
-                    {{ module.title }} - Video
-                </h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="video-container">
-                    <video controls>
-                        <source src="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <div class="mt-2">
-                    <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}"
-                       download
-                       class="btn btn-sm btn-outline-primary" style="border-radius: 50px; padding: 4px 14px; font-weight: 600; font-size: 0.7rem;">
-                        <i class="fas fa-download"></i> Download
-                    </a>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" style="border-radius: 50px; padding: 4px 16px;">Close</button>
-            </div>
+        <!-- ===== FOOTER ===== -->
+        <div style="text-align: center; padding: 30px 0 20px 0; color: #b2bec3; font-size: 0.85rem; border-top: 1px solid #e9ecef; margin-top: 30px;">
+            <i class="fas fa-heart" style="color: #e74c3c;"></i> Learning Management System &copy; 2026 - All rights reserved
         </div>
-    </div>
-</div>
-{% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    var videoModal = document.getElementById('videoModal');
-    if (videoModal) {
-        videoModal.addEventListener('shown.bs.modal', function () {
-            var video = this.querySelector('video');
-            if (video) video.play();
-        });
-        videoModal.addEventListener('hidden.bs.modal', function () {
-            var video = this.querySelector('video');
-            if (video) {
-                video.pause();
-                video.currentTime = 0;
-            }
-        });
-    }
-</script>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

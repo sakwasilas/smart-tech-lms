@@ -7,6 +7,7 @@
     <title>Course Management</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="bg-light">
@@ -43,11 +44,15 @@
 
     <div class="card shadow">
 
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
 
             <h4 class="mb-0">
-                Course Management
+                <i class="fas fa-book"></i> Course Management
             </h4>
+
+            <span class="badge bg-light text-dark">
+                Total: {{ courses|length }} Courses
+            </span>
 
         </div>
 
@@ -59,8 +64,9 @@
 
                 {% for category, message in messages %}
 
-                <div class="alert alert-{{ category }}">
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
                 {% endfor %}
@@ -68,127 +74,147 @@
             {% endif %}
             {% endwith %}
 
-            <!-- Add Course -->
-
-            <form method="POST"
-                  action="{{ url_for('add_course') }}">
-
-                <div class="row">
-
-                    <div class="col-md-4 mb-3">
-                        <label>Course Name</label>
-                        <input type="text"
-                               name="course_name"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                        <label>Duration</label>
-                        <input type="text"
-                               name="duration"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="col-md-2 mb-3">
-                        <label>Fee</label>
-                        <input type="number"
-                               name="fee"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Status</label>
-
-                        <select name="status"
-                                class="form-select">
-
-                            <option value="Active">
-                                Active
-                            </option>
-
-                            <option value="Inactive">
-                                Inactive
-                            </option>
-
-                        </select>
-
-                    </div>
-
+            <!-- Add Course Form -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Course</h5>
                 </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_course') }}">
 
-                <div class="mb-3">
+                        <div class="row">
 
-                    <label>Description</label>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Course Name <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       name="course_name"
+                                       class="form-control"
+                                       required>
+                            </div>
 
-                    <textarea
-                        name="description"
-                        class="form-control"
-                        rows="3"></textarea>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label fw-bold">Course Code</label>
+                                <input type="text"
+                                       name="course_code"
+                                       class="form-control"
+                                       placeholder="e.g., CS101">
+                            </div>
 
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label fw-bold">Duration</label>
+                                <input type="text"
+                                       name="duration"
+                                       class="form-control"
+                                       placeholder="e.g., 6 Months">
+                            </div>
+
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label fw-bold">Fee (Ksh)</label>
+                                <input type="number"
+                                       name="fee"
+                                       class="form-control"
+                                       value="0"
+                                       step="0.01"
+                                       min="0">
+                            </div>
+
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label fw-bold">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- Free Course Checkbox -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" class="form-check-input" id="is_free" name="is_free" onchange="toggleFeeField()">
+                                    <label class="form-check-label fw-bold" for="is_free">
+                                        <i class="fas fa-gift text-success"></i> Free Course
+                                    </label>
+                                    <small class="text-muted d-block">Check this if students can access this course without payment</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Description</label>
+                                <textarea name="description" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Career Objectives</label>
+                                <textarea name="career_objectives" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Prerequisites</label>
+                                <textarea name="prerequisites" class="form-control" rows="2"></textarea>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Meeting Link</label>
+                                <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/...">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success">
+                            <i class="fas fa-save"></i> Add Course
+                        </button>
+
+                    </form>
                 </div>
-
-                <div class="mb-3">
-
-                    <label>Career Objectives</label>
-
-                    <textarea
-                        name="career_objectives"
-                        class="form-control"
-                        rows="3"></textarea>
-
-                </div>
-
-                <button class="btn btn-success">
-                    Add Course
-                </button>
-
-            </form>
-
-            <hr>
+            </div>
 
             <!-- Search -->
-
-            <form method="GET">
-
-                <div class="input-group">
-
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ search }}"
-                        class="form-control"
-                        placeholder="Search course">
-
-                    <button class="btn btn-primary">
-                        Search
-                    </button>
-
-                </div>
-
-            </form>
+            <div class="mb-3">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search courses by name...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            {% if search %}
+                                <a href="{{ url_for('courses') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-info text-dark p-2">
+                            <i class="fas fa-list"></i> {{ courses|length }} Course(s) Found
+                        </span>
+                    </div>
+                </form>
+            </div>
 
             <hr>
 
             <!-- Course Table -->
-
             <div class="table-responsive">
 
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered table-striped table-hover">
 
                     <thead class="table-dark">
 
                         <tr>
-
                             <th>ID</th>
-                            <th>Course</th>
-                            <th>Duration</th>
+                            <th>Course Name</th>
+                            <th>Code</th>
+                            <th>Type</th>
                             <th>Fee</th>
+                            <th>Duration</th>
                             <th>Status</th>
-                            <th width="260">Actions</th>
-
+                            <th width="320">Actions</th>
                         </tr>
 
                     </thead>
@@ -201,24 +227,49 @@
 
                         <td>{{ course.id }}</td>
 
-                        <td>{{ course.course_name }}</td>
+                        <td>
+                            <strong>{{ course.course_name }}</strong>
+                            {% if course.is_free %}
+                                <span class="badge bg-success ms-1">FREE</span>
+                            {% endif %}
+                        </td>
 
-                        <td>{{ course.duration }}</td>
+                        <td><code>{{ course.course_code }}</code></td>
 
-                        <td>{{ course.fee }}</td>
+                        <td>
+                            {% if course.is_free %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-gift"></i> Free
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-credit-card"></i> Paid
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if course.is_free %}
+                                <span class="text-success fw-bold">FREE</span>
+                            {% else %}
+                                <span class="fw-bold">Ksh {{ "%.2f"|format(course.fee) }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ course.duration or 'N/A' }}</td>
 
                         <td>
 
                             {% if course.status=="Active" %}
 
                                 <span class="badge bg-success">
-                                    Active
+                                    <i class="fas fa-check-circle"></i> Active
                                 </span>
 
                             {% else %}
 
                                 <span class="badge bg-danger">
-                                    Inactive
+                                    <i class="fas fa-times-circle"></i> Inactive
                                 </span>
 
                             {% endif %}
@@ -227,40 +278,54 @@
 
                         <td>
 
-                            <a href="{{ url_for('edit_course', id=course.id) }}"
-                               class="btn btn-warning btn-sm">
+                            <div class="btn-group btn-group-sm" role="group">
 
-                                Edit
+                                <a href="{{ url_for('edit_course', id=course.id) }}"
+                                   class="btn btn-warning"
+                                   title="Edit Course">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
-                            </a>
+                                <a href="{{ url_for('assign_teacher', course_id=course.id) }}"
+                                   class="btn btn-primary"
+                                   title="Assign Teacher">
+                                    <i class="fas fa-user-tie"></i>
+                                </a>
 
-                            <a href="{{ url_for('delete_course', id=course.id) }}"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete this course?')">
+                                <a href="{{ url_for('admin_announcements', course_id=course.id) }}"
+                                   class="btn btn-info"
+                                   title="Manage Announcements">
+                                    <i class="fas fa-bullhorn"></i>
+                                </a>
 
-                                Delete
+                                {% if course.status=="Active" %}
 
-                            </a>
+                                <a href="{{ url_for('deactivate_course', id=course.id) }}"
+                                   class="btn btn-secondary"
+                                   title="Deactivate Course"
+                                   onclick="return confirm('Deactivate this course?')">
+                                    <i class="fas fa-pause"></i>
+                                </a>
 
-                            {% if course.status=="Active" %}
+                                {% else %}
 
-                            <a href="{{ url_for('deactivate_course', id=course.id) }}"
-                               class="btn btn-secondary btn-sm">
+                                <a href="{{ url_for('activate_course', id=course.id) }}"
+                                   class="btn btn-success"
+                                   title="Activate Course"
+                                   onclick="return confirm('Activate this course?')">
+                                    <i class="fas fa-play"></i>
+                                </a>
 
-                                Deactivate
+                                {% endif %}
 
-                            </a>
+                                <a href="{{ url_for('delete_course', id=course.id) }}"
+                                   class="btn btn-danger"
+                                   title="Delete Course"
+                                   onclick="return confirm('Delete this course? This cannot be undone!')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
 
-                            {% else %}
-
-                            <a href="{{ url_for('activate_course', id=course.id) }}"
-                               class="btn btn-success btn-sm">
-
-                                Activate
-
-                            </a>
-
-                            {% endif %}
+                            </div>
 
                         </td>
 
@@ -270,10 +335,13 @@
 
                     <tr>
 
-                        <td colspan="6"
-                            class="text-center">
+                        <td colspan="8"
+                            class="text-center py-4">
 
-                            No courses found.
+                            <i class="fas fa-folder-open fa-2x text-muted d-block mb-2"></i>
+                            <span class="text-muted">No courses found.</span>
+                            <br>
+                            <small class="text-muted">Add your first course using the form above.</small>
 
                         </td>
 
@@ -287,11 +355,65 @@
 
             </div>
 
+            <!-- Course Statistics -->
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Free Courses</h5>
+                            <h2>{{ courses|selectattr('is_free', 'equalto', true)|list|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Paid Courses</h5>
+                            <h2>{{ courses|selectattr('is_free', 'equalto', false)|list|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Active Courses</h5>
+                            <h2>{{ courses|selectattr('status', 'equalto', 'Active')|list|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Total Courses</h5>
+                            <h2>{{ courses|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
 </div>
+
+<script>
+    function toggleFeeField() {
+        const isFree = document.getElementById('is_free').checked;
+        const feeInput = document.querySelector('input[name="fee"]');
+        
+        if (isFree) {
+            feeInput.value = 0;
+            feeInput.disabled = true;
+            feeInput.classList.add('bg-light');
+        } else {
+            feeInput.disabled = false;
+            feeInput.classList.remove('bg-light');
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
