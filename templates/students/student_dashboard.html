@@ -407,7 +407,7 @@
               {% else %}<span class="course-fee"><i class="fas fa-dollar-sign"></i> Ksh {{ course.fee }}</span>{% endif %}
               <span><i class="fas fa-code"></i> {{ course.course_code }}</span>
             </div>
-            <p class="course-description">{{ course.description[:120] }}{% if course.description and course.description|length > 120 %}...{% endif %}</p>
+            
           </div>
           {% set enrolled = false %}
           {% for item in my_courses %}{% if item.course_id == course.id %}{% set enrolled = true %}{% endif %}{% endfor %}
