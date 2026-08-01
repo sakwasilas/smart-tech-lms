@@ -328,7 +328,6 @@
   <div class="brand">
     <span class="accent">◆</span> LMS
   </div>
-  <!-- REMOVED: user-info with email -->
 </header>
 
 <!-- ===== STYLED HR ===== -->
@@ -338,16 +337,14 @@
 
   <!-- ===== LEFT PANEL ===== -->
   <aside class="left-panel">
-    <div class="user-badge">
-      <!-- REMOVED: email from user badge -->
-    </div>
+    <div class="user-badge"></div>
 
     <nav class="nav-left">
       <a href="{{ url_for('student_dashboard') }}" class="nav-item active">Dashboard</a>
-      <a href="#" class="nav-item">Available</a>
-      <a href="#" class="nav-item">My Courses</a>
-      <a href="#" class="nav-item">Payments</a>
-      <a href="#" class="nav-item">Announcements</a>
+      <a href="{{ url_for('student_dashboard') }}#available" class="nav-item">Available</a>
+      <a href="{{ url_for('student_dashboard') }}#my-courses" class="nav-item">My Courses</a>
+      <a href="{{ url_for('student_dashboard') }}#payments" class="nav-item">Payments</a>
+      <a href="{{ url_for('student_dashboard') }}#announcements" class="nav-item">Announcements</a>
       <div class="logout-item">
         <a href="{{ url_for('logout') }}" class="nav-item">Logout</a>
       </div>
@@ -405,7 +402,7 @@
     <hr class="hr-section" />
 
     <!-- available courses -->
-    <div class="section-header">
+    <div class="section-header" id="available">
       <h3>Available courses</h3>
       <span class="badge-count">{{ courses|length }}</span>
     </div>
@@ -448,7 +445,7 @@
     <hr class="hr-section" />
 
     <!-- my courses -->
-    <div class="section-header">
+    <div class="section-header" id="my-courses">
       <h3>My courses</h3>
       <span class="badge-count">{{ my_courses|length }}</span>
     </div>
@@ -486,6 +483,76 @@
         {% endfor %}
       {% else %}
         <div class="empty-state" style="grid-column:1/-1;"><h5>No Courses Yet</h5><p>You haven't enrolled in any courses. Browse available courses above!</p></div>
+      {% endif %}
+    </div>
+
+    <!-- ===== HR BEFORE ANNOUNCEMENTS ===== -->
+    <hr class="hr-section" />
+
+    <!-- announcements -->
+    <div class="section-header" id="announcements">
+      <h3>Announcements</h3>
+    </div>
+    <div class="course-grid">
+      {% if announcements %}
+        {% for announcement in announcements %}
+        <div class="course-card fade-in" style="border-top-color: {% if announcement.is_pinned %}#f5b342{% else %}#4f6ef7{% endif %};">
+          <div>
+            <h4>
+              {{ announcement.title }}
+              {% if announcement.is_pinned %}<span class="badge-paid">PINNED</span>{% endif %}
+            </h4>
+            <div class="course-meta">
+              <span>{{ announcement.created_at }}</span>
+              <span>By: {{ announcement.author.fullname if announcement.author else 'Admin' }}</span>
+            </div>
+            <p class="course-description">{{ announcement.content[:150] }}{% if announcement.content and announcement.content|length > 150 %}...{% endif %}</p>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state" style="grid-column:1/-1;"><h5>No Announcements</h5><p>There are no announcements for this course yet.</p></div>
+      {% endif %}
+    </div>
+
+    <!-- ===== HR BEFORE QUIZZES ===== -->
+    <hr class="hr-section" />
+
+    <!-- quizzes -->
+    <div class="section-header" id="quizzes">
+      <h3>Quizzes</h3>
+      <span class="badge-count">{{ quizzes|length }}</span>
+    </div>
+    <div class="course-grid">
+      {% if quizzes %}
+        {% for quiz in quizzes %}
+        <div class="course-card fade-in" style="border-top-color: {% if quiz.attempted %}#2edb7a{% else %}#4f6ef7{% endif %};">
+          <div>
+            <h4>
+              {{ quiz.title }}
+              {% if quiz.attempted %}<span class="badge-free">COMPLETED</span>{% else %}<span class="badge-paid">PENDING</span>{% endif %}
+            </h4>
+            <div class="course-meta">
+              <span>Time Limit: {{ quiz.time_limit }} mins</span>
+              <span>Passing Score: {{ quiz.passing_score }}%</span>
+            </div>
+            <p class="course-description">{{ quiz.description[:100] }}{% if quiz.description and quiz.description|length > 100 %}...{% endif %}</p>
+            {% if quiz.attempt %}
+            <div class="course-meta">
+              <span>Score: {{ quiz.attempt.score|round(1) }}%</span>
+              <span>Status: {% if quiz.attempt.passed %}Passed{% else %}Failed{% endif %}</span>
+            </div>
+            {% endif %}
+          </div>
+          {% if quiz.attempted %}
+            <button class="btn-enroll success" disabled>Already Completed</button>
+          {% else %}
+            <a href="{{ url_for('student_take_quiz', quiz_id=quiz.id) }}" class="btn-enroll primary" style="text-align:center;text-decoration:none;display:block;">Take Quiz</a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state" style="grid-column:1/-1;"><h5>No Quizzes Available</h5><p>There are no quizzes for this course yet.</p></div>
       {% endif %}
     </div>
 
