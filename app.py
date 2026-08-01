@@ -200,7 +200,7 @@ def student_register():
 # ==================================================
 
 # ==================================================
-# STUDENT DASHBOARD - Updated to show free/paid status
+# STUDENT DASHBOARD - FIXED
 # ==================================================
 
 @app.route("/student/dashboard")
@@ -233,7 +233,7 @@ def student_dashboard():
         student_id=student.id
     ).all()
     
-    # Add course info to each enrollment
+    # Explicitly load the course for each enrollment
     for enrollment in my_courses:
         enrollment.course = db_session.query(Course).filter_by(
             id=enrollment.course_id
@@ -358,6 +358,11 @@ def payment_page(enrollment_id):
     if not enrollment:
         flash("Enrollment not found.", "danger")
         return redirect(url_for("student_dashboard"))
+    
+    # Load course for the enrollment
+    enrollment.course = db_session.query(Course).filter_by(
+        id=enrollment.course_id
+    ).first()
 
     return render_template(
         "students/payment.html",
@@ -424,7 +429,7 @@ def submit_payment(enrollment_id):
 
 
 # ==================================================
-# ACCESS COURSE - Updated for Free/Paid courses
+# ACCESS COURSE - FIXED for "Paid" and "Verified" status
 # ==================================================
 
 @app.route("/course/<int:course_id>")
@@ -457,9 +462,9 @@ def access_course(course_id):
         flash("Course not found.", "danger")
         return redirect(url_for("student_dashboard"))
 
-    # Check payment only for paid courses
+    # Check payment only for paid courses - FIXED to accept both "Paid" and "Verified"
     if not course.is_free:
-        if enrollment.payment_status != "Paid":
+        if enrollment.payment_status not in ["Paid", "Verified"]:
             # Check if there's a pending payment
             pending_payment = db_session.query(Payment).filter_by(
                 enrollment_id=enrollment.id,
@@ -550,7 +555,7 @@ def access_course(course_id):
 
 
 # ==================================================
-# ADMIN - VERIFY PAYMENTS
+# ADMIN - VERIFY PAYMENTS - FIXED
 # ==================================================
 
 @app.route("/admin/verify_payments")
@@ -597,7 +602,7 @@ def admin_verify_payment(payment_id):
     payment.status = "Verified"
     payment.verified_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Update enrollment payment status
+    # Update enrollment payment status to "Paid" - FIXED
     enrollment = db_session.query(Enrollment).filter_by(id=payment.enrollment_id).first()
     if enrollment:
         enrollment.payment_status = "Paid"
