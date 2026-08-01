@@ -53,7 +53,7 @@
       font-size: 1.4rem;
     }
     .left-panel .user-badge {
-      background: #f5f7fa;
+      background: #ffffff;
       border-radius: 60px;
       padding: 8px 16px;
       font-size: 0.75rem;
@@ -98,7 +98,7 @@
       transition: 0.2s;
     }
     .nav-left .nav-item:hover {
-      background: #f0f2f5;
+      background: #f5f5f5;
       color: #1a2639;
     }
     .nav-left .nav-item:hover i {
@@ -107,7 +107,6 @@
     .nav-left .nav-item.active {
       background: #5b6fd8;
       color: #fff;
-      box-shadow: 0 8px 18px rgba(91,111,216,0.25);
     }
     .nav-left .nav-item.active i {
       color: #fff;
@@ -136,7 +135,7 @@
       min-width: 0;
     }
 
-    /* --- components (refreshed) --- */
+    /* --- components --- */
     .stat-card {
       border: 1px solid #e8ecf1;
       border-radius: 24px;
@@ -239,15 +238,15 @@
       font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer;
       margin-top: 12px; text-align: center; text-decoration: none; display: block;
     }
-    .btn-enroll.primary { background: linear-gradient(145deg, #6c7eea, #8b5fc7); color: #fff; }
-    .btn-enroll.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(91,111,216,0.3); color:#fff; text-decoration:none; }
+    .btn-enroll.primary { background: #5b6fd8; color: #fff; }
+    .btn-enroll.primary:hover { background: #4a5fc7; color:#fff; text-decoration:none; }
     .btn-enroll.success { background: #2edb7a; color: #0f2a1e; }
     .btn-enroll.success:hover { background: #23c46a; color:#0f2a1e; text-decoration:none; }
     .btn-enroll.warning { background: #f5b342; color: #281e0a; }
     .btn-enroll.warning:hover { background: #e0a030; color:#281e0a; text-decoration:none; }
     .btn-enroll.free { background: #2edb7a; color: #0f2a1e; }
-    .btn-enroll.free:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46, 230, 192, 0.3); color:#0f2a1e; text-decoration:none; }
-    .btn-enroll:disabled { background: #b2bec3; cursor: not-allowed; }
+    .btn-enroll.free:hover { background: #23c46a; color:#0f2a1e; text-decoration:none; }
+    .btn-enroll:disabled { background: #e8ecf1; cursor: not-allowed; color: #9aabbe; }
     .btn-enroll:disabled:hover { transform: none; box-shadow: none; }
 
     .section-header {
@@ -407,7 +406,7 @@
               {% else %}<span class="course-fee"><i class="fas fa-dollar-sign"></i> Ksh {{ course.fee }}</span>{% endif %}
               <span><i class="fas fa-code"></i> {{ course.course_code }}</span>
             </div>
-            
+            <p class="course-description">{{ course.description[:120] }}{% if course.description and course.description|length > 120 %}...{% endif %}</p>
           </div>
           {% set enrolled = false %}
           {% for item in my_courses %}{% if item.course_id == course.id %}{% set enrolled = true %}{% endif %}{% endfor %}
