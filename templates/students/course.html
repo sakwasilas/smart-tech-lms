@@ -11,37 +11,37 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #ffffff;
+            background: #f5f6fa;
             min-height: 100vh;
         }
 
         /* ===== SPLIT LAYOUT ===== */
         .dashboard-wrapper { display: flex; min-height: 100vh; }
 
-        /* LEFT PANEL - compact & clean */
+        /* LEFT PANEL - BLACK HEADER */
         .left-panel {
             width: 260px;
             min-height: 100vh;
-            background: #ffffff;
-            border-right: 1px solid #e8ecf1;
+            background: #1a1a2e;
             padding: 28px 16px 24px 20px;
             position: sticky; top: 0; height: 100vh;
             overflow-y: auto;
             display: flex; flex-direction: column;
             z-index: 10;
+            border-right: 1px solid #2d2d44;
         }
         .left-panel .brand {
-            font-weight: 800; font-size: 1.2rem; color: #1a2639;
+            font-weight: 800; font-size: 1.2rem; color: #ffffff;
             display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
         }
         .left-panel .brand i { color: #4f6ef7; font-size: 1.4rem; }
         .left-panel .user-badge {
-            background: #ffffff;
+            background: rgba(255,255,255,0.08);
             border-radius: 40px; padding: 8px 16px;
-            font-size: 0.75rem; font-weight: 600; color: #1f2a44;
+            font-size: 0.75rem; font-weight: 600; color: #c8d0e6;
             display: inline-flex; align-items: center; gap: 8px;
             margin-top: 4px; margin-bottom: 28px;
-            border: 1px solid #e8ecf1;
+            border: 1px solid rgba(255,255,255,0.06);
         }
         .left-panel .user-badge i { color: #4f6ef7; }
 
@@ -52,27 +52,27 @@
             display: flex; align-items: center; gap: 14px;
             padding: 10px 16px; border-radius: 16px;
             font-weight: 600; font-size: 0.85rem;
-            color: #3a4b62; transition: all 0.15s ease;
+            color: #a8b2d1; transition: all 0.15s ease;
             text-decoration: none; background: transparent;
         }
-        .nav-left .nav-item i { width: 22px; font-size: 1rem; color: #7b8ba3; }
-        .nav-left .nav-item:hover { background: #f5f5f5; color: #1a2639; }
+        .nav-left .nav-item i { width: 22px; font-size: 1rem; color: #6b7aa3; }
+        .nav-left .nav-item:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
         .nav-left .nav-item:hover i { color: #4f6ef7; }
         .nav-left .nav-item.active {
             background: #4f6ef7; color: #fff;
         }
         .nav-left .nav-item.active i { color: #fff; }
         .nav-left .logout-item {
-            margin-top: auto; border-top: 1px solid #e8ecf1; padding-top: 18px;
+            margin-top: auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 18px;
         }
-        .nav-left .logout-item .nav-item { color: #b13a4f; }
-        .nav-left .logout-item .nav-item i { color: #b13a4f; }
-        .nav-left .logout-item .nav-item:hover { background: #fee9ec; color: #a12d40; }
+        .nav-left .logout-item .nav-item { color: #e9546b; }
+        .nav-left .logout-item .nav-item i { color: #e9546b; }
+        .nav-left .logout-item .nav-item:hover { background: rgba(233, 84, 107, 0.15); color: #ff6b8a; }
 
         /* RIGHT PANEL - main content */
         .right-panel {
             flex: 1; padding: 28px 32px 30px 32px;
-            background: #ffffff; min-width: 0;
+            background: #f5f6fa; min-width: 0;
         }
 
         /* ===== COURSE HERO ===== */
@@ -87,15 +87,15 @@
         }
         .course-hero .hero-badge {
             display: inline-block;
-            background: #f5f5f5;
+            background: #f0f4fe;
             padding: 4px 18px;
             border-radius: 40px;
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.5px;
-            color: #1a2639;
+            color: #4f6ef7;
             margin-bottom: 12px;
-            border: 1px solid #e8ecf1;
+            border: 1px solid #e0e7ff;
         }
         .course-hero h1 {
             font-weight: 800;
@@ -114,7 +114,7 @@
             gap: 12px 20px;
             margin: 8px 0 14px 0;
             padding: 10px 16px;
-            background: #f8f8f8;
+            background: #f8f9fc;
             border-radius: 16px;
             border: 1px solid #e8ecf1;
         }
@@ -144,13 +144,14 @@
             font-size: 0.75rem;
         }
         .meta-strip .badge-code {
-            background: #f5f5f5;
+            background: #f0f4fe;
             padding: 2px 16px;
             border-radius: 40px;
             font-family: monospace;
             font-weight: 600;
             font-size: 0.8rem;
-            border: 1px solid #e8ecf1;
+            border: 1px solid #e0e7ff;
+            color: #4f6ef7;
         }
         .meta-strip .badge-status {
             padding: 2px 16px;
@@ -165,7 +166,7 @@
 
         /* ===== DESCRIPTION & OBJECTIVES ===== */
         .course-description-section {
-            background: #f8f8f8;
+            background: #f8f9fc;
             border-radius: 16px;
             padding: 16px 20px;
             margin-top: 10px;
@@ -271,7 +272,7 @@
         }
         .modules-card .card-header {
             padding: 18px 24px;
-            background: #ffffff;
+            background: #fafbfc;
             border-bottom: 1px solid #e8ecf1;
             display: flex;
             justify-content: space-between;
@@ -291,13 +292,13 @@
             align-items: flex-start;
             gap: 16px;
             padding: 14px 16px;
-            background: #f8f8f8;
+            background: #f8f9fc;
             border-radius: 16px;
             margin-bottom: 10px;
             transition: all 0.2s;
             border-left: 4px solid #4f6ef7;
         }
-        .module-item:hover { background: #f0f0f0; }
+        .module-item:hover { background: #f0f2f8; }
         .module-item.completed { border-left-color: #2edb7a; }
         .module-item.locked { border-left-color: #cbd5e1; opacity: 0.7; }
 
@@ -385,7 +386,7 @@
             font-size: 0.7rem;
             color: #5d6a7a;
             padding: 8px 16px;
-            background: #f8f8f8;
+            background: #f8f9fc;
             border-radius: 12px;
             margin-top: 12px;
             border: 1px solid #e8ecf1;
@@ -421,7 +422,7 @@
             .dashboard-wrapper { flex-direction: column; }
             .left-panel {
                 width: 100%; min-height: auto; height: auto; position: relative;
-                border-right: none; border-bottom: 1px solid #e8ecf1;
+                border-right: none; border-bottom: 1px solid #2d2d44;
                 padding: 14px 20px; flex-direction: row; flex-wrap: wrap;
                 align-items: center; gap: 8px;
             }
@@ -455,7 +456,7 @@
 
 <div class="dashboard-wrapper">
 
-    <!-- ===== LEFT PANEL ===== -->
+    <!-- ===== LEFT PANEL - BLACK ===== -->
     <aside class="left-panel">
         <div class="brand"><i class="fas fa-graduation-cap"></i> LMS</div>
         <div class="user-badge"><i class="fas fa-user-circle"></i> {{ session.email or 'student@email.com' }}</div>
@@ -513,7 +514,7 @@
                 {% endif %}
             </div>
 
-            <!-- ===== DESCRIPTION & OBJECTIVES ===== -->
+            <!-- ===== DESCRIPTION ===== -->
             <div class="course-description-section">
                 <span class="section-label"><i class="fas fa-info-circle"></i> About this course</span>
                 <ul>
