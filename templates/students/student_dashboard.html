@@ -54,6 +54,14 @@
       opacity: 1;
     }
 
+    .hr-section {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, #4f6ef7, #7c4d9e, #4f6ef7);
+      margin: 28px 0 24px 0;
+      opacity: 0.5;
+    }
+
     /* ----- split layout ----- */
     .dashboard-wrapper {
       display: flex;
@@ -155,20 +163,32 @@
     .stat-card .stat-label {
       font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.5px; opacity: 0.7;
-      color: #1a2639;
+      color: #ffffff;
     }
     .stat-card .stat-value {
       font-size: 1.7rem; font-weight: 800; line-height: 1.2;
-      color: #1a2639;
+      color: #ffffff;
     }
     .stat-card .stat-sub {
-      font-size: 0.6rem; opacity: 0.6; margin-top: 2px;
-      color: #1a2639;
+      font-size: 0.6rem; opacity: 0.8; margin-top: 2px;
+      color: rgba(255,255,255,0.8);
     }
-    .stat-card.purple { border-top: 4px solid #6c7eea; }
-    .stat-card.blue { border-top: 4px solid #4b9dfa; }
-    .stat-card.green { border-top: 4px solid #3edb7a; }
-    .stat-card.pink { border-top: 4px solid #ea7ac4; }
+    .stat-card.purple { 
+      background: linear-gradient(135deg, #6c7eea, #8b5fc7);
+      border: none;
+    }
+    .stat-card.blue { 
+      background: linear-gradient(135deg, #4b9dfa, #47d0fd);
+      border: none;
+    }
+    .stat-card.green { 
+      background: linear-gradient(135deg, #3edb7a, #2ee6c0);
+      border: none;
+    }
+    .stat-card.pink { 
+      background: linear-gradient(135deg, #ea7ac4, #d45b8f);
+      border: none;
+    }
 
     .profile-card {
       background: #ffffff;
@@ -382,6 +402,9 @@
       </div>
     </div>
 
+    <!-- ===== HR BEFORE STATS ===== -->
+    <hr class="hr-section" />
+
     <!-- stats -->
     <div class="row g-3 mb-3">
       <div class="col-md-3 col-6"><div class="stat-card purple fade-in"><div class="stat-label">Available</div><div class="stat-value">{{ courses|length }}</div><span class="stat-sub">ready to enroll</span></div></div>
@@ -389,6 +412,9 @@
       <div class="col-md-3 col-6"><div class="stat-card green fade-in"><div class="stat-label">Free</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', true)|list|length }}</div><span class="stat-sub">free access</span></div></div>
       <div class="col-md-3 col-6"><div class="stat-card pink fade-in"><div class="stat-label">Paid</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', false)|list|length }}</div><span class="stat-sub">paid enrollments</span></div></div>
     </div>
+
+    <!-- ===== HR BEFORE COURSES ===== -->
+    <hr class="hr-section" />
 
     <!-- available courses -->
     <div class="section-header">
@@ -429,6 +455,9 @@
         <div class="empty-state" style="grid-column:1/-1;"><h5>No Courses Available</h5><p>There are no active courses for enrollment.</p></div>
       {% endif %}
     </div>
+
+    <!-- ===== HR BEFORE MY COURSES ===== -->
+    <hr class="hr-section" />
 
     <!-- my courses -->
     <div class="section-header">
