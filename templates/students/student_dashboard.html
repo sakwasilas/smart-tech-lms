@@ -35,15 +35,6 @@
     .top-header .brand .accent {
       color: #4f6ef7;
     }
-    .top-header .user-info {
-      color: #c8d0e6;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    .top-header .user-info span {
-      color: #ffffff;
-      font-weight: 600;
-    }
 
     /* ===== HR STYLED ===== */
     .hr-styled {
@@ -315,7 +306,6 @@
     }
     @media (max-width: 576px) {
       .top-header .brand { font-size: 1rem; }
-      .top-header .user-info { font-size: 0.7rem; }
       .nav-left .nav-item { font-size: 0.7rem; padding: 4px 10px; }
       .profile-card { flex-direction: column; text-align: center; }
       .profile-card .profile-status { text-align: center; }
@@ -338,9 +328,7 @@
   <div class="brand">
     <span class="accent">◆</span> LMS
   </div>
-  <div class="user-info">
-    <span>{{ student.email }}</span>
-  </div>
+  <!-- REMOVED: user-info with email -->
 </header>
 
 <!-- ===== STYLED HR ===== -->
@@ -351,7 +339,7 @@
   <!-- ===== LEFT PANEL ===== -->
   <aside class="left-panel">
     <div class="user-badge">
-      {{ student.email }}
+      <!-- REMOVED: email from user badge -->
     </div>
 
     <nav class="nav-left">
