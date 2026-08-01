@@ -413,7 +413,7 @@
       <div class="col-md-3 col-6"><div class="stat-card pink fade-in"><div class="stat-label">Paid</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', false)|list|length }}</div><span class="stat-sub">paid enrollments</span></div></div>
     </div>
 
-    <!-- ===== HR BEFORE COURSES ===== -->
+    <!-- ===== HR BEFORE AVAILABLE COURSES ===== -->
     <hr class="hr-section" />
 
     <!-- available courses -->
@@ -467,7 +467,7 @@
     <div class="course-grid">
       {% if my_courses %}
         {% for enrollment in my_courses %}
-        <div class="course-card fade-in" style="border-top-color: {% if enrollment.payment_status == 'Paid' or enrollment.course.is_free %}#2edb7a{% else %}#f5b342{% endif %};">
+        <div class="course-card fade-in" style="border-top-color: {% if enrollment.payment_status == 'Paid' or enrollment.payment_status == 'Verified' or enrollment.course.is_free %}#2edb7a{% else %}#f5b342{% endif %};">
           <div>
             <h4>
               {{ enrollment.course.course_name }}
@@ -476,7 +476,7 @@
             <div class="course-meta">
               <span>{{ enrollment.date_enrolled }}</span>
               <span>
-                {% if enrollment.payment_status == 'Paid' %}<span class="badge-access">Verified</span>
+                {% if enrollment.payment_status == 'Paid' or enrollment.payment_status == 'Verified' %}<span class="badge-access">Verified</span>
                 {% elif enrollment.course.is_free %}<span class="badge-access">Free Access</span>
                 {% else %}<span class="badge-pending">Pending</span>{% endif %}
               </span>
