@@ -3,57 +3,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student · split dashboard</title>
-  <!-- Bootstrap + Icons + Fonts -->
+  <!-- Bootstrap + Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: #ffffff;
+      background: #f5f6fa;
       min-height: 100vh;
+    }
+
+    /* ===== TOP BLACK HEADER ===== */
+    .top-header {
+      background: #1a1a2e;
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #2d2d44;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-header .brand {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+    .top-header .brand .accent {
+      color: #4f6ef7;
+    }
+    .top-header .user-info {
+      color: #c8d0e6;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .top-header .user-info span {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* ===== HR STYLED ===== */
+    .hr-styled {
+      border: none;
+      height: 3px;
+      background: linear-gradient(90deg, #4f6ef7, #7c4d9e, #4f6ef7);
+      margin: 0;
+      opacity: 1;
     }
 
     /* ----- split layout ----- */
     .dashboard-wrapper {
       display: flex;
-      min-height: 100vh;
+      min-height: calc(100vh - 72px);
       gap: 0;
     }
 
     /* LEFT PANEL – clean white */
     .left-panel {
       width: 270px;
-      min-height: 100vh;
+      min-height: 100%;
       background: #ffffff;
       border-right: 1px solid #e8ecf1;
       padding: 28px 14px 28px 18px;
       position: sticky;
-      top: 0;
-      height: 100vh;
+      top: 72px;
+      height: calc(100vh - 72px);
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       z-index: 10;
     }
 
-    .left-panel .brand {
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: #1a2639;
-      margin-bottom: 6px;
-      letter-spacing: -0.3px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .left-panel .brand i {
-      color: #5b6fd8;
-      font-size: 1.4rem;
-    }
     .left-panel .user-badge {
-      background: #ffffff;
+      background: #f5f7fa;
       border-radius: 60px;
       padding: 8px 16px;
       font-size: 0.75rem;
@@ -62,12 +87,8 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 4px;
       margin-bottom: 28px;
       border: 1px solid #e8ecf1;
-    }
-    .left-panel .user-badge i {
-      color: #5b6fd8;
     }
 
     /* nav */
@@ -80,7 +101,6 @@
     .nav-left .nav-item {
       display: flex;
       align-items: center;
-      gap: 14px;
       padding: 11px 16px;
       border-radius: 18px;
       font-weight: 600;
@@ -91,24 +111,12 @@
       background: transparent;
       border: none;
     }
-    .nav-left .nav-item i {
-      width: 22px;
-      font-size: 1rem;
-      color: #7b8ba3;
-      transition: 0.2s;
-    }
     .nav-left .nav-item:hover {
       background: #f5f5f5;
       color: #1a2639;
     }
-    .nav-left .nav-item:hover i {
-      color: #5b6fd8;
-    }
     .nav-left .nav-item.active {
-      background: #5b6fd8;
-      color: #fff;
-    }
-    .nav-left .nav-item.active i {
+      background: #4f6ef7;
       color: #fff;
     }
     .nav-left .logout-item {
@@ -117,9 +125,6 @@
       padding-top: 18px;
     }
     .nav-left .logout-item .nav-item {
-      color: #b13a4f;
-    }
-    .nav-left .logout-item .nav-item i {
       color: #b13a4f;
     }
     .nav-left .logout-item .nav-item:hover {
@@ -131,7 +136,7 @@
     .right-panel {
       flex: 1;
       padding: 28px 30px 30px 30px;
-      background: #ffffff;
+      background: #f5f6fa;
       min-width: 0;
     }
 
@@ -147,10 +152,6 @@
       background: #ffffff;
     }
     .stat-card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0,0,0,0.05); }
-    .stat-card .stat-icon {
-      position: absolute; right: 12px; top: 12px;
-      font-size: 2.2rem; opacity: 0.12;
-    }
     .stat-card .stat-label {
       font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.5px; opacity: 0.7;
@@ -180,16 +181,14 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      border-left: 6px solid #5b6fd8;
+      border-left: 6px solid #4f6ef7;
     }
     .profile-card .profile-info h3 {
       font-weight: 700; font-size: 1.2rem; color: #1a2639; margin:0;
     }
-    .profile-card .profile-info h3 i { color: #5b6fd8; margin-right: 8px; }
     .profile-card .profile-info p {
       color: #5d6a7a; font-size: 0.85rem; margin: 2px 0 0 0;
     }
-    .profile-card .profile-info p i { width: 20px; color: #5b6fd8; }
     .status-badge {
       padding: 6px 20px; border-radius: 40px; font-size: 0.75rem; font-weight: 700;
     }
@@ -218,16 +217,14 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 260px;
-      border-top: 4px solid #5b6fd8;
+      border-top: 4px solid #4f6ef7;
       position: relative;
     }
     .course-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.04); }
-    .course-card .course-icon { font-size: 1.8rem; margin-bottom: 8px; }
     .course-card h4 { font-weight: 700; font-size: 1rem; color: #1a2639; margin-bottom: 6px; }
     .course-card .course-meta {
       display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.75rem; color: #5d6a7a;
     }
-    .course-card .course-meta i { color: #5b6fd8; width: 16px; }
     .course-card .course-description {
       font-size: 0.85rem; color: #5d6a7a; line-height: 1.4; margin: 6px 0; flex-grow:1;
     }
@@ -238,8 +235,8 @@
       font-weight: 700; font-size: 0.85rem; transition: 0.2s; cursor: pointer;
       margin-top: 12px; text-align: center; text-decoration: none; display: block;
     }
-    .btn-enroll.primary { background: #5b6fd8; color: #fff; }
-    .btn-enroll.primary:hover { background: #4a5fc7; color:#fff; text-decoration:none; }
+    .btn-enroll.primary { background: #4f6ef7; color: #fff; }
+    .btn-enroll.primary:hover { background: #3a5cd4; color:#fff; text-decoration:none; }
     .btn-enroll.success { background: #2edb7a; color: #0f2a1e; }
     .btn-enroll.success:hover { background: #23c46a; color:#0f2a1e; text-decoration:none; }
     .btn-enroll.warning { background: #f5b342; color: #281e0a; }
@@ -255,7 +252,7 @@
     }
     .section-header h3 { font-weight: 700; color: #1a2639; margin:0; font-size:1.1rem; }
     .section-header .badge-count {
-      background: #5b6fd8; color: #fff; padding: 2px 16px; border-radius: 40px;
+      background: #4f6ef7; color: #fff; padding: 2px 16px; border-radius: 40px;
       font-size: 0.7rem; font-weight: 700;
     }
 
@@ -263,7 +260,6 @@
       text-align: center; padding: 40px 20px; background: #ffffff;
       border-radius: 24px; border: 1px solid #e8ecf1;
     }
-    .empty-state i { font-size: 2.8rem; color: #b2bec3; margin-bottom: 12px; }
     .empty-state h5 { color: #1a2639; font-weight: 700; }
 
     .alert-custom {
@@ -279,18 +275,18 @@
       text-align: center; padding: 24px 0 10px 0; color: #9aabbe;
       font-size: 0.75rem; border-top: 1px solid #e8ecf1; margin-top: 28px;
     }
-    .footer i { color: #e9546b; }
 
     /* responsive */
     @media (max-width: 992px) {
-      .dashboard-wrapper { flex-direction: column; }
+      .top-header { padding: 12px 20px; flex-wrap: wrap; gap: 8px; }
+      .dashboard-wrapper { flex-direction: column; min-height: auto; }
       .left-panel {
         width: 100%; min-height: auto; height: auto; position: relative;
         border-right: none; border-bottom: 1px solid #e8ecf1;
         padding: 14px 20px; flex-direction: row; flex-wrap: wrap;
         align-items: center; gap: 8px;
+        top: 0;
       }
-      .left-panel .brand { margin-bottom: 0; }
       .left-panel .user-badge { margin-bottom: 0; margin-top: 0; }
       .nav-left { flex-direction: row; flex-wrap: wrap; gap: 4px; width: 100%; margin-top: 4px; }
       .nav-left .nav-item { padding: 6px 14px; font-size: 0.75rem; }
@@ -298,8 +294,9 @@
       .right-panel { padding: 18px 14px; }
     }
     @media (max-width: 576px) {
-      .left-panel .brand { font-size: 1rem; }
-      .nav-left .nav-item { font-size: 0.7rem; padding: 4px 10px; gap: 6px; }
+      .top-header .brand { font-size: 1rem; }
+      .top-header .user-info { font-size: 0.7rem; }
+      .nav-left .nav-item { font-size: 0.7rem; padding: 4px 10px; }
       .profile-card { flex-direction: column; text-align: center; }
       .profile-card .profile-status { text-align: center; }
       .stat-card .stat-value { font-size: 1.3rem; }
@@ -316,25 +313,35 @@
 </head>
 <body>
 
+<!-- ===== TOP BLACK HEADER ===== -->
+<header class="top-header">
+  <div class="brand">
+    <span class="accent">◆</span> LMS
+  </div>
+  <div class="user-info">
+    <span>{{ student.email }}</span>
+  </div>
+</header>
+
+<!-- ===== STYLED HR ===== -->
+<hr class="hr-styled" />
+
 <div class="dashboard-wrapper">
 
   <!-- ===== LEFT PANEL ===== -->
   <aside class="left-panel">
-    <div class="brand">
-      <i class="fas fa-graduation-cap"></i> LMS
-    </div>
     <div class="user-badge">
-      <i class="fas fa-user-circle"></i> {{ student.email }}
+      {{ student.email }}
     </div>
 
     <nav class="nav-left">
-      <a href="{{ url_for('student_dashboard') }}" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
-      <a href="#" class="nav-item"><i class="fas fa-book-open"></i> Available</a>
-      <a href="#" class="nav-item"><i class="fas fa-book"></i> My Courses</a>
-      <a href="#" class="nav-item"><i class="fas fa-credit-card"></i> Payments</a>
-      <a href="#" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+      <a href="{{ url_for('student_dashboard') }}" class="nav-item active">Dashboard</a>
+      <a href="#" class="nav-item">Available</a>
+      <a href="#" class="nav-item">My Courses</a>
+      <a href="#" class="nav-item">Payments</a>
+      <a href="#" class="nav-item">Announcements</a>
       <div class="logout-item">
-        <a href="{{ url_for('logout') }}" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="{{ url_for('logout') }}" class="nav-item">Logout</a>
       </div>
     </nav>
   </aside>
@@ -347,7 +354,6 @@
       {% if messages %}
         {% for category, message in messages %}
         <div class="alert-custom {{ category }}">
-          <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
           {{ message }}
         </div>
         {% endfor %}
@@ -357,7 +363,7 @@
     <!-- header -->
     <div class="d-flex justify-content-between align-items-center mb-2">
       <div>
-        <h4 class="fw-bold mb-0" style="color:#1a2639;"><i class="fas fa-chart-line me-2" style="color:#5b6fd8;"></i>Student overview</h4>
+        <h4 class="fw-bold mb-0" style="color:#1a2639;">Student overview</h4>
         <p class="text-muted small">Welcome back, {{ student.fullname }}</p>
       </div>
     </div>
@@ -365,13 +371,12 @@
     <!-- profile card -->
     <div class="profile-card fade-in">
       <div class="profile-info">
-        <h3><i class="fas fa-user-graduate"></i> {{ student.fullname }}</h3>
-        <p><i class="fas fa-envelope"></i> {{ student.email }}</p>
-        <p><i class="fas fa-phone"></i> {{ student.phone or 'Not provided' }}</p>
+        <h3>{{ student.fullname }}</h3>
+        <p>{{ student.email }}</p>
+        <p>{{ student.phone or 'Not provided' }}</p>
       </div>
       <div class="profile-status">
         <span class="status-badge {{ student.status|lower }}">
-          <i class="fas fa-{% if student.status == 'Active' %}check-circle{% elif student.status == 'Pending' %}clock{% else %}times-circle{% endif %}"></i>
           {{ student.status }}
         </span>
       </div>
@@ -379,15 +384,15 @@
 
     <!-- stats -->
     <div class="row g-3 mb-3">
-      <div class="col-md-3 col-6"><div class="stat-card purple fade-in"><i class="fas fa-book-open stat-icon"></i><div class="stat-label">Available</div><div class="stat-value">{{ courses|length }}</div><span class="stat-sub">ready to enroll</span></div></div>
-      <div class="col-md-3 col-6"><div class="stat-card blue fade-in"><i class="fas fa-book stat-icon"></i><div class="stat-label">My Courses</div><div class="stat-value">{{ my_courses|length }}</div><span class="stat-sub">enrolled</span></div></div>
-      <div class="col-md-3 col-6"><div class="stat-card green fade-in"><i class="fas fa-gift stat-icon"></i><div class="stat-label">Free</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', true)|list|length }}</div><span class="stat-sub">free access</span></div></div>
-      <div class="col-md-3 col-6"><div class="stat-card pink fade-in"><i class="fas fa-credit-card stat-icon"></i><div class="stat-label">Paid</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', false)|list|length }}</div><span class="stat-sub">paid enrollments</span></div></div>
+      <div class="col-md-3 col-6"><div class="stat-card purple fade-in"><div class="stat-label">Available</div><div class="stat-value">{{ courses|length }}</div><span class="stat-sub">ready to enroll</span></div></div>
+      <div class="col-md-3 col-6"><div class="stat-card blue fade-in"><div class="stat-label">My Courses</div><div class="stat-value">{{ my_courses|length }}</div><span class="stat-sub">enrolled</span></div></div>
+      <div class="col-md-3 col-6"><div class="stat-card green fade-in"><div class="stat-label">Free</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', true)|list|length }}</div><span class="stat-sub">free access</span></div></div>
+      <div class="col-md-3 col-6"><div class="stat-card pink fade-in"><div class="stat-label">Paid</div><div class="stat-value">{{ my_courses|selectattr('course.is_free', 'equalto', false)|list|length }}</div><span class="stat-sub">paid enrollments</span></div></div>
     </div>
 
     <!-- available courses -->
     <div class="section-header">
-      <h3><i class="fas fa-plus-circle" style="color:#5b6fd8;"></i> Available courses</h3>
+      <h3>Available courses</h3>
       <span class="badge-count">{{ courses|length }}</span>
     </div>
     <div class="course-grid">
@@ -395,40 +400,39 @@
         {% for course in courses %}
         <div class="course-card fade-in">
           <div>
-            <div class="course-icon">📚</div>
             <h4>
               {{ course.course_name }}
-              {% if course.is_free %}<span class="badge-free"><i class="fas fa-gift"></i> FREE</span>{% else %}<span class="badge-paid"><i class="fas fa-credit-card"></i> PAID</span>{% endif %}
+              {% if course.is_free %}<span class="badge-free">FREE</span>{% else %}<span class="badge-paid">PAID</span>{% endif %}
             </h4>
             <div class="course-meta">
-              <span><i class="fas fa-clock"></i> {{ course.duration or 'N/A' }}</span>
-              {% if course.is_free %}<span class="course-fee" style="color:#2edb7a;"><i class="fas fa-gift"></i> FREE</span>
-              {% else %}<span class="course-fee"><i class="fas fa-dollar-sign"></i> Ksh {{ course.fee }}</span>{% endif %}
-              <span><i class="fas fa-code"></i> {{ course.course_code }}</span>
+              <span>{{ course.duration or 'N/A' }}</span>
+              {% if course.is_free %}<span class="course-fee" style="color:#2edb7a;">FREE</span>
+              {% else %}<span class="course-fee">Ksh {{ course.fee }}</span>{% endif %}
+              <span>{{ course.course_code }}</span>
             </div>
             <p class="course-description">{{ course.description[:120] }}{% if course.description and course.description|length > 120 %}...{% endif %}</p>
           </div>
           {% set enrolled = false %}
           {% for item in my_courses %}{% if item.course_id == course.id %}{% set enrolled = true %}{% endif %}{% endfor %}
           {% if enrolled %}
-            <button class="btn-enroll success" disabled><i class="fas fa-check-circle"></i> Already Enrolled</button>
+            <button class="btn-enroll success" disabled>Already Enrolled</button>
           {% else %}
             <form action="{{ url_for('enroll', course_id=course.id) }}" method="POST">
               <button type="submit" class="btn-enroll {% if course.is_free %}free{% else %}primary{% endif %}">
-                {% if course.is_free %}<i class="fas fa-gift"></i> Enroll Free{% else %}<i class="fas fa-plus-circle"></i> Enroll Now - Ksh {{ course.fee }}{% endif %}
+                {% if course.is_free %}Enroll Free{% else %}Enroll Now - Ksh {{ course.fee }}{% endif %}
               </button>
             </form>
           {% endif %}
         </div>
         {% endfor %}
       {% else %}
-        <div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-book-open"></i><h5>No Courses Available</h5><p>There are no active courses for enrollment.</p></div>
+        <div class="empty-state" style="grid-column:1/-1;"><h5>No Courses Available</h5><p>There are no active courses for enrollment.</p></div>
       {% endif %}
     </div>
 
     <!-- my courses -->
     <div class="section-header">
-      <h3><i class="fas fa-book" style="color:#5b6fd8;"></i> My courses</h3>
+      <h3>My courses</h3>
       <span class="badge-count">{{ my_courses|length }}</span>
     </div>
     <div class="course-grid">
@@ -436,41 +440,39 @@
         {% for enrollment in my_courses %}
         <div class="course-card fade-in" style="border-top-color: {% if enrollment.payment_status == 'Paid' or enrollment.course.is_free %}#2edb7a{% else %}#f5b342{% endif %};">
           <div>
-            <div class="course-icon">📖</div>
             <h4>
               {{ enrollment.course.course_name }}
-              {% if enrollment.course.is_free %}<span class="badge-free"><i class="fas fa-gift"></i> FREE</span>{% else %}<span class="badge-paid"><i class="fas fa-credit-card"></i> PAID</span>{% endif %}
+              {% if enrollment.course.is_free %}<span class="badge-free">FREE</span>{% else %}<span class="badge-paid">PAID</span>{% endif %}
             </h4>
             <div class="course-meta">
-              <span><i class="fas fa-calendar-alt"></i> {{ enrollment.date_enrolled }}</span>
+              <span>{{ enrollment.date_enrolled }}</span>
               <span>
-                <i class="fas fa-credit-card"></i>
-                {% if enrollment.payment_status == 'Paid' %}<span class="badge-access"><i class="fas fa-check-circle"></i> Verified</span>
-                {% elif enrollment.course.is_free %}<span class="badge-access"><i class="fas fa-gift"></i> Free Access</span>
-                {% else %}<span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>{% endif %}
+                {% if enrollment.payment_status == 'Paid' %}<span class="badge-access">Verified</span>
+                {% elif enrollment.course.is_free %}<span class="badge-access">Free Access</span>
+                {% else %}<span class="badge-pending">Pending</span>{% endif %}
               </span>
             </div>
             <p class="course-description">{{ enrollment.course.description[:100] }}{% if enrollment.course.description and enrollment.course.description|length > 100 %}...{% endif %}</p>
             <div class="course-meta">
-              <span><i class="fas fa-clock"></i> {{ enrollment.course.duration or 'N/A' }}</span>
-              {% if enrollment.course.is_free %}<span style="color:#2edb7a;font-weight:700;"><i class="fas fa-gift"></i> FREE</span>{% else %}<span><i class="fas fa-dollar-sign"></i> Ksh {{ enrollment.course.fee }}</span>{% endif %}
-              <span><i class="fas fa-{% if enrollment.status == 'Active' %}check-circle text-success{% else %}times-circle text-danger{% endif %}"></i> {{ enrollment.status }}</span>
-              <span><i class="fas fa-code"></i> {{ enrollment.course.course_code }}</span>
+              <span>{{ enrollment.course.duration or 'N/A' }}</span>
+              {% if enrollment.course.is_free %}<span style="color:#2edb7a;font-weight:700;">FREE</span>{% else %}<span>Ksh {{ enrollment.course.fee }}</span>{% endif %}
+              <span>{{ enrollment.status }}</span>
+              <span>{{ enrollment.course.course_code }}</span>
             </div>
           </div>
           {% if enrollment.payment_status == "Pending" and not enrollment.course.is_free %}
-            <a href="{{ url_for('payment_page', enrollment_id=enrollment.id) }}" class="btn-enroll warning" style="text-align:center;text-decoration:none;display:block;"><i class="fas fa-credit-card"></i> Make Payment</a>
+            <a href="{{ url_for('payment_page', enrollment_id=enrollment.id) }}" class="btn-enroll warning" style="text-align:center;text-decoration:none;display:block;">Make Payment</a>
           {% else %}
-            <a href="{{ url_for('access_course', course_id=enrollment.course_id) }}" class="btn-enroll primary" style="text-align:center;text-decoration:none;display:block;"><i class="fas fa-play-circle"></i> Access Course</a>
+            <a href="{{ url_for('access_course', course_id=enrollment.course_id) }}" class="btn-enroll primary" style="text-align:center;text-decoration:none;display:block;">Access Course</a>
           {% endif %}
         </div>
         {% endfor %}
       {% else %}
-        <div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-book"></i><h5>No Courses Yet</h5><p>You haven't enrolled in any courses. Browse available courses above!</p></div>
+        <div class="empty-state" style="grid-column:1/-1;"><h5>No Courses Yet</h5><p>You haven't enrolled in any courses. Browse available courses above!</p></div>
       {% endif %}
     </div>
 
-    <div class="footer"><i class="fas fa-heart"></i> LMS &copy; 2026 — split student dashboard</div>
+    <div class="footer">LMS &copy; 2026 — split student dashboard</div>
 
   </main>
 </div>
