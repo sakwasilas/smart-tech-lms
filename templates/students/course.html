@@ -11,7 +11,7 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f0f4f9;
+            background: #ffffff;
             min-height: 100vh;
         }
 
@@ -23,12 +23,11 @@
             width: 260px;
             min-height: 100vh;
             background: #ffffff;
-            border-right: 1px solid #e9eff6;
+            border-right: 1px solid #e8ecf1;
             padding: 28px 16px 24px 20px;
             position: sticky; top: 0; height: 100vh;
             overflow-y: auto;
             display: flex; flex-direction: column;
-            box-shadow: 2px 0 20px rgba(0,0,0,0.02);
             z-index: 10;
         }
         .left-panel .brand {
@@ -37,11 +36,12 @@
         }
         .left-panel .brand i { color: #4f6ef7; font-size: 1.4rem; }
         .left-panel .user-badge {
-            background: #f0f4fe; border-radius: 40px; padding: 8px 16px;
+            background: #ffffff;
+            border-radius: 40px; padding: 8px 16px;
             font-size: 0.75rem; font-weight: 600; color: #1f2a44;
             display: inline-flex; align-items: center; gap: 8px;
             margin-top: 4px; margin-bottom: 28px;
-            border: 1px solid rgba(79,110,247,0.08);
+            border: 1px solid #e8ecf1;
         }
         .left-panel .user-badge i { color: #4f6ef7; }
 
@@ -56,14 +56,14 @@
             text-decoration: none; background: transparent;
         }
         .nav-left .nav-item i { width: 22px; font-size: 1rem; color: #7b8ba3; }
-        .nav-left .nav-item:hover { background: #f0f4fe; color: #1a2639; }
+        .nav-left .nav-item:hover { background: #f5f5f5; color: #1a2639; }
         .nav-left .nav-item:hover i { color: #4f6ef7; }
         .nav-left .nav-item.active {
-            background: #4f6ef7; color: #fff; box-shadow: 0 6px 16px rgba(79,110,247,0.25);
+            background: #4f6ef7; color: #fff;
         }
         .nav-left .nav-item.active i { color: #fff; }
         .nav-left .logout-item {
-            margin-top: auto; border-top: 1px solid #e9eff6; padding-top: 18px;
+            margin-top: auto; border-top: 1px solid #e8ecf1; padding-top: 18px;
         }
         .nav-left .logout-item .nav-item { color: #b13a4f; }
         .nav-left .logout-item .nav-item i { color: #b13a4f; }
@@ -72,47 +72,41 @@
         /* RIGHT PANEL - main content */
         .right-panel {
             flex: 1; padding: 28px 32px 30px 32px;
-            background: #f4f8fe; min-width: 0;
+            background: #ffffff; min-width: 0;
         }
 
         /* ===== COURSE HERO ===== */
         .course-hero {
-            background: linear-gradient(135deg, #4f6ef7 0%, #7c4d9e 100%);
+            border: 1px solid #e8ecf1;
             border-radius: 28px;
             padding: 32px 36px;
-            color: #fff;
+            background: #ffffff;
             margin-bottom: 28px;
             position: relative;
             overflow: hidden;
         }
-        .course-hero::after {
-            content: '';
-            position: absolute;
-            right: -60px; top: -60px;
-            width: 300px; height: 300px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
-        }
         .course-hero .hero-badge {
             display: inline-block;
-            background: rgba(255,255,255,0.15);
+            background: #f5f5f5;
             padding: 4px 18px;
             border-radius: 40px;
             font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.5px;
-            backdrop-filter: blur(4px);
+            color: #1a2639;
             margin-bottom: 12px;
+            border: 1px solid #e8ecf1;
         }
         .course-hero h1 {
             font-weight: 800;
             font-size: 2.2rem;
             margin-bottom: 4px;
             letter-spacing: -0.5px;
+            color: #1a2639;
         }
-        .course-hero h1 i { margin-right: 12px; opacity: 0.8; }
+        .course-hero h1 i { margin-right: 12px; opacity: 0.8; color: #4f6ef7; }
 
-        /* ===== META STRIP - directly below title ===== */
+        /* ===== META STRIP ===== */
         .meta-strip {
             display: flex;
             flex-wrap: wrap;
@@ -120,9 +114,9 @@
             gap: 12px 20px;
             margin: 8px 0 14px 0;
             padding: 10px 16px;
-            background: rgba(255,255,255,0.10);
+            background: #f8f8f8;
             border-radius: 16px;
-            backdrop-filter: blur(4px);
+            border: 1px solid #e8ecf1;
         }
         .meta-strip .meta-item {
             display: flex;
@@ -130,9 +124,9 @@
             gap: 6px;
             font-size: 0.85rem;
             font-weight: 500;
-            color: rgba(255,255,255,0.95);
+            color: #1a2639;
         }
-        .meta-strip .meta-item i { font-size: 0.9rem; opacity: 0.8; }
+        .meta-strip .meta-item i { font-size: 0.9rem; opacity: 0.8; color: #4f6ef7; }
         .meta-strip .badge-free {
             background: #2edb7a;
             color: #0f2a1e;
@@ -150,38 +144,39 @@
             font-size: 0.75rem;
         }
         .meta-strip .badge-code {
-            background: rgba(255,255,255,0.15);
+            background: #f5f5f5;
             padding: 2px 16px;
             border-radius: 40px;
             font-family: monospace;
             font-weight: 600;
             font-size: 0.8rem;
+            border: 1px solid #e8ecf1;
         }
         .meta-strip .badge-status {
             padding: 2px 16px;
             border-radius: 40px;
             font-weight: 700;
             font-size: 0.75rem;
-            background: rgba(46, 219, 122, 0.25);
-            color: #2edb7a;
-            border: 1px solid rgba(46, 219, 122, 0.3);
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
         }
         .meta-strip .badge-status i { margin-right: 4px; }
 
-        /* ===== DESCRIPTION & OBJECTIVES - BULLET STYLE ===== */
+        /* ===== DESCRIPTION & OBJECTIVES ===== */
         .course-description-section {
-            background: rgba(255,255,255,0.08);
+            background: #f8f8f8;
             border-radius: 16px;
             padding: 16px 20px;
             margin-top: 10px;
-            backdrop-filter: blur(4px);
+            border: 1px solid #e8ecf1;
         }
         .course-description-section .section-label {
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            opacity: 0.7;
+            color: #5d6a7a;
             margin-bottom: 6px;
             display: block;
         }
@@ -195,7 +190,7 @@
             position: relative;
             font-size: 0.95rem;
             line-height: 1.6;
-            opacity: 0.95;
+            color: #1a2639;
         }
         .course-description-section ul li::before {
             content: '▹';
@@ -229,14 +224,14 @@
             gap: 8px;
             margin-left: auto;
         }
-        .btn-live:hover { background: #128C7E; color: #fff; transform: translateY(-2px); }
+        .btn-live:hover { background: #128C7E; color: #fff; }
 
         /* ===== PROGRESS CARD ===== */
         .progress-card {
-            background: #fff;
+            background: #ffffff;
             border-radius: 24px;
             padding: 20px 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid #e8ecf1;
             margin-bottom: 24px;
         }
         .progress-card h4 {
@@ -249,11 +244,11 @@
         .progress {
             height: 10px;
             border-radius: 10px;
-            background: #e9eff6;
+            background: #e8ecf1;
         }
         .progress-bar {
             border-radius: 10px;
-            background: linear-gradient(135deg, #4f6ef7, #7c4d9e);
+            background: #4f6ef7;
             transition: width 0.6s ease;
         }
         .progress-stats {
@@ -269,15 +264,15 @@
 
         /* ===== MODULES LIST ===== */
         .modules-card {
-            background: #fff;
+            background: #ffffff;
             border-radius: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid #e8ecf1;
             overflow: hidden;
         }
         .modules-card .card-header {
             padding: 18px 24px;
-            background: #fafcff;
-            border-bottom: 2px solid #f0f4fc;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ecf1;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -296,13 +291,13 @@
             align-items: flex-start;
             gap: 16px;
             padding: 14px 16px;
-            background: #f8faff;
+            background: #f8f8f8;
             border-radius: 16px;
             margin-bottom: 10px;
             transition: all 0.2s;
             border-left: 4px solid #4f6ef7;
         }
-        .module-item:hover { background: #f0f4fe; transform: translateX(4px); }
+        .module-item:hover { background: #f0f0f0; }
         .module-item.completed { border-left-color: #2edb7a; }
         .module-item.locked { border-left-color: #cbd5e1; opacity: 0.7; }
 
@@ -361,10 +356,10 @@
             white-space: nowrap;
         }
         .btn-module.primary {
-            background: linear-gradient(135deg, #4f6ef7, #7c4d9e);
+            background: #4f6ef7;
             color: #fff;
         }
-        .btn-module.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,110,247,0.3); color: #fff; }
+        .btn-module.primary:hover { background: #3a5cd4; color: #fff; }
         .btn-module.completed {
             background: #2edb7a;
             color: #0f2a1e;
@@ -376,11 +371,11 @@
             cursor: not-allowed;
         }
         .btn-module.retake {
-            background: #f0f4fe;
+            background: #ffffff;
             color: #4f6ef7;
             border: 1px solid #4f6ef7;
         }
-        .btn-module.retake:hover { background: #4f6ef7; color: #fff; transform: translateY(-2px); }
+        .btn-module.retake:hover { background: #4f6ef7; color: #fff; }
 
         /* Retake notice */
         .retake-notice {
@@ -388,11 +383,12 @@
             align-items: center;
             gap: 8px;
             font-size: 0.7rem;
-            color: #9aabbe;
+            color: #5d6a7a;
             padding: 8px 16px;
-            background: #f8faff;
+            background: #f8f8f8;
             border-radius: 12px;
             margin-top: 12px;
+            border: 1px solid #e8ecf1;
         }
         .retake-notice i { color: #4f6ef7; }
 
@@ -405,17 +401,18 @@
 
         /* ===== FLASH ===== */
         .alert-custom {
-            border-radius: 16px; padding: 12px 20px; border: none; margin-bottom: 20px;
+            border-radius: 16px; padding: 12px 20px; border: 1px solid #e8ecf1;
+            margin-bottom: 20px; background: #ffffff;
         }
-        .alert-custom.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-        .alert-custom.danger { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-        .alert-custom.warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .alert-custom.success { border-left: 4px solid #28a745; }
+        .alert-custom.danger { border-left: 4px solid #dc3545; }
+        .alert-custom.warning { border-left: 4px solid #ffc107; }
 
         /* ===== FOOTER ===== */
         .footer {
             text-align: center; padding: 24px 0 6px 0;
             color: #9aabbe; font-size: 0.75rem;
-            border-top: 1px solid #e4ecf5; margin-top: 32px;
+            border-top: 1px solid #e8ecf1; margin-top: 32px;
         }
         .footer i { color: #e9546b; }
 
@@ -424,7 +421,7 @@
             .dashboard-wrapper { flex-direction: column; }
             .left-panel {
                 width: 100%; min-height: auto; height: auto; position: relative;
-                border-right: none; border-bottom: 1px solid #e9eff6;
+                border-right: none; border-bottom: 1px solid #e8ecf1;
                 padding: 14px 20px; flex-direction: row; flex-wrap: wrap;
                 align-items: center; gap: 8px;
             }
@@ -495,7 +492,7 @@
             <!-- TITLE -->
             <h1><i class="fas fa-code"></i> {{ course.course_name }}</h1>
 
-            <!-- ===== META STRIP - directly below title ===== -->
+            <!-- ===== META STRIP ===== -->
             <div class="meta-strip">
                 <span class="meta-item"><i class="fas fa-clock"></i> Duration: {{ course.duration or '4 weeks' }}</span>
 
@@ -516,12 +513,11 @@
                 {% endif %}
             </div>
 
-            <!-- ===== DESCRIPTION & OBJECTIVES - BULLET FORMAT ===== -->
+            <!-- ===== DESCRIPTION & OBJECTIVES ===== -->
             <div class="course-description-section">
                 <span class="section-label"><i class="fas fa-info-circle"></i> About this course</span>
                 <ul>
                     {% if course.description %}
-                        <!-- Split description by newlines or periods to create bullet points -->
                         {% set lines = course.description.split('.') %}
                         {% for line in lines %}
                             {% if line.strip()|length > 0 %}
@@ -534,7 +530,7 @@
                 </ul>
 
                 {% if course.career_objectives %}
-                <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.10);">
+                <div style="margin-top:12px; padding-top:12px; border-top:1px solid #e8ecf1;">
                     <span class="section-label"><i class="fas fa-bullseye"></i> What you'll learn</span>
                     <ul>
                         {% set objectives = course.career_objectives.split('.') %}
