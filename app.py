@@ -13,6 +13,7 @@ import json
 import PyPDF2
 import math
 import re
+from math import ceil
 
 from werkzeug.utils import secure_filename
 
@@ -1092,7 +1093,7 @@ def student_questions(course_id):
 # ==================================================
 
 # ==================================================
-# ADMIN DASHBOARD
+# ADMIN DASHBOARD - WITH PAGINATION
 # ==================================================
 
 @app.route("/admin_dashboard")
@@ -1118,7 +1119,7 @@ def admin_dashboard():
     paid_courses = db_session.query(Course).filter_by(is_free=False).count()
 
     # Payment Statistics
-    total_payments = db_session.query(Payment).count()
+    total_payments_count = db_session.query(Payment).count()
     total_revenue = db_session.query(func.sum(Payment.amount)).filter(
         Payment.status == "Verified"
     ).scalar() or 0
@@ -1129,9 +1130,31 @@ def admin_dashboard():
         status="Pending"
     ).count()
 
+    # ===== PAGINATION FOR RECENT PAYMENTS =====
+    # Get page number from query string (default: 1)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    # Validate per_page
+    if per_page not in [5, 10, 25, 50]:
+        per_page = 10
+    
+    # Calculate total pages
+    total_pages = ceil(total_payments_count / per_page) if total_payments_count > 0 else 1
+    
+    # Ensure page is within valid range
+    if page < 1:
+        page = 1
+    elif page > total_pages:
+        page = total_pages
+    
+    # Calculate offset
+    offset = (page - 1) * per_page
+    
+    # Get paginated payments
     recent_payments = db_session.query(Payment).order_by(
         Payment.id.desc()
-    ).limit(10).all()
+    ).limit(per_page).offset(offset).all()
 
     return render_template(
         "admin/admin_dashboard.html",
@@ -1141,11 +1164,15 @@ def admin_dashboard():
         total_courses=total_courses,
         total_modules=total_modules,
         pending_students=pending_students,
-        total_payments=total_payments,
+        total_payments=total_payments_count,
         total_revenue=total_revenue,
         paid_payments=paid_payments,
         pending_payments=pending_payments,
         recent_payments=recent_payments,
+        page=page,
+        total_pages=total_pages,
+        total_payments_count=total_payments_count,
+        per_page=per_page,
         free_courses=free_courses,
         paid_courses=paid_courses
     )
