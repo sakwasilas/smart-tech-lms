@@ -1541,6 +1541,12 @@ def assign_teacher(course_id):
     if request.method == "POST":
         teacher_id = request.form.get("teacher_id")
         
+        # Verify teacher exists
+        teacher = db_session.query(Teacher).filter_by(id=teacher_id).first()
+        if not teacher:
+            flash("Teacher not found.", "danger")
+            return redirect(url_for("assign_teacher", course_id=course_id))
+        
         existing = db_session.query(CourseTeacher).filter_by(
             course_id=course_id,
             teacher_id=teacher_id
@@ -1896,7 +1902,8 @@ def teachers():
             fullname=fullname,
             email=email,
             phone=phone,
-            specialization=specialization
+            specialization=specialization,
+            status=status
         )
         db_session.add(teacher)
         db_session.commit()
@@ -1973,12 +1980,12 @@ def delete_teacher(id):
 
 # ==================================================
 # ==================================================
-# TEACHER SECTION
+# TEACHER SECTION - FIXED
 # ==================================================
 # ==================================================
 
 # ==================================================
-# TEACHER DASHBOARD - Updated for free/paid courses
+# TEACHER DASHBOARD - FIXED to only show assigned courses
 # ==================================================
 
 @app.route("/teacher_dashboard")
@@ -1990,27 +1997,36 @@ def teacher_dashboard():
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
 
+    # Get the logged-in user
     user = db_session.query(User).filter_by(id=session["user_id"]).first()
     
     if not user:
         flash("User not found.", "danger")
         return redirect(url_for("login"))
     
-    teacher = db_session.query(Teacher).filter_by(email=user.email).first()
+    # Find teacher by user_id (most reliable)
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
     
     if not teacher:
-        flash("Teacher profile not found.", "danger")
-        return redirect(url_for("login"))
+        # Fallback: try by email
+        teacher = db_session.query(Teacher).filter_by(email=user.email).first()
+        
+        if not teacher:
+            flash("Teacher profile not found. Please contact admin.", "danger")
+            return redirect(url_for("login"))
     
-    # Get courses assigned to this teacher
-    course_assignments = db_session.query(CourseTeacher).filter_by(
-        teacher_id=teacher.id,
-        status="Active"
+    # IMPORTANT: Get ONLY the courses assigned to this specific teacher
+    # Using direct join query to ensure we only get this teacher's courses
+    my_courses = db_session.query(Course).join(
+        CourseTeacher,
+        CourseTeacher.course_id == Course.id
+    ).filter(
+        CourseTeacher.teacher_id == teacher.id,
+        CourseTeacher.status == "Active",
+        Course.status == "Active"
     ).all()
     
-    my_courses = [assignment.course for assignment in course_assignments]
-    
-    # Count statistics
+    # Count statistics for this teacher's courses only
     total_students = 0
     total_free_students = 0
     total_paid_students = 0
@@ -2020,14 +2036,13 @@ def teacher_dashboard():
     pending_questions = 0
     
     for course in my_courses:
-        # For free courses, all enrolled students count
+        # Count students for each course
         if course.is_free:
             students = db_session.query(Enrollment).filter_by(
                 course_id=course.id
             ).count()
             total_free_students += students
         else:
-            # For paid courses, only paid students count
             students = db_session.query(Enrollment).filter_by(
                 course_id=course.id,
                 payment_status="Paid"
@@ -2035,22 +2050,34 @@ def teacher_dashboard():
             total_paid_students += students
         
         total_students += students
-        total_modules += db_session.query(Module).filter_by(
+        
+        # Count modules
+        module_count = db_session.query(Module).filter_by(
             course_id=course.id
         ).count()
-        total_assignments += db_session.query(Assignment).filter_by(
+        total_modules += module_count
+        
+        # Count assignments
+        assignment_count = db_session.query(Assignment).filter_by(
             course_id=course.id
         ).count()
-        pending_submissions += db_session.query(AssignmentSubmission).join(
+        total_assignments += assignment_count
+        
+        # Count pending submissions
+        pending_count = db_session.query(AssignmentSubmission).join(
             Assignment
         ).filter(
             Assignment.course_id == course.id,
             AssignmentSubmission.status == "Submitted"
         ).count()
-        pending_questions += db_session.query(Question).filter_by(
+        pending_submissions += pending_count
+        
+        # Count pending questions
+        question_count = db_session.query(Question).filter_by(
             course_id=course.id,
             status="Pending"
         ).count()
+        pending_questions += question_count
     
     return render_template(
         "teacher/teacher_dashboard.html",
@@ -2068,7 +2095,7 @@ def teacher_dashboard():
 
 
 # ==================================================
-# TEACHER - MANAGE COURSE - Updated
+# TEACHER - MANAGE COURSE - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/manage_course/<int:course_id>")
@@ -2079,6 +2106,25 @@ def manage_course_modules(course_id):
     if session.get("role") != "teacher":
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # IMPORTANT: Check if this course is assigned to this teacher
+    assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not assignment:
+        flash("You are not authorized to manage this course.", "danger")
+        return redirect(url_for("teacher_dashboard"))
     
     course = db_session.query(Course).filter_by(id=course_id).first()
     if not course:
@@ -2135,7 +2181,7 @@ def manage_course_modules(course_id):
 
 
 # ==================================================
-# TEACHER - ADD MODULE
+# TEACHER - ADD MODULE - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/add_module/<int:course_id>", methods=["GET", "POST"])
@@ -2146,6 +2192,25 @@ def teacher_add_module(course_id):
     if session.get("role") != "teacher":
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not assignment:
+        flash("You are not authorized to manage this course.", "danger")
+        return redirect(url_for("teacher_dashboard"))
     
     course = db_session.query(Course).filter_by(id=course_id).first()
     if not course:
@@ -2218,7 +2283,7 @@ def teacher_add_module(course_id):
 
 
 # ==================================================
-# TEACHER - EDIT MODULE
+# TEACHER - EDIT MODULE - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/edit_module/<int:module_id>", methods=["GET", "POST"])
@@ -2233,6 +2298,25 @@ def teacher_edit_module(module_id):
     module = db_session.query(Module).filter_by(id=module_id).first()
     if not module:
         flash("Module not found.", "danger")
+        return redirect(url_for("teacher_dashboard"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization for the course this module belongs to
+    assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=module.course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not assignment:
+        flash("You are not authorized to edit this module.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
     if request.method == "POST":
@@ -2278,7 +2362,7 @@ def teacher_edit_module(module_id):
 
 
 # ==================================================
-# TEACHER - DELETE MODULE
+# TEACHER - DELETE MODULE - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/delete_module/<int:module_id>")
@@ -2295,6 +2379,25 @@ def teacher_delete_module(module_id):
         flash("Module not found.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=module.course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not assignment:
+        flash("You are not authorized to delete this module.", "danger")
+        return redirect(url_for("teacher_dashboard"))
+    
     course_id = module.course_id
     db_session.delete(module)
     db_session.commit()
@@ -2304,7 +2407,7 @@ def teacher_delete_module(module_id):
 
 
 # ==================================================
-# TEACHER - ADD ASSIGNMENT
+# TEACHER - ADD ASSIGNMENT - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/add_assignment/<int:course_id>", methods=["GET", "POST"])
@@ -2315,6 +2418,25 @@ def teacher_add_assignment(course_id):
     if session.get("role") != "teacher":
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not assignment:
+        flash("You are not authorized to manage this course.", "danger")
+        return redirect(url_for("teacher_dashboard"))
     
     course = db_session.query(Course).filter_by(id=course_id).first()
     if not course:
@@ -2353,7 +2475,7 @@ def teacher_add_assignment(course_id):
 
 
 # ==================================================
-# TEACHER - VIEW ASSIGNMENT SUBMISSIONS
+# TEACHER - VIEW ASSIGNMENT SUBMISSIONS - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/assignment_submissions/<int:assignment_id>")
@@ -2370,6 +2492,25 @@ def teacher_assignment_submissions(assignment_id):
         flash("Assignment not found.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    course_assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=assignment.course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not course_assignment:
+        flash("You are not authorized to view these submissions.", "danger")
+        return redirect(url_for("teacher_dashboard"))
+    
     submissions = db_session.query(AssignmentSubmission).filter_by(
         assignment_id=assignment_id
     ).all()
@@ -2382,7 +2523,7 @@ def teacher_assignment_submissions(assignment_id):
 
 
 # ==================================================
-# TEACHER - GRADE SUBMISSION
+# TEACHER - GRADE SUBMISSION - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/grade_submission/<int:submission_id>", methods=["GET", "POST"])
@@ -2398,6 +2539,27 @@ def teacher_grade_submission(submission_id):
     if not submission:
         flash("Submission not found.", "danger")
         return redirect(url_for("teacher_dashboard"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    assignment = db_session.query(Assignment).filter_by(id=submission.assignment_id).first()
+    if assignment:
+        course_assignment = db_session.query(CourseTeacher).filter_by(
+            course_id=assignment.course_id,
+            teacher_id=teacher.id,
+            status="Active"
+        ).first()
+        
+        if not course_assignment:
+            flash("You are not authorized to grade this submission.", "danger")
+            return redirect(url_for("teacher_dashboard"))
     
     if request.method == "POST":
         score = request.form.get("score")
@@ -2417,7 +2579,7 @@ def teacher_grade_submission(submission_id):
 
 
 # ==================================================
-# TEACHER - CREATE QUIZ
+# TEACHER - CREATE QUIZ - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/create_quiz/<int:course_id>", methods=["GET", "POST"])
@@ -2428,6 +2590,25 @@ def teacher_create_quiz(course_id):
     if session.get("role") != "teacher":
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    course_assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not course_assignment:
+        flash("You are not authorized to manage this course.", "danger")
+        return redirect(url_for("teacher_dashboard"))
     
     course = db_session.query(Course).filter_by(id=course_id).first()
     if not course:
@@ -2493,7 +2674,7 @@ def teacher_create_quiz(course_id):
 
 
 # ==================================================
-# TEACHER - VIEW QUIZ ATTEMPTS
+# TEACHER - VIEW QUIZ ATTEMPTS - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/quiz_attempts/<int:quiz_id>")
@@ -2510,6 +2691,25 @@ def teacher_quiz_attempts(quiz_id):
         flash("Quiz not found.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    course_assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=quiz.course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not course_assignment:
+        flash("You are not authorized to view these attempts.", "danger")
+        return redirect(url_for("teacher_dashboard"))
+    
     attempts = db_session.query(QuizAttempt).filter_by(
         quiz_id=quiz_id
     ).order_by(QuizAttempt.completed_at.desc()).all()
@@ -2522,7 +2722,7 @@ def teacher_quiz_attempts(quiz_id):
 
 
 # ==================================================
-# TEACHER - ANSWER QUESTION
+# TEACHER - ANSWER QUESTION - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/answer_question/<int:question_id>", methods=["GET", "POST"])
@@ -2537,6 +2737,25 @@ def teacher_answer_question(question_id):
     question = db_session.query(Question).filter_by(id=question_id).first()
     if not question:
         flash("Question not found.", "danger")
+        return redirect(url_for("teacher_dashboard"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization - teacher should be assigned to the course
+    course_assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=question.course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not course_assignment:
+        flash("You are not authorized to answer questions for this course.", "danger")
         return redirect(url_for("teacher_dashboard"))
     
     if request.method == "POST":
@@ -2563,7 +2782,7 @@ def teacher_answer_question(question_id):
 
 
 # ==================================================
-# TEACHER - VIEW STUDENT PROGRESS - Updated
+# TEACHER - VIEW STUDENT PROGRESS - With Authorization Check
 # ==================================================
 
 @app.route("/teacher/student_progress/<int:course_id>")
@@ -2574,6 +2793,25 @@ def teacher_student_progress(course_id):
     if session.get("role") != "teacher":
         flash("Access denied.", "danger")
         return redirect(url_for("login"))
+    
+    # Get the teacher
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    if not teacher:
+        flash("Teacher profile not found.", "danger")
+        return redirect(url_for("login"))
+    
+    # Check authorization
+    course_assignment = db_session.query(CourseTeacher).filter_by(
+        course_id=course_id,
+        teacher_id=teacher.id,
+        status="Active"
+    ).first()
+    
+    if not course_assignment:
+        flash("You are not authorized to view progress for this course.", "danger")
+        return redirect(url_for("teacher_dashboard"))
     
     course = db_session.query(Course).filter_by(id=course_id).first()
     if not course:
@@ -2609,6 +2847,175 @@ def teacher_student_progress(course_id):
         enrollments=enrollments,
         is_free=course.is_free
     )
+
+
+# ==================================================
+# DEBUG ROUTE - Check Teacher Assignments
+# ==================================================
+
+@app.route("/debug_teacher_courses")
+def debug_teacher_courses():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    if session.get("role") != "teacher":
+        return "Access denied", 403
+    
+    user = db_session.query(User).filter_by(id=session["user_id"]).first()
+    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
+    
+    html = """
+    <html>
+    <head><title>Debug - Teacher Courses</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .box { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+    </head>
+    <body>
+        <h1>🔍 Debug: Teacher Course Assignments</h1>
+    """
+    
+    if not teacher:
+        html += f"""
+        <div class="box" style="border-color: red;">
+            <h3 class="error">❌ Teacher not found for user: {user.email}</h3>
+            <p><strong>User ID:</strong> {user.id}</p>
+            <p><strong>User Email:</strong> {user.email}</p>
+            <p><strong>User Role:</strong> {user.role}</p>
+        </div>
+        """
+        return html + "</body></html>"
+    
+    html += f"""
+    <div class="box" style="border-color: green;">
+        <h3 class="success">✅ Teacher Found</h3>
+        <table>
+            <tr><th>Property</th><th>Value</th></tr>
+            <tr><td>Teacher ID</td><td>{teacher.id}</td></tr>
+            <tr><td>Name</td><td>{teacher.fullname}</td></tr>
+            <tr><td>Email</td><td>{teacher.email}</td></tr>
+            <tr><td>User ID</td><td>{teacher.user_id}</td></tr>
+            <tr><td>Specialization</td><td>{teacher.specialization or 'N/A'}</td></tr>
+            <tr><td>Status</td><td>{teacher.status}</td></tr>
+        </table>
+    </div>
+    """
+    
+    # Get all assignments for this teacher
+    assignments = db_session.query(CourseTeacher).filter_by(
+        teacher_id=teacher.id
+    ).all()
+    
+    html += f"""
+    <div class="box">
+        <h3>📚 Course Assignments ({len(assignments)})</h3>
+    """
+    
+    if assignments:
+        html += """
+        <table>
+            <tr>
+                <th>Assignment ID</th>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Status</th>
+                <th>Assigned Date</th>
+            </tr>
+        """
+        for assignment in assignments:
+            course = db_session.query(Course).filter_by(id=assignment.course_id).first()
+            course_name = course.course_name if course else "UNKNOWN"
+            is_free = "FREE" if course and course.is_free else "PAID"
+            html += f"""
+                <tr>
+                    <td>{assignment.id}</td>
+                    <td>{assignment.course_id}</td>
+                    <td><strong>{course_name}</strong> <span style='color: {"green" if is_free == "FREE" else "orange"};'>({is_free})</span></td>
+                    <td>{assignment.status}</td>
+                    <td>{assignment.assigned_date.strftime('%Y-%m-%d') if assignment.assigned_date else 'N/A'}</td>
+                </tr>
+            """
+        html += "</table>"
+    else:
+        html += "<p class='warning'>⚠️ No course assignments found for this teacher.</p>"
+    
+    html += "</div>"
+    
+    # Show all active courses
+    all_courses = db_session.query(Course).filter_by(status="Active").all()
+    html += f"""
+    <div class="box">
+        <h3>📖 All Active Courses ({len(all_courses)})</h3>
+    """
+    
+    if all_courses:
+        assigned_ids = [a.course_id for a in assignments]
+        html += "<ul>"
+        for course in all_courses:
+            is_assigned = course.id in assigned_ids
+            icon = "✅" if is_assigned else "❌"
+            html += f"""
+                <li>
+                    {icon} <strong>{course.course_name}</strong> 
+                    (ID: {course.id}) 
+                    - {"FREE" if course.is_free else "PAID"}
+                    {"" if is_assigned else "<span style='color:red;'> (NOT ASSIGNED TO YOU)</span>"}
+                </li>
+            """
+        html += "</ul>"
+    else:
+        html += "<p>No active courses found.</p>"
+    
+    html += "</div>"
+    
+    # Show what the teacher dashboard will display
+    my_courses = db_session.query(Course).join(
+        CourseTeacher,
+        CourseTeacher.course_id == Course.id
+    ).filter(
+        CourseTeacher.teacher_id == teacher.id,
+        CourseTeacher.status == "Active",
+        Course.status == "Active"
+    ).all()
+    
+    html += f"""
+    <div class="box" style="border-color: blue;">
+        <h3>📊 Dashboard Will Show ({len(my_courses)} courses)</h3>
+    """
+    
+    if my_courses:
+        html += "<ul>"
+        for course in my_courses:
+            html += f"""
+                <li>
+                    ✅ <strong>{course.course_name}</strong> 
+                    (ID: {course.id})
+                    <a href="/teacher/manage_course/{course.id}" target="_blank">[Manage]</a>
+                </li>
+            """
+        html += "</ul>"
+    else:
+        html += "<p class='warning'>⚠️ No courses will be shown on dashboard.</p>"
+    
+    html += "</div>"
+    
+    html += """
+    <hr>
+    <p>
+        <a href="/teacher_dashboard">← Back to Dashboard</a>
+    </p>
+    </body>
+    </html>
+    """
+    
+    return html
 
 
 # ==================================================
