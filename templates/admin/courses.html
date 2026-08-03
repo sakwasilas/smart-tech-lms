@@ -136,8 +136,8 @@
     <!-- Main Layout Grid -->
     <div class="row g-4">
         
-        <!-- Left Main Content Column: Search & Table (col-lg-8) -->
-        <div class="col-lg-8">
+        <!-- Left Main Content Column: Search & Table (col-lg-12 for full width) -->
+        <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-3 border-bottom-0">
                     <form method="GET" class="row g-2 align-items-center">
@@ -165,6 +165,7 @@
                                 <th>Code</th>
                                 <th>Fee</th>
                                 <th>Status</th>
+                                <th>Teachers</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -191,13 +192,31 @@
                                         <span class="badge rounded-pill bg-secondary">Inactive</span>
                                     {% endif %}
                                 </td>
+                                <td>
+                                    <!-- Display assigned teachers -->
+                                    {% set assigned = course.course_teachers|selectattr('status', 'equalto', 'Active')|list %}
+                                    {% if assigned %}
+                                        {% for ct in assigned %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary me-1">
+                                                {{ ct.teacher.fullname }}
+                                            </span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted small">No teachers</span>
+                                    {% endif %}
+                                </td>
                                 <td class="text-end">
                                     <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Manage Teachers Button -->
+                                        <button type="button" class="btn btn-outline-success" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#manageTeachersModal{{ course.id }}"
+                                                title="Manage Teachers">
+                                            <i class="fas fa-user-tie"></i>
+                                            <span class="d-none d-md-inline">Teachers</span>
+                                        </button>
                                         <a href="{{ url_for('edit_course', id=course.id) }}" class="btn btn-outline-secondary" title="Edit">
                                             <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('assign_teacher', course_id=course.id) }}" class="btn btn-outline-primary" title="Assign Teacher">
-                                            <i class="fas fa-user-tie"></i>
                                         </a>
                                         <a href="{{ url_for('admin_announcements', course_id=course.id) }}" class="btn btn-outline-info" title="Announcements">
                                             <i class="fas fa-bullhorn"></i>
@@ -219,7 +238,7 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="7" class="text-center py-5">
                                     <i class="fas fa-folder-open fa-3x text-muted mb-3 d-block"></i>
                                     <p class="text-muted mb-0">No courses match your search criteria.</p>
                                 </td>
@@ -231,58 +250,114 @@
             </div>
         </div>
 
-        <!-- Right Side Column: Stats Cards (col-lg-4) -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-header bg-white border-bottom-0 pt-3">
-                    <h6 class="fw-bold mb-0 text-uppercase text-muted small"><i class="fas fa-chart-pie me-1"></i> Summary Stats</h6>
-                </div>
-                <div class="card-body pt-1">
-                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
-                        <div>
-                            <small class="text-muted d-block">Total Courses</small>
-                            <span class="fs-4 fw-bold text-dark">{{ courses|length }}</span>
-                        </div>
-                        <div class="bg-primary text-white p-3 rounded-circle">
-                            <i class="fas fa-book fa-lg"></i>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
-                        <div>
-                            <small class="text-muted d-block">Active Courses</small>
-                            <span class="fs-4 fw-bold text-info">{{ courses|selectattr('status', 'equalto', 'Active')|list|length }}</span>
-                        </div>
-                        <div class="bg-info text-white p-3 rounded-circle">
-                            <i class="fas fa-check-circle fa-lg"></i>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
-                        <div>
-                            <small class="text-muted d-block">Free Courses</small>
-                            <span class="fs-4 fw-bold text-success">{{ courses|selectattr('is_free', 'equalto', true)|list|length }}</span>
-                        </div>
-                        <div class="bg-success text-white p-3 rounded-circle">
-                            <i class="fas fa-gift fa-lg"></i>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
-                        <div>
-                            <small class="text-muted d-block">Paid Courses</small>
-                            <span class="fs-4 fw-bold text-warning">{{ courses|selectattr('is_free', 'equalto', false)|list|length }}</span>
-                        </div>
-                        <div class="bg-warning text-dark p-3 rounded-circle">
-                            <i class="fas fa-credit-card fa-lg"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
+
+<!-- ================================================== -->
+<!-- MANAGE TEACHERS MODAL (for each course) -->
+<!-- ================================================== -->
+{% for course in courses %}
+<div class="modal fade" id="manageTeachersModal{{ course.id }}" tabindex="-1" aria-labelledby="manageTeachersModalLabel{{ course.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="manageTeachersModalLabel{{ course.id }}">
+                    <i class="fas fa-user-tie me-2"></i> Manage Teachers - {{ course.course_name }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Assign Teacher Form -->
+                <form method="POST" action="{{ url_for('assign_teacher', course_id=course.id) }}" class="mb-4">
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <select name="teacher_id" class="form-select" required>
+                                <option value="">-- Select Teacher to Assign --</option>
+                                {% for teacher in all_teachers %}
+                                    {% set is_assigned = false %}
+                                    {% for ct in course.course_teachers %}
+                                        {% if ct.teacher_id == teacher.id and ct.status == 'Active' %}
+                                            {% set is_assigned = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <option value="{{ teacher.id }}" {% if is_assigned %}disabled{% endif %}>
+                                        {{ teacher.fullname }} - {{ teacher.specialization or 'General' }}
+                                        {% if is_assigned %}(Already Assigned){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus-circle me-1"></i> Assign Teacher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Current Assigned Teachers -->
+                <h6 class="fw-bold mb-3"><i class="fas fa-users me-2"></i>Current Assigned Teachers</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Teacher</th>
+                                <th>Specialization</th>
+                                <th>Assigned Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set active_assignments = course.course_teachers|selectattr('status', 'equalto', 'Active')|list %}
+                            {% if active_assignments %}
+                                {% for ct in active_assignments %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><strong>{{ ct.teacher.fullname }}</strong></td>
+                                    <td>{{ ct.teacher.specialization or 'General' }}</td>
+                                    <!-- FIXED: Handle assigned_date as string -->
+                                    <td>
+                                        {% if ct.assigned_date %}
+                                            {% if ' ' in ct.assigned_date %}
+                                                {{ ct.assigned_date.split(' ')[0] }}
+                                            {% else %}
+                                                {{ ct.assigned_date }}
+                                            {% endif %}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('remove_teacher', assignment_id=ct.id) }}" 
+                                           class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Remove {{ ct.teacher.fullname }} from this course?')">
+                                            <i class="fas fa-user-minus"></i> Remove
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        <i class="fas fa-users fa-2x d-block mb-2"></i>
+                                        No teachers assigned to this course yet.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 <script>
     function toggleFeeField() {

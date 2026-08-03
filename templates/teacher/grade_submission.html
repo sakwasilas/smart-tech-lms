@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Submission</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f9; }
+        
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            padding: 14px 0;
+            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+        .navbar-custom .navbar-brand i { margin-right: 10px; }
+        
+        .btn-nav {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: none;
+            color: white;
+            background: rgba(255,255,255,0.2);
+        }
+        .btn-nav:hover { background: rgba(255,255,255,0.3); color: white; transform: translateY(-2px); }
+        
+        .card-modern {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            background: white;
+            overflow: hidden;
+        }
+        .card-modern .card-header-custom {
+            padding: 16px 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #f0f4f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+        .card-modern .card-header-custom i { color: #667eea; margin-right: 8px; }
+        .card-modern .card-body-custom { padding: 24px; }
+        
+        .form-control-modern {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 14px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .form-control-modern:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(46, 204, 113, 0.4); color: white; }
+        
+        .btn-cancel {
+            background: #e9ecef;
+            color: #2d3436;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-cancel:hover { background: #dee2e6; color: #2d3436; }
+        
+        .submission-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+        }
+        .submission-box .label { font-weight: 600; color: #2d3436; }
+        .submission-box .value { color: #636e72; }
+        
+        .badge-status {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-status.submitted { background: #f39c12; color: white; }
+        .badge-status.graded { background: #2ecc71; color: white; }
+        
+        .alert-custom {
+            border-radius: 12px;
+            padding: 14px 20px;
+            border: none;
+            margin-bottom: 20px;
+        }
+        .alert-custom.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-custom.danger { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        
+        @media (max-width: 768px) {
+            .card-modern .card-body-custom { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('teacher_dashboard') }}">
+            <i class="fas fa-graduation-cap"></i> LMS Teacher
+        </a>
+        <div>
+            <a href="{{ url_for('teacher_assignment_submissions', assignment_id=submission.assignment_id) }}" class="btn-nav">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <a href="{{ url_for('logout') }}" class="btn-nav" style="background: rgba(231,76,60,0.8);">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card-modern">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-check-circle"></i> Grade Submission</span>
+                    <span class="badge bg-secondary">Student: {{ submission.student.fullname }}</span>
+                </div>
+                <div class="card-body-custom">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert-custom {{ category }}">
+                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <!-- Submission Details -->
+                    <div class="submission-box">
+                        <p><span class="label">Assignment:</span> <span class="value">{{ submission.assignment.title }}</span></p>
+                        <p><span class="label">Student:</span> <span class="value">{{ submission.student.fullname }}</span></p>
+                        <p><span class="label">Submitted:</span> <span class="value">{{ submission.submitted_at }}</span></p>
+                        <p><span class="label">Status:</span> 
+                            <span class="badge-status {{ submission.status|lower }}">{{ submission.status }}</span>
+                        </p>
+                        {% if submission.submission_text %}
+                        <p><span class="label">Submission Text:</span></p>
+                        <div class="border p-3 rounded bg-white">{{ submission.submission_text }}</div>
+                        {% endif %}
+                        {% if submission.file_name %}
+                        <p><span class="label">File:</span> 
+                            <a href="#" class="text-primary"><i class="fas fa-paperclip"></i> {{ submission.file_name }}</a>
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('teacher_grade_submission', submission_id=submission.id) }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Score <span class="text-danger">*</span></label>
+                                <input type="number" name="score" class="form-control-modern" 
+                                       value="{{ submission.score if submission.score else '' }}" 
+                                       min="0" max="{{ submission.assignment.max_score }}" 
+                                       step="0.5" required>
+                                <small class="text-muted">Maximum score: {{ submission.assignment.max_score }}</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-control-modern">
+                                    <option value="Graded" {% if submission.status == 'Graded' %}selected{% endif %}>Graded</option>
+                                    <option value="Submitted" {% if submission.status == 'Submitted' %}selected{% endif %}>Submitted (Not Graded)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Feedback</label>
+                            <textarea name="feedback" class="form-control-modern" rows="4" placeholder="Provide feedback to the student...">{{ submission.feedback if submission.feedback else '' }}</textarea>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-submit">
+                                    <i class="fas fa-save"></i> Save Grade
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{{ url_for('teacher_assignment_submissions', assignment_id=submission.assignment_id) }}" class="btn-cancel">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

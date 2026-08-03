@@ -201,7 +201,7 @@ def student_register():
 # ==================================================
 
 # ==================================================
-# STUDENT DASHBOARD - FIXED
+# STUDENT DASHBOARD
 # ==================================================
 
 @app.route("/student/dashboard")
@@ -302,7 +302,7 @@ def enroll(course_id):
         enrollment = Enrollment(
             student_id=student.id,
             course_id=course.id,
-            date_enrolled=datetime.now().strftime("%Y-%m-%d"),
+            date_enrolled=datetime.now(),
             payment_status=payment_status,
             status="Active"
         )
@@ -316,7 +316,7 @@ def enroll(course_id):
             phone="FREE_ENROLLMENT",
             transaction_code=f"FREE_{course.id}_{student.id}_{int(datetime.now().timestamp())}",
             status="Verified",
-            date_paid=datetime.now().strftime("%Y-%m-%d")
+            date_paid=datetime.now()
         )
         db_session.add(payment)
         db_session.commit()
@@ -330,7 +330,7 @@ def enroll(course_id):
         enrollment = Enrollment(
             student_id=student.id,
             course_id=course.id,
-            date_enrolled=datetime.now().strftime("%Y-%m-%d"),
+            date_enrolled=datetime.now(),
             payment_status="Pending",
             status="Active"
         )
@@ -419,7 +419,7 @@ def submit_payment(enrollment_id):
         phone=phone,
         transaction_code=transaction_code,
         status="Pending",
-        date_paid=datetime.now().strftime("%Y-%m-%d")
+        date_paid=datetime.now()
     )
 
     db_session.add(payment)
@@ -463,7 +463,7 @@ def access_course(course_id):
         flash("Course not found.", "danger")
         return redirect(url_for("student_dashboard"))
 
-    # Check payment only for paid courses - FIXED to accept both "Paid" and "Verified"
+    # Check payment only for paid courses
     if not course.is_free:
         if enrollment.payment_status not in ["Paid", "Verified"]:
             # Check if there's a pending payment
@@ -477,7 +477,6 @@ def access_course(course_id):
             else:
                 flash("Please complete payment first.", "warning")
             return redirect(url_for("student_dashboard"))
-    # If course is free, skip payment check
 
     modules = db_session.query(Module).filter_by(
         course_id=course_id
@@ -556,7 +555,7 @@ def access_course(course_id):
 
 
 # ==================================================
-# ADMIN - VERIFY PAYMENTS - FIXED
+# ADMIN - VERIFY PAYMENTS
 # ==================================================
 
 @app.route("/admin/verify_payments")
@@ -601,9 +600,9 @@ def admin_verify_payment(payment_id):
     
     # Verify payment
     payment.status = "Verified"
-    payment.verified_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    payment.verified_at = datetime.now()
     
-    # Update enrollment payment status to "Paid" - FIXED
+    # Update enrollment payment status to "Paid"
     enrollment = db_session.query(Enrollment).filter_by(id=payment.enrollment_id).first()
     if enrollment:
         enrollment.payment_status = "Paid"
@@ -856,7 +855,7 @@ def complete_module(module_id):
             student_id=student.id,
             module_id=module_id,
             status="Completed",
-            completed_date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            completed_date=datetime.now()
         )
         db_session.add(progress)
         db_session.commit()
@@ -996,7 +995,7 @@ def student_take_quiz(quiz_id):
             score=percentage,
             passed=passed,
             answers=json.dumps(answers),
-            completed_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            completed_at=datetime.now()
         )
         
         db_session.add(attempt)
@@ -1343,7 +1342,7 @@ def mass_unblock_students():
 
 
 # ==================================================
-# COURSE MANAGEMENT (ADMIN) - Updated with is_free
+# COURSE MANAGEMENT (ADMIN) - FIXED
 # ==================================================
 
 @app.route("/courses")
@@ -1361,9 +1360,23 @@ def courses():
     if search:
         query = query.filter(Course.course_name.like(f"%{search}%"))
 
-    courses = query.order_by(Course.course_name).all()
+    # Get all courses with their teacher assignments loaded
+    courses = query.order_by(Course.id).all()
+    
+    # Load course_teachers relationship for each course
+    for course in courses:
+        # This ensures the relationship is loaded
+        _ = course.course_teachers
 
-    return render_template("admin/courses.html", courses=courses, search=search)
+    # Get all active teachers for the modal dropdown
+    all_teachers = db_session.query(Teacher).filter_by(status="Active").all()
+
+    return render_template(
+        "admin/courses.html",
+        courses=courses,
+        search=search,
+        all_teachers=all_teachers
+    )
 
 
 @app.route("/add_course", methods=["GET", "POST"])
@@ -1513,7 +1526,7 @@ def deactivate_course(id):
 
 
 # ==================================================
-# ADMIN - ASSIGN TEACHER TO COURSE
+# ADMIN - ASSIGN TEACHER TO COURSE - FIXED
 # ==================================================
 
 @app.route("/admin/assign_teacher/<int:course_id>", methods=["GET", "POST"])
@@ -1547,15 +1560,33 @@ def assign_teacher(course_id):
             flash("Teacher not found.", "danger")
             return redirect(url_for("assign_teacher", course_id=course_id))
         
+        # Check if already assigned (active)
         existing = db_session.query(CourseTeacher).filter_by(
             course_id=course_id,
-            teacher_id=teacher_id
+            teacher_id=teacher_id,
+            status="Active"
         ).first()
         
         if existing:
             flash("Teacher already assigned to this course.", "warning")
             return redirect(url_for("assign_teacher", course_id=course_id))
         
+        # Check if there's an inactive assignment (reactivate it)
+        inactive = db_session.query(CourseTeacher).filter_by(
+            course_id=course_id,
+            teacher_id=teacher_id,
+            status="Inactive"
+        ).first()
+        
+        if inactive:
+            # Reactivate instead of creating new
+            inactive.status = "Active"
+            inactive.assigned_date = datetime.now()
+            db_session.commit()
+            flash(f"{teacher.fullname} re-assigned to {course.course_name}!", "success")
+            return redirect(url_for("assign_teacher", course_id=course_id))
+        
+        # Create new assignment
         assignment = CourseTeacher(
             course_id=course_id,
             teacher_id=teacher_id,
@@ -1564,8 +1595,10 @@ def assign_teacher(course_id):
         db_session.add(assignment)
         db_session.commit()
         
-        flash("Teacher assigned successfully!", "success")
-        return redirect(url_for("assign_teacher", course_id=course_id))
+        flash(f"{teacher.fullname} assigned to {course.course_name} successfully!", "success")
+        
+        # Redirect back to the course management page
+        return redirect(url_for('courses'))
 
     return render_template(
         "admin/assign_teacher.html",
@@ -1595,7 +1628,7 @@ def remove_teacher(assignment_id):
     db_session.commit()
     
     flash("Teacher removed from course.", "success")
-    return redirect(url_for("assign_teacher", course_id=course_id))
+    return redirect(url_for("courses"))
 
 
 # ==================================================
@@ -1861,7 +1894,7 @@ def deactivate_module(id):
 
 
 # ==================================================
-# TEACHER MANAGEMENT (ADMIN)
+# TEACHER MANAGEMENT (ADMIN) - FIXED
 # ==================================================
 
 @app.route("/teachers", methods=["GET", "POST"])
@@ -1881,11 +1914,13 @@ def teachers():
         status = request.form.get("status")
         specialization = request.form.get("specialization", "")
 
+        # Check if email exists
         existing = db_session.query(User).filter_by(email=email).first()
         if existing:
             flash("Email already exists.", "warning")
             return redirect(url_for("teachers"))
 
+        # Create the user FIRST
         user = User(
             fullname=fullname,
             phone=phone,
@@ -1895,10 +1930,11 @@ def teachers():
             status=status
         )
         db_session.add(user)
-        db_session.flush()
+        db_session.flush()  # This gets the user.id
         
+        # Create the teacher WITH the user_id
         teacher = Teacher(
-            user_id=user.id,
+            user_id=user.id,  # CRITICAL: Link to the user
             fullname=fullname,
             email=email,
             phone=phone,
@@ -1931,7 +1967,12 @@ def edit_teacher(id):
         flash("Teacher not found.", "danger")
         return redirect(url_for("teachers"))
 
+    # Find the associated user
     user = db_session.query(User).filter_by(email=teacher.email, role="teacher").first()
+    
+    # If user not found by email, try by user_id
+    if not user and teacher.user_id:
+        user = db_session.query(User).filter_by(id=teacher.user_id, role="teacher").first()
 
     if request.method == "POST":
         teacher.fullname = request.form.get('fullname')
@@ -1945,6 +1986,8 @@ def edit_teacher(id):
             user.email = request.form.get('email')
             user.phone = request.form.get('phone')
             user.status = request.form.get('status')
+            # Make sure user_id is set correctly
+            teacher.user_id = user.id
 
         db_session.commit()
         flash("Teacher updated successfully!", "success")
@@ -1967,25 +2010,116 @@ def delete_teacher(id):
         flash("Teacher not found.", "danger")
         return redirect(url_for("teachers"))
 
-    user = db_session.query(User).filter_by(email=teacher.email, role="teacher").first()
-    if user:
-        db_session.delete(user)
+    try:
+        # Find the associated user
+        user = None
+        
+        # Try by user_id first
+        if teacher.user_id:
+            user = db_session.query(User).filter_by(id=teacher.user_id, role="teacher").first()
+        
+        # If not found by user_id, try by email
+        if not user:
+            user = db_session.query(User).filter_by(email=teacher.email, role="teacher").first()
+            if user:
+                # Update teacher with correct user_id before deletion
+                teacher.user_id = user.id
+                db_session.flush()
+        
+        # Delete the user first (if exists)
+        if user:
+            db_session.delete(user)
+        
+        # Then delete the teacher
+        db_session.delete(teacher)
+        db_session.commit()
+        
+        flash("Teacher deleted successfully.", "success")
+    except Exception as e:
+        db_session.rollback()
+        flash(f"Error deleting teacher: {str(e)}", "danger")
     
-    db_session.delete(teacher)
-    db_session.commit()
-
-    flash("Teacher deleted successfully.", "success")
     return redirect(url_for('teachers'))
 
 
 # ==================================================
+# ADMIN FIX - Fix teacher user_id links
 # ==================================================
-# TEACHER SECTION - FIXED
+
+@app.route("/admin/fix_teachers")
+def fix_teachers():
+    """One-time fix to ensure all teachers have correct user_id links"""
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("login"))
+    
+    fixed_count = 0
+    error_count = 0
+    teachers = db_session.query(Teacher).all()
+    
+    for teacher in teachers:
+        try:
+            # Check if teacher has a user_id
+            if not teacher.user_id:
+                # Try to find user by email
+                user = db_session.query(User).filter_by(
+                    email=teacher.email,
+                    role="teacher"
+                ).first()
+                
+                if user:
+                    teacher.user_id = user.id
+                    fixed_count += 1
+                    print(f"Fixed teacher: {teacher.fullname} -> user_id: {user.id}")
+                else:
+                    # Create a user for this teacher
+                    print(f"Creating user for teacher: {teacher.fullname}")
+                    user = User(
+                        fullname=teacher.fullname,
+                        email=teacher.email,
+                        phone=teacher.phone,
+                        password="password123",  # Default password
+                        role="teacher",
+                        status=teacher.status or "Active"
+                    )
+                    db_session.add(user)
+                    db_session.flush()
+                    teacher.user_id = user.id
+                    fixed_count += 1
+            
+            # Verify the user_id actually exists
+            elif teacher.user_id:
+                user = db_session.query(User).filter_by(id=teacher.user_id).first()
+                if not user:
+                    # user_id doesn't exist, try to find by email
+                    user = db_session.query(User).filter_by(
+                        email=teacher.email,
+                        role="teacher"
+                    ).first()
+                    if user:
+                        teacher.user_id = user.id
+                        fixed_count += 1
+                        print(f"Fixed teacher: {teacher.fullname} -> user_id: {user.id}")
+        except Exception as e:
+            error_count += 1
+            print(f"Error fixing teacher {teacher.id}: {str(e)}")
+    
+    db_session.commit()
+    flash(f"Fixed {fixed_count} teacher records. {error_count} errors.", "success")
+    return redirect(url_for("teachers"))
+
+
+# ==================================================
+# ==================================================
+# TEACHER SECTION - COMPLETELY FIXED
 # ==================================================
 # ==================================================
 
 # ==================================================
-# TEACHER DASHBOARD - FIXED to only show assigned courses
+# TEACHER DASHBOARD - COMPLETELY FIXED
 # ==================================================
 
 @app.route("/teacher_dashboard")
@@ -2008,22 +2142,27 @@ def teacher_dashboard():
     teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
     
     if not teacher:
-        # Fallback: try by email
+        # Fallback: try by email (exact match)
         teacher = db_session.query(Teacher).filter_by(email=user.email).first()
+        
+        if teacher:
+            # FIX: Update the teacher record with the correct user_id
+            teacher.user_id = user.id
+            db_session.commit()
+            flash("Teacher profile fixed. Please refresh.", "info")
+            return redirect(url_for("teacher_dashboard"))
         
         if not teacher:
             flash("Teacher profile not found. Please contact admin.", "danger")
             return redirect(url_for("login"))
     
-    # IMPORTANT: Get ONLY the courses assigned to this specific teacher
-    # Using direct join query to ensure we only get this teacher's courses
+    # Get ALL courses assigned to this specific teacher
     my_courses = db_session.query(Course).join(
         CourseTeacher,
         CourseTeacher.course_id == Course.id
     ).filter(
         CourseTeacher.teacher_id == teacher.id,
-        CourseTeacher.status == "Active",
-        Course.status == "Active"
+        CourseTeacher.status == "Active"
     ).all()
     
     # Count statistics for this teacher's courses only
@@ -2036,15 +2175,17 @@ def teacher_dashboard():
     pending_questions = 0
     
     for course in my_courses:
-        # Count students for each course
+        # Count students for each course (only active enrollments)
         if course.is_free:
             students = db_session.query(Enrollment).filter_by(
-                course_id=course.id
+                course_id=course.id,
+                status="Active"
             ).count()
             total_free_students += students
         else:
             students = db_session.query(Enrollment).filter_by(
                 course_id=course.id,
+                status="Active",
                 payment_status="Paid"
             ).count()
             total_paid_students += students
@@ -2053,13 +2194,15 @@ def teacher_dashboard():
         
         # Count modules
         module_count = db_session.query(Module).filter_by(
-            course_id=course.id
+            course_id=course.id,
+            status="Active"
         ).count()
         total_modules += module_count
         
         # Count assignments
         assignment_count = db_session.query(Assignment).filter_by(
-            course_id=course.id
+            course_id=course.id,
+            status="Active"
         ).count()
         total_assignments += assignment_count
         
@@ -2147,11 +2290,13 @@ def manage_course_modules(course_id):
     # For free courses, count all enrolled students
     if course.is_free:
         enrolled_students = db_session.query(Enrollment).filter_by(
-            course_id=course_id
+            course_id=course_id,
+            status="Active"
         ).all()
     else:
         enrolled_students = db_session.query(Enrollment).filter_by(
             course_id=course_id,
+            status="Active",
             payment_status="Paid"
         ).all()
     
@@ -2568,7 +2713,7 @@ def teacher_grade_submission(submission_id):
         submission.score = score
         submission.feedback = feedback
         submission.status = "Graded"
-        submission.graded_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        submission.graded_at = datetime.now()
         
         db_session.commit()
         
@@ -2821,11 +2966,13 @@ def teacher_student_progress(course_id):
     # For paid courses, only show paid students
     if course.is_free:
         enrollments = db_session.query(Enrollment).filter_by(
-            course_id=course_id
+            course_id=course_id,
+            status="Active"
         ).all()
     else:
         enrollments = db_session.query(Enrollment).filter_by(
             course_id=course_id,
+            status="Active",
             payment_status="Paid"
         ).all()
     
@@ -2847,175 +2994,6 @@ def teacher_student_progress(course_id):
         enrollments=enrollments,
         is_free=course.is_free
     )
-
-
-# ==================================================
-# DEBUG ROUTE - Check Teacher Assignments
-# ==================================================
-
-@app.route("/debug_teacher_courses")
-def debug_teacher_courses():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
-    
-    if session.get("role") != "teacher":
-        return "Access denied", 403
-    
-    user = db_session.query(User).filter_by(id=session["user_id"]).first()
-    teacher = db_session.query(Teacher).filter_by(user_id=user.id).first()
-    
-    html = """
-    <html>
-    <head><title>Debug - Teacher Courses</title>
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .success { color: green; }
-        .error { color: red; }
-        .warning { color: orange; }
-        .box { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-    </style>
-    </head>
-    <body>
-        <h1>🔍 Debug: Teacher Course Assignments</h1>
-    """
-    
-    if not teacher:
-        html += f"""
-        <div class="box" style="border-color: red;">
-            <h3 class="error">❌ Teacher not found for user: {user.email}</h3>
-            <p><strong>User ID:</strong> {user.id}</p>
-            <p><strong>User Email:</strong> {user.email}</p>
-            <p><strong>User Role:</strong> {user.role}</p>
-        </div>
-        """
-        return html + "</body></html>"
-    
-    html += f"""
-    <div class="box" style="border-color: green;">
-        <h3 class="success">✅ Teacher Found</h3>
-        <table>
-            <tr><th>Property</th><th>Value</th></tr>
-            <tr><td>Teacher ID</td><td>{teacher.id}</td></tr>
-            <tr><td>Name</td><td>{teacher.fullname}</td></tr>
-            <tr><td>Email</td><td>{teacher.email}</td></tr>
-            <tr><td>User ID</td><td>{teacher.user_id}</td></tr>
-            <tr><td>Specialization</td><td>{teacher.specialization or 'N/A'}</td></tr>
-            <tr><td>Status</td><td>{teacher.status}</td></tr>
-        </table>
-    </div>
-    """
-    
-    # Get all assignments for this teacher
-    assignments = db_session.query(CourseTeacher).filter_by(
-        teacher_id=teacher.id
-    ).all()
-    
-    html += f"""
-    <div class="box">
-        <h3>📚 Course Assignments ({len(assignments)})</h3>
-    """
-    
-    if assignments:
-        html += """
-        <table>
-            <tr>
-                <th>Assignment ID</th>
-                <th>Course ID</th>
-                <th>Course Name</th>
-                <th>Status</th>
-                <th>Assigned Date</th>
-            </tr>
-        """
-        for assignment in assignments:
-            course = db_session.query(Course).filter_by(id=assignment.course_id).first()
-            course_name = course.course_name if course else "UNKNOWN"
-            is_free = "FREE" if course and course.is_free else "PAID"
-            html += f"""
-                <tr>
-                    <td>{assignment.id}</td>
-                    <td>{assignment.course_id}</td>
-                    <td><strong>{course_name}</strong> <span style='color: {"green" if is_free == "FREE" else "orange"};'>({is_free})</span></td>
-                    <td>{assignment.status}</td>
-                    <td>{assignment.assigned_date.strftime('%Y-%m-%d') if assignment.assigned_date else 'N/A'}</td>
-                </tr>
-            """
-        html += "</table>"
-    else:
-        html += "<p class='warning'>⚠️ No course assignments found for this teacher.</p>"
-    
-    html += "</div>"
-    
-    # Show all active courses
-    all_courses = db_session.query(Course).filter_by(status="Active").all()
-    html += f"""
-    <div class="box">
-        <h3>📖 All Active Courses ({len(all_courses)})</h3>
-    """
-    
-    if all_courses:
-        assigned_ids = [a.course_id for a in assignments]
-        html += "<ul>"
-        for course in all_courses:
-            is_assigned = course.id in assigned_ids
-            icon = "✅" if is_assigned else "❌"
-            html += f"""
-                <li>
-                    {icon} <strong>{course.course_name}</strong> 
-                    (ID: {course.id}) 
-                    - {"FREE" if course.is_free else "PAID"}
-                    {"" if is_assigned else "<span style='color:red;'> (NOT ASSIGNED TO YOU)</span>"}
-                </li>
-            """
-        html += "</ul>"
-    else:
-        html += "<p>No active courses found.</p>"
-    
-    html += "</div>"
-    
-    # Show what the teacher dashboard will display
-    my_courses = db_session.query(Course).join(
-        CourseTeacher,
-        CourseTeacher.course_id == Course.id
-    ).filter(
-        CourseTeacher.teacher_id == teacher.id,
-        CourseTeacher.status == "Active",
-        Course.status == "Active"
-    ).all()
-    
-    html += f"""
-    <div class="box" style="border-color: blue;">
-        <h3>📊 Dashboard Will Show ({len(my_courses)} courses)</h3>
-    """
-    
-    if my_courses:
-        html += "<ul>"
-        for course in my_courses:
-            html += f"""
-                <li>
-                    ✅ <strong>{course.course_name}</strong> 
-                    (ID: {course.id})
-                    <a href="/teacher/manage_course/{course.id}" target="_blank">[Manage]</a>
-                </li>
-            """
-        html += "</ul>"
-    else:
-        html += "<p class='warning'>⚠️ No courses will be shown on dashboard.</p>"
-    
-    html += "</div>"
-    
-    html += """
-    <hr>
-    <p>
-        <a href="/teacher_dashboard">← Back to Dashboard</a>
-    </p>
-    </body>
-    </html>
-    """
-    
-    return html
 
 
 # ==================================================
