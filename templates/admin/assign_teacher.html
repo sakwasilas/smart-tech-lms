@@ -173,7 +173,8 @@
                     {% endif %}
                     {% endwith %}
                     
-                    <form method="POST">
+                    <!-- 🔥 FIXED: Added action attribute with correct course_id -->
+                    <form method="POST" action="{{ url_for('assign_teacher', course_id=course.id) }}">
                         <div class="mb-3">
                             <label class="form-label">Select Teacher</label>
                             <select name="teacher_id" class="form-control-modern" required>
