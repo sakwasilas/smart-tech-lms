@@ -13,388 +13,275 @@
 <body class="bg-light">
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
     <div class="container">
-
-        <a class="navbar-brand fw-bold"
-           href="{{ url_for('admin_dashboard') }}">
-            Learning Management System
+        <a class="navbar-brand fw-bold" href="{{ url_for('admin_dashboard') }}">
+            <i class="fas fa-graduation-cap me-2"></i>LMS Admin
         </a>
-
         <div class="ms-auto">
-
-            <a href="{{ url_for('admin_dashboard') }}"
-               class="btn btn-light btn-sm me-2">
-                Dashboard
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-light btn-sm me-2">
+                <i class="fas fa-chart-line me-1"></i> Dashboard
             </a>
-
-            <a href="{{ url_for('logout') }}"
-               class="btn btn-danger btn-sm">
-                Logout
+            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">
+                <i class="fas fa-sign-out-alt me-1"></i> Logout
             </a>
-
         </div>
-
     </div>
-
 </nav>
 
-<div class="container mt-4">
+<div class="container mb-5">
 
-    <div class="card shadow">
-
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-
-            <h4 class="mb-0">
-                <i class="fas fa-book"></i> Course Management
-            </h4>
-
-            <span class="badge bg-light text-dark">
-                Total: {{ courses|length }} Courses
-            </span>
-
+    <!-- Header & Toggle Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="fw-bold mb-0 text-dark"><i class="fas fa-book-open text-primary me-2"></i>Course Management</h3>
+            <small class="text-muted">Manage available courses, pricing, and assignments</small>
         </div>
+        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#addCourseCollapse" aria-expanded="false" aria-controls="addCourseCollapse">
+            <i class="fas fa-plus-circle me-1"></i> Add New Course
+        </button>
+    </div>
 
-        <div class="card-body">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
+    <!-- Collapsible Add Course Card (Hidden by default) -->
+    <div class="collapse mb-4" id="addCourseCollapse">
+        <div class="card card-body border-0 shadow-sm border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-success mb-0"><i class="fas fa-plus-circle me-1"></i> Create New Course</h5>
+                <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#addCourseCollapse"></button>
+            </div>
+            
+            <form method="POST" action="{{ url_for('add_course') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Course Name <span class="text-danger">*</span></label>
+                        <input type="text" name="course_name" class="form-control" required placeholder="e.g. Web Development">
+                    </div>
 
-                {% for category, message in messages %}
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Course Code</label>
+                        <input type="text" name="course_code" class="form-control" placeholder="CS101">
+                    </div>
 
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Duration</label>
+                        <input type="text" name="duration" class="form-control" placeholder="6 Months">
+                    </div>
 
-                {% endfor %}
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Fee (Ksh)</label>
+                        <input type="number" name="fee" class="form-control" value="0" step="0.01" min="0">
+                    </div>
 
-            {% endif %}
-            {% endwith %}
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
 
-            <!-- Add Course Form -->
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Course</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('add_course') }}">
-
-                        <div class="row">
-
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Course Name <span class="text-danger">*</span></label>
-                                <input type="text"
-                                       name="course_name"
-                                       class="form-control"
-                                       required>
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label fw-bold">Course Code</label>
-                                <input type="text"
-                                       name="course_code"
-                                       class="form-control"
-                                       placeholder="e.g., CS101">
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label fw-bold">Duration</label>
-                                <input type="text"
-                                       name="duration"
-                                       class="form-control"
-                                       placeholder="e.g., 6 Months">
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label fw-bold">Fee (Ksh)</label>
-                                <input type="number"
-                                       name="fee"
-                                       class="form-control"
-                                       value="0"
-                                       step="0.01"
-                                       min="0">
-                            </div>
-
-                            <div class="col-md-2 mb-3">
-                                <label class="form-label fw-bold">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" id="is_free" name="is_free" onchange="toggleFeeField()">
+                            <label class="form-check-label fw-bold" for="is_free">
+                                <i class="fas fa-gift text-success me-1"></i> Free Course
+                            </label>
+                            <small class="text-muted d-inline ms-2">(Enabling sets fee to 0 and disables the input)</small>
                         </div>
+                    </div>
 
-                        <!-- Free Course Checkbox -->
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <div class="form-check form-switch">
-                                    <input type="checkbox" class="form-check-input" id="is_free" name="is_free" onchange="toggleFeeField()">
-                                    <label class="form-check-label fw-bold" for="is_free">
-                                        <i class="fas fa-gift text-success"></i> Free Course
-                                    </label>
-                                    <small class="text-muted d-block">Check this if students can access this course without payment</small>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Description</label>
+                        <textarea name="description" class="form-control" rows="2" placeholder="Course overview..."></textarea>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Description</label>
-                                <textarea name="description" class="form-control" rows="3"></textarea>
-                            </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Career Objectives</label>
+                        <textarea name="career_objectives" class="form-control" rows="2" placeholder="Potential job outcomes..."></textarea>
+                    </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Career Objectives</label>
-                                <textarea name="career_objectives" class="form-control" rows="3"></textarea>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Prerequisites</label>
+                        <textarea name="prerequisites" class="form-control" rows="1" placeholder="Required knowledge or tools..."></textarea>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Prerequisites</label>
-                                <textarea name="prerequisites" class="form-control" rows="2"></textarea>
-                            </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Meeting Link</label>
+                        <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/...">
+                    </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Meeting Link</label>
-                                <input type="url" name="meeting_link" class="form-control" placeholder="https://meet.google.com/...">
-                            </div>
-                        </div>
-
-                        <button class="btn btn-success">
-                            <i class="fas fa-save"></i> Add Course
+                    <div class="col-12 text-end mt-3">
+                        <button type="button" class="btn btn-light me-2" data-bs-toggle="collapse" data-bs-target="#addCourseCollapse">Cancel</button>
+                        <button class="btn btn-success px-4">
+                            <i class="fas fa-save me-1"></i> Save Course
                         </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- Main Layout Grid -->
+    <div class="row g-4">
+        
+        <!-- Left Main Content Column: Search & Table (col-lg-8) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-bottom-0">
+                    <form method="GET" class="row g-2 align-items-center">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" name="search" value="{{ search }}" class="form-control bg-light border-start-0" placeholder="Search courses by name...">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                            {% if search %}
+                                <a href="{{ url_for('courses') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+                            {% endif %}
+                        </div>
                     </form>
                 </div>
-            </div>
 
-            <!-- Search -->
-            <div class="mb-3">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-8">
-                        <div class="input-group">
-                            <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search courses by name...">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                            {% if search %}
-                                <a href="{{ url_for('courses') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Clear
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        <span class="badge bg-info text-dark p-2">
-                            <i class="fas fa-list"></i> {{ courses|length }} Course(s) Found
-                        </span>
-                    </div>
-                </form>
-            </div>
-
-            <hr>
-
-            <!-- Course Table -->
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-striped table-hover">
-
-                    <thead class="table-dark">
-
-                        <tr>
-                            <th>ID</th>
-                            <th>Course Name</th>
-                            <th>Code</th>
-                            <th>Type</th>
-                            <th>Fee</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th width="320">Actions</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    {% for course in courses %}
-
-                    <tr>
-
-                        <td>{{ course.id }}</td>
-
-                        <td>
-                            <strong>{{ course.course_name }}</strong>
-                            {% if course.is_free %}
-                                <span class="badge bg-success ms-1">FREE</span>
-                            {% endif %}
-                        </td>
-
-                        <td><code>{{ course.course_code }}</code></td>
-
-                        <td>
-                            {% if course.is_free %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-gift"></i> Free
-                                </span>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Course Name</th>
+                                <th>Code</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td class="text-muted fw-bold">#{{ course.id }}</td>
+                                <td>
+                                    <span class="fw-bold d-block text-dark">{{ course.course_name }}</span>
+                                    <small class="text-muted"><i class="far fa-clock me-1"></i>{{ course.duration or 'N/A' }}</small>
+                                </td>
+                                <td><code>{{ course.course_code or '-' }}</code></td>
+                                <td>
+                                    {% if course.is_free %}
+                                        <span class="badge bg-success-subtle text-success border border-success">FREE</span>
+                                    {% else %}
+                                        <span class="fw-semibold">Ksh {{ "%.2f"|format(course.fee) }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if course.status=="Active" %}
+                                        <span class="badge rounded-pill bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('edit_course', id=course.id) }}" class="btn btn-outline-secondary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('assign_teacher', course_id=course.id) }}" class="btn btn-outline-primary" title="Assign Teacher">
+                                            <i class="fas fa-user-tie"></i>
+                                        </a>
+                                        <a href="{{ url_for('admin_announcements', course_id=course.id) }}" class="btn btn-outline-info" title="Announcements">
+                                            <i class="fas fa-bullhorn"></i>
+                                        </a>
+                                        {% if course.status=="Active" %}
+                                            <a href="{{ url_for('deactivate_course', id=course.id) }}" class="btn btn-outline-warning" title="Deactivate" onclick="return confirm('Deactivate this course?')">
+                                                <i class="fas fa-pause"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('activate_course', id=course.id) }}" class="btn btn-outline-success" title="Activate" onclick="return confirm('Activate this course?')">
+                                                <i class="fas fa-play"></i>
+                                            </a>
+                                        {% endif %}
+                                        <a href="{{ url_for('delete_course', id=course.id) }}" class="btn btn-outline-danger" title="Delete" onclick="return confirm('Delete this course?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                             {% else %}
-                                <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-credit-card"></i> Paid
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if course.is_free %}
-                                <span class="text-success fw-bold">FREE</span>
-                            {% else %}
-                                <span class="fw-bold">Ksh {{ "%.2f"|format(course.fee) }}</span>
-                            {% endif %}
-                        </td>
-
-                        <td>{{ course.duration or 'N/A' }}</td>
-
-                        <td>
-
-                            {% if course.status=="Active" %}
-
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check-circle"></i> Active
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-danger">
-                                    <i class="fas fa-times-circle"></i> Inactive
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            <div class="btn-group btn-group-sm" role="group">
-
-                                <a href="{{ url_for('edit_course', id=course.id) }}"
-                                   class="btn btn-warning"
-                                   title="Edit Course">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-
-                                <a href="{{ url_for('assign_teacher', course_id=course.id) }}"
-                                   class="btn btn-primary"
-                                   title="Assign Teacher">
-                                    <i class="fas fa-user-tie"></i>
-                                </a>
-
-                                <a href="{{ url_for('admin_announcements', course_id=course.id) }}"
-                                   class="btn btn-info"
-                                   title="Manage Announcements">
-                                    <i class="fas fa-bullhorn"></i>
-                                </a>
-
-                                {% if course.status=="Active" %}
-
-                                <a href="{{ url_for('deactivate_course', id=course.id) }}"
-                                   class="btn btn-secondary"
-                                   title="Deactivate Course"
-                                   onclick="return confirm('Deactivate this course?')">
-                                    <i class="fas fa-pause"></i>
-                                </a>
-
-                                {% else %}
-
-                                <a href="{{ url_for('activate_course', id=course.id) }}"
-                                   class="btn btn-success"
-                                   title="Activate Course"
-                                   onclick="return confirm('Activate this course?')">
-                                    <i class="fas fa-play"></i>
-                                </a>
-
-                                {% endif %}
-
-                                <a href="{{ url_for('delete_course', id=course.id) }}"
-                                   class="btn btn-danger"
-                                   title="Delete Course"
-                                   onclick="return confirm('Delete this course? This cannot be undone!')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                    {% else %}
-
-                    <tr>
-
-                        <td colspan="8"
-                            class="text-center py-4">
-
-                            <i class="fas fa-folder-open fa-2x text-muted d-block mb-2"></i>
-                            <span class="text-muted">No courses found.</span>
-                            <br>
-                            <small class="text-muted">Add your first course using the form above.</small>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                    </tbody>
-
-                </table>
-
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-folder-open fa-3x text-muted mb-3 d-block"></i>
+                                    <p class="text-muted mb-0">No courses match your search criteria.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
 
-            <!-- Course Statistics -->
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Free Courses</h5>
-                            <h2>{{ courses|selectattr('is_free', 'equalto', true)|list|length }}</h2>
+        <!-- Right Side Column: Stats Cards (col-lg-4) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-bottom-0 pt-3">
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small"><i class="fas fa-chart-pie me-1"></i> Summary Stats</h6>
+                </div>
+                <div class="card-body pt-1">
+                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
+                        <div>
+                            <small class="text-muted d-block">Total Courses</small>
+                            <span class="fs-4 fw-bold text-dark">{{ courses|length }}</span>
+                        </div>
+                        <div class="bg-primary text-white p-3 rounded-circle">
+                            <i class="fas fa-book fa-lg"></i>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-warning text-dark">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Paid Courses</h5>
-                            <h2>{{ courses|selectattr('is_free', 'equalto', false)|list|length }}</h2>
+
+                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
+                        <div>
+                            <small class="text-muted d-block">Active Courses</small>
+                            <span class="fs-4 fw-bold text-info">{{ courses|selectattr('status', 'equalto', 'Active')|list|length }}</span>
+                        </div>
+                        <div class="bg-info text-white p-3 rounded-circle">
+                            <i class="fas fa-check-circle fa-lg"></i>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-info text-white">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Active Courses</h5>
-                            <h2>{{ courses|selectattr('status', 'equalto', 'Active')|list|length }}</h2>
+
+                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 bg-light rounded">
+                        <div>
+                            <small class="text-muted d-block">Free Courses</small>
+                            <span class="fs-4 fw-bold text-success">{{ courses|selectattr('is_free', 'equalto', true)|list|length }}</span>
+                        </div>
+                        <div class="bg-success text-white p-3 rounded-circle">
+                            <i class="fas fa-gift fa-lg"></i>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card bg-secondary text-white">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Total Courses</h5>
-                            <h2>{{ courses|length }}</h2>
+
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                        <div>
+                            <small class="text-muted d-block">Paid Courses</small>
+                            <span class="fs-4 fw-bold text-warning">{{ courses|selectattr('is_free', 'equalto', false)|list|length }}</span>
+                        </div>
+                        <div class="bg-warning text-dark p-3 rounded-circle">
+                            <i class="fas fa-credit-card fa-lg"></i>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
     </div>
-
 </div>
 
 <script>

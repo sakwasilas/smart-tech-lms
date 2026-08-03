@@ -5,238 +5,603 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Payments</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f0f4f9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f2f6fc;
+            min-height: 100vh;
+        }
+
+        /* ----- NAVBAR ----- */
         .navbar-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            padding: 14px 0;
-            box-shadow: 0 4px 25px rgba(102, 126, 234, 0.35);
+            background: linear-gradient(135deg, #5b6fd8 0%, #7c4d9e 100%) !important;
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(91, 111, 216, 0.3);
         }
         .navbar-custom .navbar-brand {
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: white !important;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .navbar-custom .navbar-brand i { margin-right: 10px; }
-        .btn-nav {
-            padding: 6px 16px;
-            border-radius: 30px;
+        .navbar-custom .navbar-brand .brand-icon {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 900;
+            color: white;
             font-size: 0.8rem;
+        }
+        .btn-nav {
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
             transition: all 0.3s;
             text-decoration: none;
             border: none;
             color: white;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
+            margin: 0 4px;
         }
-        .btn-nav:hover { background: rgba(255,255,255,0.3); color: white; transform: translateY(-2px); }
+        .btn-nav:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        .btn-nav.danger {
+            background: rgba(231, 76, 60, 0.7);
+        }
+        .btn-nav.danger:hover {
+            background: rgba(231, 76, 60, 0.9);
+        }
+
+        /* ----- LAYOUT ----- */
+        .dashboard-wrapper {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* LEFT PANEL - BIG */
+        .left-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* RIGHT PANEL - SMALL */
+        .right-panel {
+            width: 320px;
+            flex-shrink: 0;
+        }
+
+        /* ----- CARDS ----- */
         .card-modern {
             border: none;
             border-radius: 16px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
             background: white;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            transition: box-shadow 0.3s;
+        }
+        .card-modern:hover {
+            box-shadow: 0 6px 28px rgba(0,0,0,0.06);
         }
         .card-modern .card-header-custom {
-            padding: 16px 24px;
+            padding: 12px 18px;
             font-weight: 700;
-            border-bottom: 2px solid #f0f4f9;
+            font-size: 0.8rem;
+            border-bottom: 2px solid #f0f4fc;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
+            background: #fafcff;
         }
-        .card-modern .card-header-custom i { color: #667eea; margin-right: 8px; }
-        .card-modern .card-body-custom { padding: 24px; }
+        .card-modern .card-header-custom .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-modern .card-header-custom .header-left .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .card-modern .card-header-custom .header-left .dot.pending-dot { background: #f39c12; }
+        .card-modern .card-header-custom .header-left .dot.verified-dot { background: #2ecc71; }
+        .card-modern .card-body-custom { padding: 0; }
+
+        /* ----- BADGES ----- */
+        .badge-count {
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: white;
+        }
+        .badge-count.pending-badge { background: #f39c12; }
+        .badge-count.verified-badge { background: #2ecc71; }
+
+        .badge-status {
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-status.pending { background: #fef9e7; color: #b7950b; }
+        .badge-status.verified { background: #eafaf1; color: #1a8a4a; }
+        .badge-status.rejected { background: #fdedec; color: #b03a2e; }
+        .badge-status .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .badge-status.pending .status-dot { background: #f39c12; }
+        .badge-status.verified .status-dot { background: #2ecc71; }
+        .badge-status.rejected .status-dot { background: #e74c3c; }
+
+        /* ----- TABLES ----- */
         .table-modern thead {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #5b6fd8, #7c4d9e);
             color: white;
         }
         .table-modern thead th {
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
-            padding: 12px 16px;
+            letter-spacing: 0.4px;
+            padding: 8px 14px;
             border: none;
         }
         .table-modern tbody td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f4f9;
+            padding: 8px 14px;
+            border-bottom: 1px solid #edf2f9;
             vertical-align: middle;
-        }
-        .table-modern tbody tr:hover { background: #f8f9fa; }
-        .btn-action {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 600;
             font-size: 0.75rem;
+        }
+        .table-modern tbody tr:hover { background: #f8faff; }
+        .table-modern tbody tr:last-child td { border-bottom: none; }
+
+        .table-modern .student-name {
+            font-weight: 600;
+            color: #1a2639;
+            font-size: 0.8rem;
+        }
+        .table-modern .student-email {
+            font-size: 0.6rem;
+            color: #9aabbe;
+        }
+        .table-modern .transaction-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.65rem;
+            background: #f4f8ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #3a4b62;
+        }
+        .table-modern .amount {
+            font-weight: 700;
+            color: #1a2639;
+        }
+
+        /* ----- BUTTONS ----- */
+        .btn-action {
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.65rem;
             transition: all 0.3s;
             text-decoration: none;
             border: none;
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            cursor: pointer;
         }
-        .btn-action:hover { transform: translateY(-2px); }
-        .btn-success-action { background: #2ecc71; color: white; }
-        .btn-success-action:hover { background: #27ae60; color: white; }
-        .btn-danger-action { background: #e74c3c; color: white; }
-        .btn-danger-action:hover { background: #c0392b; color: white; }
-        .badge-status {
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+        .btn-action:hover {
+            transform: translateY(-1px);
+            text-decoration: none;
+        }
+        .btn-action.verify {
+            background: #2ecc71;
+            color: white;
+        }
+        .btn-action.verify:hover {
+            background: #27ae60;
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+        .btn-action.reject {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-action.reject:hover {
+            background: #c0392b;
+            color: white;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .btn-action .action-icon {
+            display: inline-block;
+            font-weight: 900;
+            font-size: 0.55rem;
+        }
+
+        /* ----- RIGHT PANEL STATS ----- */
+        .stat-mini {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: white;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.03);
+            transition: all 0.2s;
+        }
+        .stat-mini:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+        .stat-mini .stat-label {
+            font-size: 0.7rem;
             font-weight: 600;
+            color: #6c7eea;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        .badge-status.pending { background: #f39c12; color: white; }
-        .badge-status.verified { background: #2ecc71; color: white; }
-        .badge-status.rejected { background: #e74c3c; color: white; }
+        .stat-mini .stat-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1a2639;
+        }
+        .stat-mini .stat-value .currency {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #9aabbe;
+        }
+        .stat-mini.pending-stat .stat-value { color: #f39c12; }
+        .stat-mini.verified-stat .stat-value { color: #2ecc71; }
+        .stat-mini.revenue-stat .stat-value { color: #5b6fd8; }
+
+        .stat-mini .stat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .stat-mini .stat-dot.pending-dot { background: #f39c12; }
+        .stat-mini .stat-dot.verified-dot { background: #2ecc71; }
+        .stat-mini .stat-dot.revenue-dot { background: #5b6fd8; }
+
+        /* ----- EMPTY STATE ----- */
+        .empty-state {
+            padding: 30px 16px;
+            text-align: center;
+            color: #9aabbe;
+        }
+        .empty-state .empty-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.3;
+            font-weight: 300;
+        }
+        .empty-state .empty-title {
+            font-weight: 600;
+            color: #6c7eea;
+            font-size: 0.85rem;
+        }
+        .empty-state .empty-sub {
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 992px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+                padding: 12px;
+            }
+            .right-panel {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 10px;
+            }
+            .right-panel .stat-mini { margin-bottom: 0; }
+        }
+        @media (max-width: 768px) {
+            .navbar-custom .navbar-brand { font-size: 0.9rem; }
+            .btn-nav { font-size: 0.6rem; padding: 3px 10px; }
+            .table-modern thead th { font-size: 0.5rem; padding: 4px 8px; }
+            .table-modern tbody td { font-size: 0.65rem; padding: 4px 8px; }
+            .card-modern .card-header-custom { padding: 8px 12px; font-size: 0.7rem; flex-wrap: wrap; gap: 4px; }
+            .btn-action { font-size: 0.55rem; padding: 2px 6px; }
+            .badge-status { font-size: 0.5rem; padding: 1px 8px; }
+            .table-modern .student-name { font-size: 0.7rem; }
+            .table-modern .transaction-code { font-size: 0.55rem; }
+            .right-panel { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 576px) {
+            .dashboard-wrapper { padding: 8px; gap: 10px; }
+            .container-fluid { padding: 0; }
+            .table-modern tbody td, .table-modern thead th { padding: 3px 4px; font-size: 0.55rem; }
+            .table-modern .transaction-code { font-size: 0.5rem; padding: 1px 3px; }
+            .btn-action { font-size: 0.5rem; padding: 1px 4px; }
+            .badge-status { font-size: 0.45rem; padding: 1px 6px; }
+            .stat-mini { padding: 8px 12px; }
+            .stat-mini .stat-value { font-size: 1rem; }
+            .stat-mini .stat-label { font-size: 0.6rem; }
+            .right-panel { grid-template-columns: 1fr 1fr; gap: 6px; }
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in:nth-child(1) { animation-delay: 0.05s; }
+        .fade-in:nth-child(2) { animation-delay: 0.10s; }
+        .fade-in:nth-child(3) { animation-delay: 0.15s; }
+        .fade-in:nth-child(4) { animation-delay: 0.20s; }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container">
+    <div class="container-fluid px-3 px-md-4">
         <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
-            <i class="fas fa-graduation-cap"></i> LMS Admin
+            <span class="brand-icon">L</span> LMS Admin
         </a>
-        <div>
+        <div class="d-flex">
             <a href="{{ url_for('admin_dashboard') }}" class="btn-nav">
-                <i class="fas fa-arrow-left"></i> Dashboard
+                ← Dashboard
             </a>
-            <a href="{{ url_for('logout') }}" class="btn-nav" style="background: rgba(231,76,60,0.8);">
-                <i class="fas fa-sign-out-alt"></i> Logout
+            <a href="{{ url_for('logout') }}" class="btn-nav danger">
+                Logout
             </a>
         </div>
     </div>
 </nav>
 
-<div class="container mt-4">
+<div class="dashboard-wrapper">
 
-    <!-- Pending Payments -->
-    <div class="card-modern">
-        <div class="card-header-custom">
-            <span><i class="fas fa-clock" style="color: #f39c12;"></i> Pending Payments</span>
-            <span class="badge" style="background: #f39c12; color: white; padding: 4px 14px; border-radius: 30px;">
-                {{ pending_payments|length }} Pending
-            </span>
-        </div>
-        <div class="card-body-custom" style="padding: 0;">
-            <div class="table-responsive">
-                <table class="table table-modern mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Student</th>
-                            <th>Course</th>
-                            <th>Amount</th>
-                            <th>Transaction Code</th>
-                            <th>Phone</th>
-                            <th>Date</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if pending_payments %}
-                            {% for payment in pending_payments %}
+    <!-- ===== LEFT PANEL - BIG ===== -->
+    <div class="left-panel">
+
+        <!-- PENDING PAYMENTS -->
+        <div class="card-modern fade-in">
+            <div class="card-header-custom">
+                <div class="header-left">
+                    <span class="dot pending-dot"></span>
+                    <span>Pending Payments</span>
+                </div>
+                <span class="badge-count pending-badge">
+                    {{ pending_payments|length }} pending
+                </span>
+            </div>
+            <div class="card-body-custom">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead>
                             <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    <strong>{{ payment.enrollment.student.fullname }}</strong>
-                                    <br><small class="text-muted">{{ payment.enrollment.student.email }}</small>
-                                </td>
-                                <td>{{ payment.enrollment.course.course_name }}</td>
-                                <td><strong>Ksh{{ "%.2f"|format(payment.amount) }}</strong></td>
-                                <td><code>{{ payment.transaction_code }}</code></td>
-                                <td>{{ payment.phone }}</td>
-                                <td>{{ payment.date_paid }}</td>
-                                <td class="text-center">
-                                    <div class="d-flex gap-1 justify-content-center">
-                                        <a href="{{ url_for('admin_verify_payment', payment_id=payment.id) }}" 
-                                           class="btn-action btn-success-action"
-                                           onclick="return confirm('Verify this payment?')">
-                                            <i class="fas fa-check-circle"></i> Verify
-                                        </a>
-                                        <a href="{{ url_for('admin_reject_payment', payment_id=payment.id) }}" 
-                                           class="btn-action btn-danger-action"
-                                           onclick="return confirm('Reject this payment?')">
-                                            <i class="fas fa-times-circle"></i> Reject
-                                        </a>
-                                    </div>
-                                </td>
+                                <th>#</th>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Amount</th>
+                                <th>Transaction</th>
+                                <th>Phone</th>
+                                <th>Date</th>
+                                <th class="text-center">Actions</th>
                             </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="fas fa-check-circle fa-2x d-block mb-2" style="color: #2ecc71;"></i>
-                                    No pending payments.
-                                </td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% if pending_payments %}
+                                {% for payment in pending_payments %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <div class="student-name">{{ payment.enrollment.student.fullname }}</div>
+                                        <div class="student-email">{{ payment.enrollment.student.email }}</div>
+                                    </td>
+                                    <td>{{ payment.enrollment.course.course_name }}</td>
+                                    <td><span class="amount">Ksh{{ "%.0f"|format(payment.amount) }}</span></td>
+                                    <td><span class="transaction-code">{{ payment.transaction_code }}</span></td>
+                                    <td>{{ payment.phone or '—' }}</td>
+                                    <td>{{ payment.date_paid or '—' }}</td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                            <a href="{{ url_for('admin_verify_payment', payment_id=payment.id) }}" 
+                                               class="btn-action verify"
+                                               onclick="return confirm('Verify this payment?')">
+                                                <span class="action-icon">✓</span> Verify
+                                            </a>
+                                            <a href="{{ url_for('admin_reject_payment', payment_id=payment.id) }}" 
+                                               class="btn-action reject"
+                                               onclick="return confirm('Reject this payment?')">
+                                                <span class="action-icon">✕</span> Reject
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="empty-state">
+                                            <span class="empty-icon">✓</span>
+                                            <div class="empty-title">All caught up!</div>
+                                            <div class="empty-sub">No pending payments to review.</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- VERIFIED PAYMENTS -->
+        <div class="card-modern fade-in mt-3">
+            <div class="card-header-custom">
+                <div class="header-left">
+                    <span class="dot verified-dot"></span>
+                    <span>Verified Payments</span>
+                </div>
+                <span class="badge-count verified-badge">
+                    {{ verified_payments|length }} verified
+                </span>
+            </div>
+            <div class="card-body-custom">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Amount</th>
+                                <th>Transaction</th>
+                                <th>Status</th>
+                                <th>Verified At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if verified_payments %}
+                                {% for payment in verified_payments %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <div class="student-name">{{ payment.enrollment.student.fullname }}</div>
+                                        <div class="student-email">{{ payment.enrollment.student.email }}</div>
+                                    </td>
+                                    <td>{{ payment.enrollment.course.course_name }}</td>
+                                    <td><span class="amount">Ksh{{ "%.0f"|format(payment.amount) }}</span></td>
+                                    <td><span class="transaction-code">{{ payment.transaction_code }}</span></td>
+                                    <td>
+                                        <span class="badge-status verified">
+                                            <span class="status-dot"></span> Verified
+                                        </span>
+                                    </td>
+                                    <td>{{ payment.verified_at or '—' }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <span class="empty-icon">📋</span>
+                                            <div class="empty-title">No verified payments</div>
+                                            <div class="empty-sub">Verified payments will appear here.</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Verified Payments -->
-    <div class="card-modern mt-4">
-        <div class="card-header-custom">
-            <span><i class="fas fa-check-circle" style="color: #2ecc71;"></i> Verified Payments</span>
-            <span class="badge" style="background: #2ecc71; color: white; padding: 4px 14px; border-radius: 30px;">
-                {{ verified_payments|length }} Verified
-            </span>
-        </div>
-        <div class="card-body-custom" style="padding: 0;">
-            <div class="table-responsive">
-                <table class="table table-modern mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Student</th>
-                            <th>Course</th>
-                            <th>Amount</th>
-                            <th>Transaction Code</th>
-                            <th>Status</th>
-                            <th>Verified At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if verified_payments %}
-                            {% for payment in verified_payments %}
-                            <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>
-                                    <strong>{{ payment.enrollment.student.fullname }}</strong>
-                                    <br><small class="text-muted">{{ payment.enrollment.student.email }}</small>
-                                </td>
-                                <td>{{ payment.enrollment.course.course_name }}</td>
-                                <td><strong>${{ "%.2f"|format(payment.amount) }}</strong></td>
-                                <td><code>{{ payment.transaction_code }}</code></td>
-                                <td>
-                                    <span class="badge-status verified">
-                                        <i class="fas fa-check-circle"></i> Verified
-                                    </span>
-                                </td>
-                                <td>{{ payment.verified_at or 'N/A' }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
-                                    <i class="fas fa-receipt fa-2x d-block mb-2"></i>
-                                    No verified payments yet.
-                                </td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+    <!-- ===== RIGHT PANEL - SMALL ===== -->
+    <div class="right-panel">
+
+        <!-- Quick Stats -->
+        <div class="card-modern fade-in">
+            <div class="card-header-custom">
+                <div class="header-left">
+                    <span>📊</span>
+                    <span>Payment Summary</span>
+                </div>
+            </div>
+            <div class="card-body-custom" style="padding: 12px 16px;">
+                <!-- Pending -->
+                <div class="stat-mini pending-stat">
+                    <div>
+                        <span class="stat-dot pending-dot"></span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                    <div class="stat-value">{{ pending_payments|length }}</div>
+                </div>
+                <!-- Verified -->
+                <div class="stat-mini verified-stat">
+                    <div>
+                        <span class="stat-dot verified-dot"></span>
+                        <span class="stat-label">Verified</span>
+                    </div>
+                    <div class="stat-value">{{ verified_payments|length }}</div>
+                </div>
+                <!-- Total Revenue -->
+                <div class="stat-mini revenue-stat">
+                    <div>
+                        <span class="stat-dot revenue-dot"></span>
+                        <span class="stat-label">Total Revenue</span>
+                    </div>
+                    <div class="stat-value">
+                        <span class="currency">Ksh</span> {{ "%.0f"|format(total_revenue or 0) }}
+                    </div>
+                </div>
+                <!-- Total Payments -->
+                <div class="stat-mini" style="border-top: 1px solid #f0f4fc; padding-top: 12px; margin-top: 4px;">
+                    <div>
+                        <span class="stat-label" style="color: #9aabbe;">Total Transactions</span>
+                    </div>
+                    <div class="stat-value" style="font-size: 1rem; color: #5b6fd8;">
+                        {{ total_payments or 0 }}
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- Quick Actions -->
+        <div class="card-modern fade-in">
+            <div class="card-header-custom">
+                <div class="header-left">
+                    <span>⚡</span>
+                    <span>Quick Actions</span>
+                </div>
+            </div>
+            <div class="card-body-custom" style="padding: 12px 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn-action verify" style="justify-content: center; padding: 6px 12px; width: 100%;">
+                        <span class="action-icon">←</span> Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('courses') }}" class="btn-action" style="justify-content: center; padding: 6px 12px; width: 100%; background: #5b6fd8; color: white;">
+                        <span class="action-icon">📚</span> Manage Courses
+                    </a>
+                    <a href="{{ url_for('manage_students') }}" class="btn-action" style="justify-content: center; padding: 6px 12px; width: 100%; background: #3498db; color: white;">
+                        <span class="action-icon">👤</span> Manage Students
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>
