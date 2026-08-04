@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -282,6 +283,70 @@
     .alert-custom.warning { border-left: 4px solid #ffc107; }
     .alert-custom.info { border-left: 4px solid #17a2b8; }
 
+    /* Teacher card styles */
+    .teacher-card {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 12px 16px;
+      border: 1px solid #e8ecf1;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .teacher-card .teacher-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f6ef7, #7c4d9e);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .teacher-card .teacher-info {
+      flex: 1;
+      min-width: 120px;
+    }
+    .teacher-card .teacher-info .name {
+      font-weight: 700;
+      color: #1a2639;
+      font-size: 0.9rem;
+    }
+    .teacher-card .teacher-info .specialization {
+      font-size: 0.75rem;
+      color: #5d6a7a;
+    }
+    .teacher-card .teacher-contact {
+      font-size: 0.75rem;
+      color: #5d6a7a;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .teacher-card .teacher-contact .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+    }
+    .teacher-card .teacher-contact .contact-item i {
+      color: #4f6ef7;
+      width: 14px;
+    }
+    .teacher-card .teacher-contact .contact-item a {
+      color: #4f6ef7;
+      text-decoration: none;
+    }
+    .teacher-card .teacher-contact .contact-item a:hover {
+      text-decoration: underline;
+    }
+
     .footer {
       text-align: center; padding: 24px 0 10px 0; color: #9aabbe;
       font-size: 0.75rem; border-top: 1px solid #e8ecf1; margin-top: 28px;
@@ -311,6 +376,8 @@
       .profile-card .profile-status { text-align: center; }
       .stat-card .stat-value { font-size: 1.3rem; }
       .course-grid { grid-template-columns: 1fr; }
+      .teacher-card { flex-direction: column; align-items: flex-start; }
+      .teacher-card .teacher-contact { align-items: flex-start; width: 100%; }
     }
 
     .fade-in { animation: fadeUp 0.4s ease forwards; opacity:0; }
@@ -343,6 +410,7 @@
       <a href="{{ url_for('student_dashboard') }}" class="nav-item active">Dashboard</a>
       <a href="{{ url_for('student_dashboard') }}#available" class="nav-item">Available</a>
       <a href="{{ url_for('student_dashboard') }}#my-courses" class="nav-item">My Courses</a>
+      <a href="{{ url_for('student_dashboard') }}#teachers" class="nav-item">My Teachers</a>
       <a href="{{ url_for('student_dashboard') }}#payments" class="nav-item">Payments</a>
       <a href="{{ url_for('student_dashboard') }}#announcements" class="nav-item">Announcements</a>
       <div class="logout-item">
@@ -473,6 +541,45 @@
               <span>{{ enrollment.status }}</span>
               <span>{{ enrollment.course.course_code }}</span>
             </div>
+
+            <!-- ===== TEACHER DISPLAY SECTION ===== -->
+            {% set course_teachers = enrollment.course.course_teachers|selectattr('status', 'equalto', 'Active')|list %}
+            {% if course_teachers %}
+              <div class="teacher-card">
+                <div class="teacher-avatar">
+                  {{ course_teachers[0].teacher.fullname[0]|upper }}
+                </div>
+                <div class="teacher-info">
+                  <div class="name">{{ course_teachers[0].teacher.fullname }}</div>
+                  <div class="specialization">{{ course_teachers[0].teacher.specialization or 'General' }}</div>
+                </div>
+                <div class="teacher-contact">
+                  {% if course_teachers[0].teacher.email %}
+                    <span class="contact-item">
+                      <i class="fas fa-envelope"></i>
+                      <a href="mailto:{{ course_teachers[0].teacher.email }}">{{ course_teachers[0].teacher.email }}</a>
+                    </span>
+                  {% endif %}
+                  {% if course_teachers[0].teacher.phone %}
+                    <span class="contact-item">
+                      <i class="fas fa-phone"></i>
+                      <a href="tel:{{ course_teachers[0].teacher.phone }}">{{ course_teachers[0].teacher.phone }}</a>
+                    </span>
+                  {% endif %}
+                  {% if course_teachers|length > 1 %}
+                    <span class="contact-item" style="color:#4f6ef7;font-weight:600;font-size:0.65rem;">
+                      +{{ course_teachers|length - 1 }} more teacher(s)
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            {% else %}
+              <div style="font-size:0.75rem;color:#9aabbe;margin-top:8px;">
+                <i class="fas fa-user-tie"></i> No teacher assigned yet
+              </div>
+            {% endif %}
+            <!-- ===== END TEACHER DISPLAY ===== -->
+
           </div>
           {% if enrollment.payment_status == "Pending" and not enrollment.course.is_free %}
             <a href="{{ url_for('payment_page', enrollment_id=enrollment.id) }}" class="btn-enroll warning" style="text-align:center;text-decoration:none;display:block;">Make Payment</a>
@@ -483,6 +590,56 @@
         {% endfor %}
       {% else %}
         <div class="empty-state" style="grid-column:1/-1;"><h5>No Courses Yet</h5><p>You haven't enrolled in any courses. Browse available courses above!</p></div>
+      {% endif %}
+    </div>
+
+    <!-- ===== HR BEFORE TEACHERS SECTION ===== -->
+    <hr class="hr-section" />
+
+    <!-- ===== TEACHERS SECTION (All assigned teachers grouped) ===== -->
+    <div class="section-header" id="teachers">
+      <h3><i class="fas fa-chalkboard-teacher"></i> My Teachers</h3>
+      <span class="badge-count">{{ all_teachers|length }}</span>
+    </div>
+    <div class="course-grid">
+      {% if all_teachers %}
+        {% for teacher in all_teachers %}
+          <div class="course-card fade-in" style="border-top-color: #7c4d9e;">
+            <div>
+              <h4>{{ teacher.fullname }}</h4>
+              <div class="course-meta">
+                <span><strong>Specialization:</strong> {{ teacher.specialization or 'General' }}</span>
+              </div>
+              <div style="margin-top:8px;">
+                {% if teacher.email %}
+                  <div style="font-size:0.8rem;color:#5d6a7a;">
+                    <i class="fas fa-envelope" style="color:#4f6ef7;width:18px;"></i>
+                    <a href="mailto:{{ teacher.email }}" style="color:#4f6ef7;text-decoration:none;">{{ teacher.email }}</a>
+                  </div>
+                {% endif %}
+                {% if teacher.phone %}
+                  <div style="font-size:0.8rem;color:#5d6a7a;">
+                    <i class="fas fa-phone" style="color:#4f6ef7;width:18px;"></i>
+                    <a href="tel:{{ teacher.phone }}" style="color:#4f6ef7;text-decoration:none;">{{ teacher.phone }}</a>
+                  </div>
+                {% endif %}
+                <div style="font-size:0.75rem;color:#9aabbe;margin-top:4px;">
+                  <i class="fas fa-book" style="width:18px;"></i>
+                  Teaches: 
+                  {% set courses_taught = teacher.course_teachers|selectattr('status', 'equalto', 'Active')|list %}
+                  {% for ct in courses_taught %}
+                    <span class="badge bg-light text-dark border">{{ ct.course.course_name }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state" style="grid-column:1/-1;">
+          <h5>No Teachers Assigned</h5>
+          <p>You don't have any teachers assigned to your courses yet.</p>
+        </div>
       {% endif %}
     </div>
 
@@ -562,5 +719,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </body>
 </html>
