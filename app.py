@@ -19,6 +19,7 @@ from werkzeug.utils import secure_filename
 
 from datetime import datetime
 from sqlalchemy import or_, func, text
+from sqlalchemy.orm import joinedload
 
 from connections import db_session
 from models import (
@@ -201,7 +202,7 @@ def student_register():
 # ==================================================
 
 # ==================================================
-# STUDENT DASHBOARD
+# STUDENT DASHBOARD - WITH EAGER LOADING
 # ==================================================
 
 @app.route("/student/dashboard")
@@ -229,18 +230,67 @@ def student_dashboard():
         ~Course.id.in_(enrolled_course_ids)
     ).all()
 
-    # My enrolled courses with course details
+    # ============================================================
+    # MY ENROLLED COURSES - WITH EAGER LOADING
+    # ============================================================
     my_courses = db_session.query(Enrollment).filter_by(
         student_id=student.id
+    ).options(
+        joinedload(Enrollment.course).joinedload(Course.course_teachers).joinedload(CourseTeacher.teacher)
     ).all()
-    
-    # Explicitly load the course for each enrollment
-    for enrollment in my_courses:
-        enrollment.course = db_session.query(Course).filter_by(
-            id=enrollment.course_id
-        ).first()
 
-    # Get notifications
+    # ============================================================
+    # GET ALL UNIQUE TEACHERS FOR THE STUDENT
+    # ============================================================
+    all_teachers = []
+    teacher_ids = set()
+    
+    for enrollment in my_courses:
+        if enrollment.course:
+            for ct in enrollment.course.course_teachers:
+                if ct.status == "Active" and ct.teacher_id not in teacher_ids:
+                    all_teachers.append(ct.teacher)
+                    teacher_ids.add(ct.teacher_id)
+
+    # ============================================================
+    # GET ANNOUNCEMENTS FOR STUDENT'S COURSES
+    # ============================================================
+    announcements = []
+    if my_courses:
+        course_ids = [e.course_id for e in my_courses]
+        announcements = db_session.query(Announcement).filter(
+            Announcement.course_id.in_(course_ids)
+        ).options(
+            joinedload(Announcement.author)
+        ).order_by(
+            Announcement.is_pinned.desc(), 
+            Announcement.created_at.desc()
+        ).all()
+
+    # ============================================================
+    # GET QUIZZES FOR STUDENT'S COURSES
+    # ============================================================
+    quizzes = []
+    if my_courses:
+        course_ids = [e.course_id for e in my_courses]
+        quiz_list = db_session.query(Quiz).filter(
+            Quiz.course_id.in_(course_ids),
+            Quiz.status == "Active"
+        ).all()
+        
+        for quiz in quiz_list:
+            # Check if student has attempted this quiz
+            attempt = db_session.query(QuizAttempt).filter_by(
+                quiz_id=quiz.id,
+                student_id=student.id
+            ).first()
+            quiz.attempted = attempt is not None
+            quiz.attempt = attempt
+            quizzes.append(quiz)
+
+    # ============================================================
+    # GET NOTIFICATIONS
+    # ============================================================
     notifications = db_session.query(Notification).filter_by(
         user_id=session["user_id"],
         is_read=False
@@ -251,7 +301,10 @@ def student_dashboard():
         student=student,
         courses=courses,
         my_courses=my_courses,
-        notifications=notifications
+        notifications=notifications,
+        all_teachers=all_teachers,
+        announcements=announcements,
+        quizzes=quizzes
     )
 
 
