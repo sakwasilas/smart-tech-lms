@@ -295,8 +295,11 @@
                     </div>
                 </form>
 
-                <!-- Current Assigned Teachers -->
-                <h6 class="fw-bold mb-3"><i class="fas fa-users me-2"></i>Current Assigned Teachers</h6>
+                <!-- Current Assigned Teachers - CORRECTED SECTION -->
+                <h6 class="fw-bold mb-3">
+                    <i class="fas fa-users me-2"></i>Current Assigned Teachers
+                </h6>
+
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
                         <thead class="table-light">
@@ -308,28 +311,33 @@
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% set active_assignments = course.course_teachers|selectattr('status', 'equalto', 'Active')|list %}
+
                             {% if active_assignments %}
                                 {% for ct in active_assignments %}
                                 <tr>
                                     <td>{{ loop.index }}</td>
-                                    <td><strong>{{ ct.teacher.fullname }}</strong></td>
-                                    <td>{{ ct.teacher.specialization or 'General' }}</td>
-                                    <!-- FIXED: Handle assigned_date as string -->
+
+                                    <td>
+                                        <strong>{{ ct.teacher.fullname }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ ct.teacher.specialization or 'General' }}
+                                    </td>
+
                                     <td>
                                         {% if ct.assigned_date %}
-                                            {% if ' ' in ct.assigned_date %}
-                                                {{ ct.assigned_date.split(' ')[0] }}
-                                            {% else %}
-                                                {{ ct.assigned_date }}
-                                            {% endif %}
+                                            {{ ct.assigned_date.strftime('%d-%m-%Y %H:%M') }}
                                         {% else %}
                                             N/A
                                         {% endif %}
                                     </td>
+
                                     <td class="text-center">
-                                        <a href="{{ url_for('remove_teacher', assignment_id=ct.id) }}" 
+                                        <a href="{{ url_for('remove_teacher', assignment_id=ct.id) }}"
                                            class="btn btn-danger btn-sm"
                                            onclick="return confirm('Remove {{ ct.teacher.fullname }} from this course?')">
                                             <i class="fas fa-user-minus"></i> Remove
