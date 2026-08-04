@@ -1938,7 +1938,7 @@ def teachers():
             fullname=fullname,
             email=email,
             phone=phone,
-            specialization=specialization,
+            
             status=status
         )
         db_session.add(teacher)
