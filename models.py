@@ -69,7 +69,7 @@ class Teacher(Base):
     fullname = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     phone = Column(String(20))
-    specialization = Column(String(100))
+
     bio = Column(Text)
     status = Column(String(20), default="Active")
     joined_date = Column(DateTime, default=datetime.now)
