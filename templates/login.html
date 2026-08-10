@@ -2,151 +2,570 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Login</title>
-
+    <title>Login | START TECH LMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
     <style>
-
-        body{
-            background:#f4f6f9;
+        /* ==================================================
+                   GLOBAL STYLES
+                   ================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .login-card{
-            max-width:420px;
-            margin:auto;
-            margin-top:70px;
-            border:none;
-            border-radius:15px;
-            box-shadow:0 5px 20px rgba(0,0,0,.15);
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
 
-        .logo{
-            font-size:55px;
-            color:#0d6efd;
+        /* ==================================================
+                   LOGIN CARD
+                   ================================================== */
+        .login-card {
+            max-width: 440px;
+            width: 100%;
+            border: none;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15),
+                        0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease;
         }
 
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(13, 110, 253, 0.20),
+                        0 15px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================================================
+                   CARD HEADER / LOGO
+                   ================================================== */
+        .card-header-custom {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            padding: 40px 30px 30px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .logo-icon {
+            font-size: 60px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+            font-weight: 300;
+        }
+
+        /* ==================================================
+                   CARD BODY
+                   ================================================== */
+        .card-body-custom {
+            padding: 35px 35px 30px;
+        }
+
+        /* ==================================================
+                   FLASH MESSAGES
+                   ================================================== */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideDown 0.4s ease;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        .alert-info {
+            background: #cff4fc;
+            color: #055160;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================================================
+                   FORM STYLES
+                   ================================================== */
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .form-label i {
+            margin-right: 6px;
+            color: #0d6efd;
+        }
+
+        .input-group-custom {
+            position: relative;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+            background: #ffffff;
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* Password toggle button */
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            color: #0d6efd;
+        }
+
+        /* ==================================================
+                   BUTTONS
+                   ================================================== */
+        .btn-login {
+            border-radius: 12px;
+            padding: 13px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border: none;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.35);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.45);
+            background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login i {
+            margin-right: 8px;
+        }
+
+        /* ==================================================
+                   DIVIDER
+                   ================================================== */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 22px 0 18px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: 15px;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: 15px;
+        }
+
+        .divider-text {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================================================
+                   REGISTER LINK
+                   ================================================== */
+        .register-link {
+            color: #1e293b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .register-link a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .register-link a:hover {
+            color: #0a58ca;
+            background: rgba(13, 110, 253, 0.08);
+            text-decoration: underline;
+        }
+
+        /* ==================================================
+                   RESPONSIVE
+                   ================================================== */
+        @media (max-width: 576px) {
+            .login-card {
+                max-width: 100%;
+                margin: 10px;
+            }
+
+            .card-header-custom {
+                padding: 30px 20px 25px;
+            }
+
+            .card-body-custom {
+                padding: 25px 20px 20px;
+            }
+
+            .logo-icon {
+                font-size: 45px;
+                padding: 15px;
+            }
+
+            .login-title {
+                font-size: 22px;
+            }
+
+            .btn-login {
+                padding: 11px 16px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .login-title {
+                font-size: 20px;
+            }
+
+            .form-control {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .card-body-custom {
+                padding: 20px 15px 18px;
+            }
+        }
+
+        /* ==================================================
+                   UTILITY: Floating labels placeholder effect
+                   ================================================== */
+        .form-floating-custom {
+            position: relative;
+        }
+
+        .form-floating-custom .form-control {
+            padding-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        .form-floating-custom .form-label {
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .form-floating-custom .form-control:focus + .form-label,
+        .form-floating-custom .form-control:not(:placeholder-shown) + .form-label {
+            top: -6px;
+            left: 14px;
+            font-size: 11px;
+            color: #0d6efd;
+            background: #ffffff;
+            padding: 0 6px;
+        }
+
+        /* ==================================================
+                   SHOW/HIDE PASSWORD TOGGLE (JavaScript enhancement)
+                   ================================================== */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 45px;
+        }
+
+        .password-wrapper .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .password-wrapper .toggle-password:hover {
+            color: #0d6efd;
+        }
     </style>
-
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container p-0">
+        <div class="login-card">
 
-    <div class="card login-card">
-
-        <div class="card-body p-5">
-
-            <div class="text-center mb-4">
-
-                <i class="bi bi-mortarboard-fill logo"></i>
-
-                <h3 class="mt-3">
-                    START TECH LMS
-                </h3>
-
-                <p class="text-muted">
-                    Login to Continue
-                </p>
-
+            <!-- ===== CARD HEADER ===== -->
+            <div class="card-header-custom">
+                <div class="logo-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+                <h1 class="login-title">START TECH LMS</h1>
+                <p class="login-subtitle">Welcome back! Please login to continue</p>
             </div>
 
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
+            <!-- ===== CARD BODY ===== -->
+            <div class="card-body-custom">
 
-                    {% for category, message in messages %}
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <i class="bi 
+                                    {% if category == 'success' %}bi-check-circle-fill
+                                    {% elif category == 'danger' %}bi-exclamation-triangle-fill
+                                    {% elif category == 'warning' %}bi-exclamation-circle-fill
+                                    {% else %}bi-info-circle-fill{% endif %}
+                                me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-                        <div class="alert alert-{{ category }} alert-dismissible fade show">
+                <!-- Login Form -->
+                <form method="POST" novalidate>
 
-                            {{ message }}
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label" for="email">
+                            <i class="bi bi-envelope"></i> Email Address
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="Enter your email address"
+                            required
+                            autofocus
+                            value="{{ request.form.get('email', '') }}"
+                        >
+                        <div class="form-text text-muted" style="font-size:12px; margin-top:4px;">
+                            We'll never share your email with anyone else.
+                        </div>
+                    </div>
 
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label class="form-label" for="password">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        <div class="password-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="Enter your password"
+                                required
+                            >
                             <button
                                 type="button"
-                                class="btn-close"
-                                data-bs-dismiss="alert">
+                                class="toggle-password"
+                                id="togglePassword"
+                                aria-label="Toggle password visibility"
+                            >
+                                <i class="bi bi-eye"></i>
                             </button>
-
                         </div>
+                        <div class="text-end mt-1">
+                            <a href="#" class="text-decoration-none" style="font-size:13px; color:#0d6efd;">
+                                Forgot password?
+                            </a>
+                        </div>
+                    </div>
 
-                    {% endfor %}
+                    <!-- Login Button -->
+                    <div class="d-grid">
+                        <button class="btn btn-login" type="submit">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Sign In
+                        </button>
+                    </div>
 
-                {% endif %}
-            {% endwith %}
+                </form>
 
-            <form method="POST">
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        name="email"
-                        class="form-control"
-                        placeholder="Enter email"
-                        required>
-
+                <!-- Divider -->
+                <div class="divider">
+                    <span class="divider-text">New here?</span>
                 </div>
 
-                <div class="mb-4">
-
-                    <label class="form-label">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        name="password"
-                        class="form-control"
-                        placeholder="Enter password"
-                        required>
-
+                <!-- Register Link -->
+                <div class="text-center register-link">
+                    Don't have an account?
+                    <a href="{{ url_for('student_register') }}">
+                        <i class="bi bi-person-plus"></i> Register Here
+                    </a>
                 </div>
-
-                <div class="d-grid">
-
-                    <button class="btn btn-primary">
-
-                        <i class="bi bi-box-arrow-in-right"></i>
-
-                        Login
-
-                    </button>
-
-                </div>
-
-            </form>
-
-            <hr>
-
-            <div class="text-center">
-
-                Don't have an account?
-
-                <a href="{{ url_for('student_register') }}">
-                    Register Here
-                </a>
 
             </div>
-
         </div>
-
     </div>
 
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==================================================
+        // PASSWORD SHOW/HIDE TOGGLE
+        // ==================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    const icon = this.querySelector('i');
+                    icon.classList.toggle('bi-eye');
+                    icon.classList.toggle('bi-eye-slash');
+                });
+            }
+
+            // ==================================================
+            // AUTO-DISMISS FLASH MESSAGES AFTER 5 SECONDS
+            // ==================================================
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const closeBtn = alert.querySelector('.btn-close');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    }
+                }, 5000);
+            });
+
+            // ==================================================
+            // REMOVE PLACEHOLDER TEXT ON FOCUS (for better UX)
+            // ==================================================
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(function(input) {
+                input.addEventListener('focus', function() {
+                    this.dataset.placeholder = this.placeholder;
+                    this.placeholder = '';
+                });
+                input.addEventListener('blur', function() {
+                    this.placeholder = this.dataset.placeholder || '';
+                });
+            });
+        });
+    </script>
 
 </body>
 
