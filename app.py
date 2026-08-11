@@ -79,9 +79,26 @@ def allowed_file(filename):
 # HOME
 # ==========================================
 
+# Add this route after your imports and before other routes
 @app.route("/")
 def home():
-    return redirect(url_for("login"))
+    # If user is logged in, redirect to their dashboard
+    if "user_id" in session:
+        role = session.get("role")
+        if role == "admin":
+            return redirect(url_for("admin_dashboard"))
+        elif role == "teacher":
+            return redirect(url_for("teacher_dashboard"))
+        elif role == "student":
+            return redirect(url_for("student_dashboard"))
+    
+    # If not logged in, show the landing page
+    return render_template("landing.html")
+
+# Keep your existing login route
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    # ... your existing login code ...
 
 
 # ==================================================
