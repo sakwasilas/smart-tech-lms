@@ -95,12 +95,6 @@ def home():
     # If not logged in, show the landing page
     return render_template("landing.html")
 
-# Keep your existing login route
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    # ... your existing login code ...
-
-
 # ==================================================
 # LOGIN
 # ==================================================
