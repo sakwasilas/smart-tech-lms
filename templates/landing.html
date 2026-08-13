@@ -1417,7 +1417,7 @@
                             <li><i class="fas fa-check-circle"></i> Bonus: Source Code for All Projects</li>
                         </ul>
                         <button class="btn-pricing" data-bs-toggle="modal" data-bs-target="#registerModal">
-                            <i class="fas fa-rocket me-2">https://smart-tech-lms.onrender.com</i>Enroll Now — KES 350
+                            <i class="fas fa-rocket me-2"></i>Enroll Now — KES 350
                         </button>
                         <p style="margin-top: 15px; font-size: 0.8rem; color: #718096;">
                             <i class="fas fa-lock me-1"></i> Secure payment via M-Pesa
@@ -1591,7 +1591,7 @@
                 Join 200+ students who started from zero and built real web apps. All 3 courses + 6 projects for just <strong>KES 350</strong>.
             </p>
             <button class="btn btn-light" style="padding: 15px 50px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; color: #667eea;" data-bs-toggle="modal" data-bs-target="#registerModal">
-                <i class="fas fa-rocket me-2">https://smart-tech-lms.onrender.com/</i>Enroll Now — KES 350
+                <i class="fas fa-rocket me-2"></i>Enroll Now — KES 350
             </button>
             <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
                 <i class="fas fa-users me-2"></i>Only <strong>200 spots</strong> available. First come, first served.
@@ -1649,7 +1649,76 @@
         </div>
     </footer>
 
-   
+    <!-- ========== REGISTRATION MODAL ========== -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-user-graduate me-2" style="color: #667eea;"></i>
+                        Enroll Now — KES 350
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('student_register') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" name="fullname" placeholder="e.g. John Mwangi" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number (Safaricom)</label>
+                            <input type="tel" class="form-control" name="phone" placeholder="0712 345 678" required>
+                        </div>
+
+                        <div class="payment-instruction">
+                            <i class="fas fa-info-circle me-2" style="color: #48bb78;"></i>
+                            <strong>M-Pesa Payment Instructions:</strong>
+                            <div class="mt-2">
+                                <p class="mb-1">1. Go to M-Pesa and select <strong>Send Money</strong></p>
+                                <p class="mb-1">2. Enter Business Number: <span class="mpesa-number">123456</span></p>
+                                <p class="mb-1">3. Enter Amount: <strong>KES 350</strong></p>
+                                <p class="mb-0">4. Enter Account Number: <strong>PYTHON350</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">M-Pesa Transaction Code</label>
+                            <input type="text" class="form-control" name="mpesa_code" placeholder="e.g. 1X2Y3Z4A" required>
+                            <small class="text-muted">Enter the confirmation code you received from M-Pesa</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Create Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Create a password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirm_password" placeholder="Confirm your password" required>
+                        </div>
+
+                        <input type="hidden" name="course_id" value="1">
+                        <input type="hidden" name="amount" value="350">
+
+                        <button type="submit" class="btn btn-hero-primary w-100" style="padding: 15px;">
+                            <i class="fas fa-check-circle me-2"></i>Register & Complete Enrollment
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-lock me-1"></i> Already have an account? 
+                        <a href="{{ url_for('login') }}" style="color: #667eea; font-weight: 600;">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ========== SCRIPTS ========== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
