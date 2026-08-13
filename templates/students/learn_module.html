@@ -4,289 +4,1163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ module.title }} - Learning Module</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        .module-content {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --text: #172033;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --bg: #f5f7fb;
+            --border: #e7ebf2;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --purple: #7c3aed;
+            --radius: 18px;
+            --sidebar-width: 260px;
         }
-        .resource-card {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s;
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg) !important;
+            color: var(--text);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================== */
+        .course-layout {
+            display: flex;
+            gap: 28px;
+            align-items: flex-start;
+            padding: 24px 0 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        .course-sidebar {
+            flex: 0 0 var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .course-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+        .sidebar-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.04);
+        }
+
+        .sidebar-course-badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary);
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-card h4 {
+            font-size: 1rem;
+            font-weight: 750;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .sidebar-card .course-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sidebar-card .course-meta .free-badge {
+            background: #dcfce7;
+            color: var(--success);
+            padding: 1px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.65rem;
+        }
+
+        .sidebar-card .course-meta .progress-badge {
+            background: #fef3c7;
+            color: var(--warning);
+            padding: 1px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.65rem;
+        }
+
+        .sidebar-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 6px 0;
+            margin-bottom: 12px;
+            transition: color 0.15s;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-back:hover {
+            color: var(--text);
+        }
+
+        .sidebar-section {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: 0;
+        }
+
+        .sidebar-section .section-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .sidebar-link.active {
+            background: #eff6ff;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sidebar-link .link-icon {
+            width: 26px;
+            height: 26px;
+            display: grid;
+            place-items: center;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-link .link-icon.video {
+            color: var(--primary);
+            background: #eff6ff;
+        }
+        .sidebar-link .link-icon.content {
+            color: var(--text);
+            background: #f1f5f9;
+        }
+        .sidebar-link .link-icon.assignment {
+            color: var(--warning);
+            background: #fffbeb;
+        }
+        .sidebar-link .link-icon.quiz {
+            color: var(--purple);
+            background: #f5f3ff;
+        }
+
+        .sidebar-link .badge-status {
+            margin-left: auto;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .badge-status.available {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        .badge-status.coming {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .sidebar-link .check-mark {
+            color: var(--success);
+            margin-left: auto;
+            font-size: 0.7rem;
+        }
+
+        .sidebar-progress {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-progress .progress-bar-custom {
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .sidebar-progress .progress-bar-custom .fill {
             height: 100%;
+            background: var(--primary);
+            border-radius: 999px;
+            transition: width 0.3s ease;
         }
-        .resource-card:hover {
-            border-color: #0d6efd;
-            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
+
+        .sidebar-progress .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--muted);
         }
-        .resource-card .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+
+        /* =========================
+           MAIN CONTENT
+        ========================== */
+        .module-header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.04);
         }
-        .resource-card.pdf .icon {
-            color: #dc3545;
+
+        .module-header .badge-module {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eff6ff;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: .7rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
-        .resource-card.video .icon {
-            color: #0d6efd;
+
+        .module-header h2 {
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+            font-weight: 750;
+            margin-bottom: 4px;
         }
-        .resource-card.live .icon {
-            color: #25D366;
+
+        .module-header .module-subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 0;
         }
-        .navigation-buttons {
+
+        /* =========================
+           CONTENT SECTION (Notes)
+        ========================== */
+        .content-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.04);
+        }
+
+        .content-section h3 {
+            font-weight: 750;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+
+        .content-section p {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .content-section .highlight-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .content-section .highlight-box code {
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* =========================
+           VIDEO SECTION (Separate)
+        ========================== */
+        .video-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.04);
+        }
+
+        .video-section .video-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .video-section .video-header .video-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .video-section .video-header h3 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 750;
+        }
+
+        .video-section .video-header .status-badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .status-badge.available {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        .status-badge.unavailable {
+            background: #f1f5f9;
+            color: var(--muted);
+        }
+
+        /* Video Player Container - Hidden until clicked */
+        .video-player-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .video-player-wrapper video {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+        }
+
+        /* Video placeholder - shown before click */
+        .video-placeholder {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0f172a;
+            cursor: pointer;
+            min-height: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-placeholder .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.6);
+            transition: background 0.3s ease;
+        }
+
+        .video-placeholder:hover .play-overlay {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .video-placeholder .play-overlay .play-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: grid;
+            place-items: center;
+            font-size: 2.5rem;
+            color: white;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .video-placeholder:hover .play-overlay .play-circle {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .video-placeholder .play-overlay .video-label {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+
+        .video-placeholder .play-overlay .video-duration {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .video-placeholder .thumbnail-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            opacity: 0.8;
+        }
+
+        /* Video controls row */
+        .video-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .video-controls .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 8px 18px;
+        }
+
+        /* =========================
+           ASSIGNMENTS & QUIZZES
+        ========================== */
+        .assignment-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: #fafbfc;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .assignment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .assignment-item .a-info {
+            flex: 1;
+        }
+        .assignment-item .a-info h6 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        .assignment-item .a-info .a-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .assignment-item .a-info .a-meta i {
+            margin-right: 4px;
+        }
+
+        .assignment-item .a-status {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .a-status.submitted {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        .a-status.pending {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+        .a-status.missed {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .quiz-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: #fafbfc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .quiz-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .quiz-item .q-info {
+            flex: 1;
+        }
+        .quiz-item .q-info h6 {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        .quiz-item .q-info .q-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .quiz-item .q-info .q-meta i {
+            margin-right: 4px;
+        }
+
+        .quiz-item .q-score {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 5px 18px rgba(15,23,42,.04);
         }
-        .module-header {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            color: white;
-            padding: 25px;
+
+        .nav-buttons .btn {
             border-radius: 10px;
-            margin-bottom: 30px;
+            font-weight: 650;
+            padding: 8px 16px;
+            font-size: 0.9rem;
         }
-        .badge-module {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
+
+        .completion-status {
+            font-size: 0.85rem;
+            color: var(--success);
+            font-weight: 700;
         }
-        .video-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 10px;
-            background: #000;
+
+        /* Scrollbar */
+        .course-sidebar::-webkit-scrollbar {
+            width: 4px;
         }
-        .video-container video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .course-sidebar::-webkit-scrollbar-track {
+            background: transparent;
         }
-        .pdf-container {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 200px;
+        .course-sidebar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 999px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+        @media (max-width: 992px) {
+            .course-layout {
+                flex-direction: column;
+                padding: 16px 0 30px;
+                gap: 20px;
+            }
+
+            .course-sidebar {
+                flex: none;
+                width: 100%;
+                min-width: unset;
+                position: static;
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .sidebar-card {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                align-items: start;
+                gap: 12px;
+                padding: 14px 16px;
+            }
+
+            .sidebar-card h4,
+            .sidebar-card .course-meta {
+                display: none;
+            }
+
+            .sidebar-back {
+                margin-bottom: 0;
+                border-bottom: 0;
+                padding: 0;
+            }
+
+            .sidebar-section {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: 0;
+            }
+
+            .sidebar-section .section-label {
+                display: none;
+            }
+
+            .sidebar-links-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .sidebar-link {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+                border-radius: 6px;
+                white-space: nowrap;
+            }
+
+            .sidebar-link .link-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 0.6rem;
+            }
+
+            .sidebar-link .badge-status {
+                display: none;
+            }
+
+            .sidebar-progress {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .module-header {
+                padding: 18px 20px;
+            }
+            .module-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+            .video-section {
+                padding: 20px;
+            }
+
+            .video-placeholder {
+                min-height: 200px;
+            }
+            .video-placeholder .play-overlay .play-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+            .video-placeholder .play-overlay .video-label {
+                font-size: 0.9rem;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-buttons .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .nav-buttons > div:last-child {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .assignment-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .quiz-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .quiz-item .q-score {
+                text-align: left;
+            }
         }
     </style>
 </head>
-<body class="bg-light">
 
-<div class="container mt-4">
-    <!-- Module Header -->
-    <div class="module-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <span class="badge-module">
-                    <i class="fas fa-book me-1"></i> Module {{ module.module_number }}
+<body>
+
+<div class="container-fluid px-3 px-md-4">
+    <div class="course-layout">
+
+        <!-- =========================================
+             SIDEBAR
+        ========================================== -->
+        <aside class="course-sidebar">
+            <div class="sidebar-card">
+
+                <a href="{{ url_for('access_course', course_id=module.course_id) }}" class="sidebar-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Course
+                </a>
+
+                <span class="sidebar-course-badge">
+                    <i class="fas fa-graduation-cap"></i> Course
                 </span>
-                <h2 class="mt-2">{{ module.title }}</h2>
-                <p class="mb-0 opacity-75">{{ module.course.course_name }}</p>
-            </div>
-            <a href="{{ url_for('access_course', course_id=module.course_id) }}" class="btn btn-light">
-                <i class="fas fa-arrow-left"></i> Back to Course
-            </a>
-        </div>
-    </div>
-
-    <!-- Module Description -->
-    {% if module.description %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5><i class="fas fa-info-circle text-primary me-2"></i>Module Description</h5>
-            <p class="mb-0">{{ module.description }}</p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Career Objectives -->
-    {% if module.career_objectives %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5><i class="fas fa-bullseye text-primary me-2"></i>Career Objectives</h5>
-            <p class="mb-0">{{ module.career_objectives }}</p>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Learning Resources -->
-    <div class="module-content">
-        <h4 class="mb-4"><i class="fas fa-book-open me-2"></i>Learning Resources</h4>
-        
-        <div class="row g-4">
-            <!-- PDF Resource -->
-            <div class="col-md-4">
-                <div class="resource-card pdf text-center">
-                    <div class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <h5>PDF Notes</h5>
-                    {% if module.pdf_file %}
-                    <p class="text-muted small">{{ module.pdf_file }}</p>
-                    <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" 
-                       target="_blank" 
-                       class="btn btn-danger w-100">
-                        <i class="fas fa-eye"></i> View PDF
-                    </a>
-                    <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" 
-                       download
-                       class="btn btn-outline-danger w-100 mt-2">
-                        <i class="fas fa-download"></i> Download PDF
-                    </a>
-                    {% else %}
-                    <p class="text-muted">No PDF notes available for this module.</p>
-                    <button class="btn btn-secondary w-100" disabled>
-                        <i class="fas fa-times"></i> Not Available
-                    </button>
-                    {% endif %}
+                <h4>{{ module.course.title|default('Python Programming') }}</h4>
+                <div class="course-meta">
+                    <span class="free-badge"><i class="fas fa-gem"></i> FREE</span>
+                    <span class="progress-badge"><i class="fas fa-spinner"></i> In Progress</span>
                 </div>
+
+                <div class="sidebar-section">
+                    <div class="section-label">
+                        <i class="fas fa-book-open"></i> Sections
+                    </div>
+                    <div class="sidebar-links-row">
+                        <a href="#section-content" class="sidebar-link active">
+                            <span class="link-icon content"><i class="fas fa-file-alt"></i></span>
+                            Notes
+                        </a>
+                        <a href="#section-video" class="sidebar-link">
+                            <span class="link-icon video"><i class="fas fa-video"></i></span>
+                            Video
+                            {% if module.video_file %}
+                            <span class="check-mark"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </a>
+                        <a href="#section-assignments" class="sidebar-link">
+                            <span class="link-icon assignment"><i class="fas fa-pencil-alt"></i></span>
+                            Assignments
+                            {% if module.assignments %}
+                            <span class="badge-status available">{{ module.assignments|length }}</span>
+                            {% else %}
+                            <span class="badge-status coming">coming</span>
+                            {% endif %}
+                        </a>
+                        <a href="#section-quizzes" class="sidebar-link">
+                            <span class="link-icon quiz"><i class="fas fa-brain"></i></span>
+                            Quizzes
+                            {% if module.quizzes %}
+                            <span class="badge-status available">{{ module.quizzes|length }}</span>
+                            {% else %}
+                            <span class="badge-status coming">coming</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sidebar-progress">
+                    <div class="stats">
+                        <span>{{ completed_count }}/{{ total_modules }} completed</span>
+                        <span>{{ progress_percent }}%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="fill" style="width: {{ progress_percent }}%;"></div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- =========================================
+             MAIN CONTENT
+        ========================================== -->
+        <main class="course-content">
+
+            <!-- MODULE HEADER -->
+            <div class="module-header">
+                <span class="badge-module">
+                    <i class="fas fa-book me-1"></i>
+                    Module {{ module.module_number }}
+                </span>
+                <h2>{{ module.title|default('Python Programming – Short Introduction Notes') }}</h2>
+                <p class="module-subtitle">{{ module.course.course_name }}</p>
             </div>
 
-            <!-- Video Resource -->
-            <div class="col-md-4">
-                <div class="resource-card video text-center">
-                    <div class="icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <h5>Video Tutorial</h5>
+            <!-- ==============================
+                 SECTION: CONTENT (NOTES)
+            ============================== -->
+            <div id="section-content" class="content-section">
+                <h3>1. What is Python?</h3>
+                <p>
+                    Python is a high-level, interpreted, general-purpose programming language used to develop
+                    different types of software and applications.
+                </p>
+                <p>
+                    Python was created by <strong>Guido van Rossum</strong> and first released in 1991.
+                </p>
+
+                {% if module.description %}
+                <div class="highlight-box">
+                    <p style="margin: 0;">{{ module.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ==============================
+                 SECTION: VIDEO (Separate section, click to load)
+            ============================== -->
+            <div id="section-video" class="video-section">
+                <div class="video-header">
+                    <span class="video-icon"><i class="fas fa-video"></i></span>
+                    <h3>Video Content</h3>
                     {% if module.video_file %}
-                    <p class="text-muted small">{{ module.video_file }}</p>
-                    <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#videoModal">
-                        <i class="fas fa-play"></i> Watch Video
-                    </button>
-                    <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" 
-                       download
-                       class="btn btn-outline-primary w-100 mt-2">
-                        <i class="fas fa-download"></i> Download Video
-                    </a>
+                    <span class="status-badge available"><i class="fas fa-check-circle"></i> Available</span>
                     {% else %}
-                    <p class="text-muted">No video available for this module.</p>
-                    <button class="btn btn-secondary w-100" disabled>
-                        <i class="fas fa-times"></i> Not Available
-                    </button>
+                    <span class="status-badge unavailable"><i class="fas fa-lock"></i> Not Available</span>
                     {% endif %}
                 </div>
-            </div>
 
-            <!-- Live Class Resource -->
-            <div class="col-md-4">
-                <div class="resource-card live text-center">
-                    <div class="icon">
-                        <i class="fas fa-video"></i>
+                {% if module.video_file %}
+                <!-- Video Player - Hidden until user clicks -->
+                <div id="videoContainer">
+                    <div id="videoPlaceholder" class="video-placeholder" onclick="loadAndPlayVideo()">
+                        <div class="thumbnail-bg"></div>
+                        <div class="play-overlay">
+                            <div class="play-circle">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <span class="video-label">Click to Watch Video</span>
+                            <span class="video-duration">~15 minutes</span>
+                        </div>
                     </div>
-                    <h5>Live Class</h5>
-                    {% if module.meeting_link %}
-                    <p class="text-muted small">Google Meet Session</p>
-                    <a href="{{ module.meeting_link }}" target="_blank" class="btn btn-success w-100">
-                        <i class="fas fa-video"></i> Join Live Class
+
+                    <!-- Video element - hidden initially, shown after click -->
+                    <div id="videoPlayerWrapper" class="video-player-wrapper" style="display: none;">
+                        <video id="moduleVideo" controls preload="none">
+                            <source id="videoSource" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+
+                    <div class="video-controls">
+                        <button class="btn btn-primary" onclick="loadAndPlayVideo()">
+                            <i class="fas fa-play"></i> Play Video
+                        </button>
+                        <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}"
+                           download class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 20px; color: var(--muted);">
+                    <i class="fas fa-video-slash fa-2x mb-3" style="opacity: 0.3;"></i>
+                    <p style="margin: 0;">No video content available for this module.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ==============================
+                 SECTION: ASSIGNMENTS
+            ============================== -->
+            <div id="section-assignments" class="content-section">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <span style="width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: #fffbeb; color: var(--warning);">
+                        <i class="fas fa-pencil-alt"></i>
+                    </span>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 750;">Assignments</h3>
+                    {% if module.assignments and module.assignments|length > 0 %}
+                    <span class="status-badge available" style="margin-left: auto;">{{ module.assignments|length }} tasks</span>
+                    {% endif %}
+                </div>
+
+                {% if module.assignments and module.assignments|length > 0 %}
+                    {% for assignment in module.assignments %}
+                    <div class="assignment-item">
+                        <div class="a-info">
+                            <h6>{{ assignment.title }}</h6>
+                            <div class="a-meta">
+                                <span><i class="fas fa-calendar-alt"></i> Due: {{ assignment.due_date }}</span>
+                                <span><i class="fas fa-star"></i> {{ assignment.points }} pts</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            {% if assignment.status == 'pending' %}
+                            <span class="a-status pending"><i class="fas fa-clock"></i> Pending</span>
+                            <a href="{{ url_for('submit_assignment', assignment_id=assignment.id) }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-upload"></i> Submit
+                            </a>
+                            {% elif assignment.status == 'submitted' %}
+                            <span class="a-status submitted"><i class="fas fa-check-circle"></i> Submitted</span>
+                            <button class="btn btn-outline-success btn-sm" disabled>
+                                <i class="fas fa-check"></i> Done
+                            </button>
+                            {% else %}
+                            <span class="a-status missed"><i class="fas fa-exclamation-circle"></i> Missed</span>
+                            <button class="btn btn-secondary btn-sm" disabled>Past Due</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 20px; color: var(--muted);">
+                        <i class="fas fa-tasks fa-2x mb-2" style="opacity: 0.3;"></i>
+                        <p style="margin: 0;">No assignments available for this module yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- ==============================
+                 SECTION: QUIZZES
+            ============================== -->
+            <div id="section-quizzes" class="content-section">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <span style="width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: #f5f3ff; color: var(--purple);">
+                        <i class="fas fa-brain"></i>
+                    </span>
+                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 750;">Quizzes</h3>
+                    {% if module.quizzes and module.quizzes|length > 0 %}
+                    <span class="status-badge available" style="margin-left: auto;">{{ module.quizzes|length }} quizzes</span>
+                    {% endif %}
+                </div>
+
+                {% if module.quizzes and module.quizzes|length > 0 %}
+                    {% for quiz in module.quizzes %}
+                    <div class="quiz-item">
+                        <div class="q-info">
+                            <h6>{{ quiz.title }}</h6>
+                            <div class="q-meta">
+                                <span><i class="fas fa-question-circle"></i> {{ quiz.questions|length }} questions</span>
+                                <span><i class="fas fa-clock"></i> {{ quiz.duration }} min</span>
+                                <span><i class="fas fa-star"></i> {{ quiz.points }} pts</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            {% if quiz.status == 'completed' %}
+                            <span class="q-score" style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> {{ quiz.score }}/{{ quiz.points }}
+                            </span>
+                            <button class="btn btn-outline-secondary btn-sm" disabled>
+                                <i class="fas fa-redo"></i> Retake
+                            </button>
+                            {% elif quiz.status == 'in-progress' %}
+                            <span class="a-status pending"><i class="fas fa-clock"></i> In Progress</span>
+                            <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play"></i> Continue
+                            </a>
+                            {% else %}
+                            <span class="a-status pending"><i class="fas fa-hourglass-half"></i> Not Started</span>
+                            <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play"></i> Start Quiz
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 20px; color: var(--muted);">
+                        <i class="fas fa-question-circle fa-2x mb-2" style="opacity: 0.3;"></i>
+                        <p style="margin: 0;">No quizzes available for this module yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- NAVIGATION -->
+            <div class="nav-buttons">
+                <div>
+                    {% if previous_module %}
+                    <a href="{{ url_for('learn_module', module_id=previous_module.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Previous
                     </a>
                     {% else %}
-                    <p class="text-muted">No live class scheduled for this module.</p>
-                    <button class="btn btn-secondary w-100" disabled>
-                        <i class="fas fa-times"></i> Not Available
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-arrow-left"></i> First
                     </button>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Navigation Buttons -->
-    <div class="navigation-buttons">
-        <div>
-            {% if previous_module %}
-            <a href="{{ url_for('learn_module', module_id=previous_module.id) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Previous Module
-            </a>
-            {% else %}
-            <button class="btn btn-secondary" disabled>
-                <i class="fas fa-arrow-left"></i> First Module
-            </button>
-            {% endif %}
-        </div>
-        
-        <div>
-            {% if not completed %}
-            <a href="{{ url_for('complete_module', module_id=module.id) }}" class="btn btn-success">
-                <i class="fas fa-check-circle"></i> Mark as Complete
-            </a>
-            {% else %}
-            <span class="badge bg-success fs-6 p-2">
-                <i class="fas fa-check-circle"></i> Completed
-            </span>
-            {% endif %}
-            
-            {% if next_module %}
-            <a href="{{ url_for('learn_module', module_id=next_module.id) }}" class="btn btn-primary ms-2">
-                Next Module <i class="fas fa-arrow-right"></i>
-            </a>
-            {% endif %}
-        </div>
-    </div>
-</div>
+                <div>
+                    {% if not completed %}
+                    <a href="{{ url_for('complete_module', module_id=module.id) }}" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> Mark Complete
+                    </a>
+                    {% else %}
+                    <span class="completion-status">
+                        <i class="fas fa-check-circle me-1"></i> Completed
+                    </span>
+                    {% endif %}
 
-<!-- Video Modal - Only shown if video exists -->
-{% if module.video_file %}
-<div class="modal fade" id="videoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-video me-2"></i>{{ module.title }} - Video Tutorial
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="video-container">
-                    <video controls>
-                        <source src="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" 
-                                type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    {% if next_module %}
+                    <a href="{{ url_for('learn_module', module_id=next_module.id) }}" class="btn btn-primary ms-2">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
+
+        </main>
     </div>
 </div>
-{% endif %}
 
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // Auto-play video when modal is shown
-    var videoModal = document.getElementById('videoModal');
-    if (videoModal) {
-        videoModal.addEventListener('shown.bs.modal', function () {
-            var video = this.querySelector('video');
-            if (video) {
+    // =========================================
+    // VIDEO - LOADS ONLY WHEN CLICKED
+    // =========================================
+    {% if module.video_file %}
+    var videoLoaded = false;
+    var video = document.getElementById('moduleVideo');
+    var videoSource = document.getElementById('videoSource');
+    var placeholder = document.getElementById('videoPlaceholder');
+    var playerWrapper = document.getElementById('videoPlayerWrapper');
+    var videoUrl = "{{ url_for('static', filename='uploads/videos/' + module.video_file) }}";
+
+    function loadAndPlayVideo() {
+        if (!videoLoaded) {
+            // Hide placeholder, show player
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            if (playerWrapper) {
+                playerWrapper.style.display = 'block';
+            }
+
+            // Set video source and load
+            videoSource.src = videoUrl;
+            video.load();
+            videoLoaded = true;
+
+            // Auto-play after loading
+            video.addEventListener('canplay', function() {
+                video.play();
+            }, { once: true });
+        } else {
+            // Video already loaded, just play
+            if (video.paused) {
                 video.play();
             }
-        });
-        
-        // Pause video when modal is hidden
-        videoModal.addEventListener('hidden.bs.modal', function () {
-            var video = this.querySelector('video');
-            if (video) {
-                video.pause();
-                video.currentTime = 0;
+        }
+    }
+
+    // Also handle if user clicks on the video container directly
+    if (placeholder) {
+        placeholder.addEventListener('click', loadAndPlayVideo);
+    }
+    {% endif %}
+
+    // =========================================
+    // SIDEBAR NAVIGATION
+    // =========================================
+    document.querySelectorAll('.sidebar-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-link').forEach(function(l) {
+                    l.classList.remove('active');
+                });
+                this.classList.add('active');
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
-    }
+    });
+
+    // Highlight active section on scroll
+    var sections = document.querySelectorAll('.content-section[id], .video-section[id]');
+    var sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+    window.addEventListener('scroll', function() {
+        var scrollPos = window.scrollY + 120;
+        sections.forEach(function(section) {
+            var sectionTop = section.offsetTop;
+            var sectionBottom = sectionTop + section.offsetHeight;
+            if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
+                var id = section.getAttribute('id');
+                sidebarLinks.forEach(function(link) {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    });
 </script>
+
 </body>
 </html>

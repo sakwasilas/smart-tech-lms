@@ -263,6 +263,63 @@
             color: white;
         }
 
+        /* ----- SWITCH TOGGLES ----- */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+        }
+        .switch-container .switch-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a2639;
+        }
+        .form-switch .form-check-input {
+            width: 2.8rem;
+            height: 1.4rem;
+            cursor: pointer;
+        }
+        .form-switch .form-check-input:checked {
+            background-color: #2edb7a;
+            border-color: #2edb7a;
+        }
+        .form-switch .form-check-input:not(:checked) {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .form-check-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1a2639;
+            cursor: pointer;
+        }
+        .form-check .text-muted {
+            font-size: 0.75rem;
+            display: block;
+            margin-left: 2.8rem;
+            color: #9aabbe;
+        }
+
+        .toggle-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .toggle-status.enabled {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .toggle-status.disabled {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+
         .section-divider {
             border: none;
             height: 2px;
@@ -270,6 +327,23 @@
             margin: 20px 0 24px 0;
             opacity: 0.6;
             border-radius: 4px;
+        }
+
+        .sub-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+        .sub-section .sub-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3a4b62;
+            margin-bottom: 12px;
+        }
+        .sub-section .sub-title i {
+            margin-right: 8px;
         }
 
         .fade-in {
@@ -287,6 +361,7 @@
             .card-modern .card-body-custom { padding: 16px; }
             .form-control-modern { font-size: 0.8rem; padding: 8px 12px; }
             .ck-editor__editable { min-height: 180px !important; }
+            .switch-container { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -360,25 +435,72 @@
                     <div class="form-text">Use the editor to format your content with text, images, tables, and links.</div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">PDF File</label>
-                        <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
-                        <div class="form-text">Upload a PDF document</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Video File</label>
-                        <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
-                        <div class="form-text">MP4, AVI, MOV, MKV</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Meeting Link</label>
-                        <input type="url" name="meeting_link" class="form-control-modern" placeholder="https://meet.google.com/...">
-                        <div class="form-text">Google Meet or Zoom link</div>
+                <!-- ============================================ -->
+                <!-- VIDEO SECTION WITH DOWNLOAD TOGGLE          -->
+                <!-- ============================================ -->
+                <div class="sub-section">
+                    <div class="sub-title"><i class="fas fa-video" style="color: #5b6fd8;"></i> Video Content</div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Upload Video</label>
+                            <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
+                            <div class="form-text">Supported formats: MP4, AVI, MOV, MKV (Max: 500MB)</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="switch-container">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="video_downloadable" name="video_downloadable" checked>
+                                    <label class="form-check-label" for="video_downloadable">
+                                        <i class="fas fa-download" style="color: #2edb7a;"></i> Allow students to download video
+                                    </label>
+                                </div>
+                                <span class="toggle-status enabled" id="videoStatus">
+                                    <i class="fas fa-check-circle"></i> Enabled
+                                </span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.75rem; margin-left: 2.8rem;">
+                                When enabled, students can download the video file. When disabled, students can only watch online.
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label">Live Meeting Link (Optional)</label>
+                            <input type="url" name="meeting_link" class="form-control-modern" placeholder="https://meet.google.com/... or https://zoom.us/j/...">
+                            <div class="form-text">Students can join live sessions through this link</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mb-3">
+                <!-- ============================================ -->
+                <!-- MATERIALS SECTION WITH DOWNLOAD TOGGLE      -->
+                <!-- ============================================ -->
+                <div class="sub-section" style="margin-top: 16px;">
+                    <div class="sub-title"><i class="fas fa-file-pdf" style="color: #e74c3c;"></i> Materials (PDF)</div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Upload PDF Materials</label>
+                            <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
+                            <div class="form-text">Only PDF files are allowed (Max: 500MB)</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="switch-container">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="materials_downloadable" name="materials_downloadable" checked>
+                                    <label class="form-check-label" for="materials_downloadable">
+                                        <i class="fas fa-download" style="color: #2edb7a;"></i> Allow students to download materials
+                                    </label>
+                                </div>
+                                <span class="toggle-status enabled" id="materialsStatus">
+                                    <i class="fas fa-check-circle"></i> Enabled
+                                </span>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.75rem; margin-left: 2.8rem;">
+                                When enabled, students can download the PDF. When disabled, students can only view online.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3" style="margin-top: 16px;">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-control-modern">
                         <option value="Active">Active</option>
@@ -452,6 +574,31 @@
         .catch(error => {
             console.error('CKEditor initialization error:', error);
         });
+
+    // ============================================
+    // TOGGLE STATUS LABELS FOR SWITCHES
+    // ============================================
+    document.getElementById('video_downloadable').addEventListener('change', function() {
+        const status = document.getElementById('videoStatus');
+        if (this.checked) {
+            status.className = 'toggle-status enabled';
+            status.innerHTML = '<i class="fas fa-check-circle"></i> Enabled';
+        } else {
+            status.className = 'toggle-status disabled';
+            status.innerHTML = '<i class="fas fa-times-circle"></i> Disabled';
+        }
+    });
+
+    document.getElementById('materials_downloadable').addEventListener('change', function() {
+        const status = document.getElementById('materialsStatus');
+        if (this.checked) {
+            status.className = 'toggle-status enabled';
+            status.innerHTML = '<i class="fas fa-check-circle"></i> Enabled';
+        } else {
+            status.className = 'toggle-status disabled';
+            status.innerHTML = '<i class="fas fa-times-circle"></i> Disabled';
+        }
+    });
 </script>
 </body>
 </html>

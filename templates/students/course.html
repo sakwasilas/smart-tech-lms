@@ -343,6 +343,10 @@
         .badge-pdf { background: #e9546b; color: #fff; }
         .badge-video { background: #4f6ef7; color: #fff; }
         .badge-live { background: #25D366; color: #fff; }
+        
+        /* Download status badges */
+        .badge-download-available { background: #2edb7a; color: #0f2a1e; }
+        .badge-download-disabled { background: #cbd5e1; color: #5d6a7a; }
 
         .module-action { flex-shrink: 0; }
         .btn-module {
@@ -416,6 +420,25 @@
             border-top: 1px solid #e8ecf1; margin-top: 32px;
         }
         .footer i { color: #e9546b; }
+
+        /* Download status tooltip */
+        .download-status-tip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        .download-status-tip.available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .download-status-tip.disabled {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
@@ -592,9 +615,37 @@
                             </h6>
                             <div class="module-desc">{{ module.description or 'No description available.' }}</div>
                             <div class="resource-badges">
-                                {% if module.pdf_file %}<span class="badge badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>{% endif %}
-                                {% if module.video_file %}<span class="badge badge-video"><i class="fas fa-video"></i> Video</span>{% endif %}
-                                {% if module.meeting_link %}<span class="badge badge-live"><i class="fas fa-video"></i> Live</span>{% endif %}
+                                {% if module.pdf_file %}
+                                    <span class="badge badge-pdf">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                        {% if module.can_download_materials %}
+                                            <span class="download-status-tip available">
+                                                <i class="fas fa-download"></i> Download
+                                            </span>
+                                        {% else %}
+                                            <span class="download-status-tip disabled">
+                                                <i class="fas fa-download"></i> View Only
+                                            </span>
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                                {% if module.video_file %}
+                                    <span class="badge badge-video">
+                                        <i class="fas fa-video"></i> Video
+                                        {% if module.can_download_video %}
+                                            <span class="download-status-tip available">
+                                                <i class="fas fa-download"></i> Download
+                                            </span>
+                                        {% else %}
+                                            <span class="download-status-tip disabled">
+                                                <i class="fas fa-download"></i> View Only
+                                            </span>
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                                {% if module.meeting_link %}
+                                    <span class="badge badge-live"><i class="fas fa-video"></i> Live</span>
+                                {% endif %}
                                 {% if not module.pdf_file and not module.video_file and not module.meeting_link %}
                                     <span class="badge bg-secondary" style="font-size:0.6rem;"><i class="fas fa-file-alt"></i> No resources</span>
                                 {% endif %}
@@ -603,13 +654,13 @@
                         <div class="module-action">
                             {% if module.completed %}
                                 <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn-module retake">
-                                     Retake
+                                    <i class="fas fa-redo"></i> Retake
                                 </a>
                             {% elif module.locked %}
                                 <button class="btn-module locked" disabled><i class="fas fa-lock"></i> Locked</button>
                             {% else %}
                                 <a href="{{ url_for('learn_module', module_id=module.id) }}" class="btn-module primary">
-                                    Start
+                                    <i class="fas fa-play"></i> Start
                                 </a>
                             {% endif %}
                         </div>
@@ -618,7 +669,7 @@
 
                     <!-- Retake notice -->
                     <div class="retake-notice">
-                        You can retake any module as many times as you want — unlimited retakes!
+                        <i class="fas fa-info-circle"></i> You can retake any module as many times as you want — unlimited retakes!
                     </div>
 
                 {% else %}

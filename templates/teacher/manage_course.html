@@ -207,6 +207,16 @@
             color: white;
         }
 
+        .btn-action.info {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-action.info:hover {
+            background: #2980b9;
+            color: white;
+        }
+
         .quick-actions {
             display: flex;
             gap: 10px;
@@ -242,6 +252,29 @@
             display: flex;
             gap: 6px;
         }
+
+        /* ===== RESOURCE INDICATORS ===== */
+        .resource-indicators {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .resource-indicators .indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .indicator.has-video { background: #e3f0ff; color: #4f6ef7; }
+        .indicator.has-pdf { background: #fce4ec; color: #e9546b; }
+        .indicator.has-live { background: #e8f5e9; color: #2e7d32; }
+        .indicator.download-allowed { background: #e8f5e9; color: #2e7d32; }
+        .indicator.download-disabled { background: #f5f5f5; color: #9e9e9e; }
+        .indicator.upload-date { background: #f5f5f5; color: #9e9e9e; font-size: 0.55rem; }
 
         .empty-state {
             text-align: center;
@@ -448,7 +481,7 @@
             </div>
         </div>
 
-        <!-- Modules -->
+        <!-- Modules with Resource Indicators -->
         <div class="section-card fade-in">
             <div class="section-header">
                 <h5><i class="fas fa-list"></i> Modules</h5>
@@ -464,6 +497,65 @@
                                 <i class="fas fa-{% if module.status == 'Active' %}check-circle text-success{% else %}times-circle text-danger{% endif %}"></i>
                                 {{ module.status }}
                             </small>
+                            
+                            <!-- Resource Indicators -->
+                            <div class="resource-indicators">
+                                <!-- Video Indicator -->
+                                {% if module.video_file %}
+                                    <span class="indicator has-video">
+                                        <i class="fas fa-video"></i> Video
+                                    </span>
+                                    {% if module.video_downloadable %}
+                                        <span class="indicator download-allowed">
+                                            <i class="fas fa-download"></i> Download Allowed
+                                        </span>
+                                    {% else %}
+                                        <span class="indicator download-disabled">
+                                            <i class="fas fa-download"></i> Download Disabled
+                                        </span>
+                                    {% endif %}
+                                    {% if module.video_uploaded_at %}
+                                        <span class="indicator upload-date">
+                                            <i class="far fa-clock"></i> {{ module.video_uploaded_at.strftime('%b %d, %Y') }}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+
+                                <!-- PDF/Materials Indicator -->
+                                {% if module.pdf_file %}
+                                    <span class="indicator has-pdf">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </span>
+                                    {% if module.materials_downloadable %}
+                                        <span class="indicator download-allowed">
+                                            <i class="fas fa-download"></i> Download Allowed
+                                        </span>
+                                    {% else %}
+                                        <span class="indicator download-disabled">
+                                            <i class="fas fa-download"></i> Download Disabled
+                                        </span>
+                                    {% endif %}
+                                    {% if module.materials_uploaded_at %}
+                                        <span class="indicator upload-date">
+                                            <i class="far fa-clock"></i> {{ module.materials_uploaded_at.strftime('%b %d, %Y') }}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+
+                                <!-- Live Meeting Indicator -->
+                                {% if module.meeting_link %}
+                                    <span class="indicator has-live">
+                                        <i class="fas fa-video"></i> Live Session
+                                    </span>
+                                {% endif %}
+
+                                <!-- No Resources -->
+                                {% if not module.video_file and not module.pdf_file and not module.meeting_link %}
+                                    <span class="indicator" style="background: #f5f5f5; color: #9e9e9e;">
+                                        <i class="fas fa-file-alt"></i> No resources
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="item-actions">
                             <a href="{{ url_for('teacher_edit_module', module_id=module.id) }}" class="btn-action warning">
@@ -479,6 +571,9 @@
                     <div class="empty-state">
                         <i class="fas fa-folder-open"></i>
                         <p>No modules added yet.</p>
+                        <a href="{{ url_for('teacher_add_module', course_id=course.id) }}" class="btn-action primary mt-2">
+                            <i class="fas fa-plus"></i> Add First Module
+                        </a>
                     </div>
                 {% endif %}
             </div>
@@ -578,7 +673,7 @@
                                     <td>{{ loop.index }}</td>
                                     <td>{{ enrollment.student.fullname }}</td>
                                     <td>{{ enrollment.student.email }}</td>
-                                    <td>{{ enrollment.date_enrolled }}</td>
+                                    <td>{{ enrollment.date_enrolled.strftime('%Y-%m-%d') }}</td>
                                     <td>
                                         {% if enrollment.payment_status == 'Paid' %}
                                             <span class="badge bg-success">Paid</span>

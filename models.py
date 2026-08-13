@@ -170,7 +170,7 @@ class Payment(Base):
 
 
 # =====================================
-# MODULES TABLE
+# MODULES TABLE - UPDATED WITH DOWNLOAD CONTROLS
 # =====================================
 
 class Module(Base):
@@ -187,6 +187,12 @@ class Module(Base):
     meeting_link = Column(String(500))
     status = Column(String(20), default="Active")
     created_at = Column(DateTime, default=datetime.now)
+    
+    # NEW FIELDS FOR DOWNLOAD CONTROL
+    video_downloadable = Column(Boolean, default=True)
+    materials_downloadable = Column(Boolean, default=True)
+    video_uploaded_at = Column(DateTime)
+    materials_uploaded_at = Column(DateTime)
 
     # Relationships
     course = relationship("Course", back_populates="modules")

@@ -46,6 +46,13 @@ from models import (
 app = Flask(__name__)
 app.secret_key = "silassakwarechoivanadasa"
 
+# ===== ADD THIS CONTEXT PROCESSOR =====
+@app.context_processor
+def utility_processor():
+    from datetime import datetime
+    return {'datetime': datetime}
+# ========================================
+
 # ==================================================
 # FILE UPLOAD CONFIGURATION
 # ==================================================
@@ -594,6 +601,7 @@ def access_course(course_id):
         for record in completed_records
     ]
 
+    # Add download permission flags to each module
     for index, module in enumerate(modules):
         if module.id in completed_ids:
             module.completed = True
@@ -608,6 +616,10 @@ def access_course(course_id):
             else:
                 module.locked = True
             module.completed = False
+        
+        # NEW: Set download permission flags for students
+        module.can_download_video = module.video_downloadable and bool(module.video_file)
+        module.can_download_materials = module.materials_downloadable and bool(module.pdf_file)
 
     return render_template(
         "students/course.html",
@@ -736,6 +748,10 @@ def module_content(module_id):
         module_id=module.id,
         status="Completed"
     ).first() is not None
+    
+    # Add download permissions
+    module.can_download_video = module.video_downloadable and bool(module.video_file)
+    module.can_download_materials = module.materials_downloadable and bool(module.pdf_file)
     
     # Get page number from query string
     page = request.args.get('page', 1, type=int)
@@ -1825,6 +1841,10 @@ def add_module():
         video_file = filename
 
     meeting_link = request.form.get("meeting_link")
+    
+    # Get download permissions
+    video_downloadable = request.form.get("video_downloadable") == "on"
+    materials_downloadable = request.form.get("materials_downloadable") == "on"
 
     module = Module(
         course_id=course_id,
@@ -1835,7 +1855,11 @@ def add_module():
         pdf_file=pdf_file,
         video_file=video_file,
         meeting_link=meeting_link,
-        status=status
+        status=status,
+        video_downloadable=video_downloadable,
+        materials_downloadable=materials_downloadable,
+        video_uploaded_at=datetime.now() if video_file else None,
+        materials_uploaded_at=datetime.now() if pdf_file else None
     )
 
     db_session.add(module)
@@ -1865,6 +1889,10 @@ def edit_module(id):
         module.description = request.form.get("description")
         module.content = request.form.get("content")
         module.status = request.form.get("status")
+        
+        # Update download permissions
+        module.video_downloadable = request.form.get("video_downloadable") == "on"
+        module.materials_downloadable = request.form.get("materials_downloadable") == "on"
 
         # Handle PDF upload
         pdf_upload = request.files.get("pdf_file")
@@ -1878,6 +1906,7 @@ def edit_module(id):
             os.makedirs(pdf_folder, exist_ok=True)
             pdf_upload.save(os.path.join(pdf_folder, filename))
             module.pdf_file = filename
+            module.materials_uploaded_at = datetime.now()
 
         # Handle Video upload
         video_upload = request.files.get("video_file")
@@ -1891,6 +1920,7 @@ def edit_module(id):
             os.makedirs(video_folder, exist_ok=True)
             video_upload.save(os.path.join(video_folder, filename))
             module.video_file = filename
+            module.video_uploaded_at = datetime.now()
 
         # Handle Meeting Link
         meeting_link = request.form.get("meeting_link")
@@ -2435,6 +2465,10 @@ def teacher_add_module(course_id):
         content = request.form.get("content")
         status = request.form.get("status", "Active")
         
+        # Get download permissions
+        video_downloadable = request.form.get("video_downloadable") == "on"
+        materials_downloadable = request.form.get("materials_downloadable") == "on"
+        
         existing = db_session.query(Module).filter_by(
             course_id=course_id,
             module_number=module_number
@@ -2481,7 +2515,11 @@ def teacher_add_module(course_id):
             pdf_file=pdf_file,
             video_file=video_file,
             meeting_link=meeting_link,
-            status=status
+            status=status,
+            video_downloadable=video_downloadable,
+            materials_downloadable=materials_downloadable,
+            video_uploaded_at=datetime.now() if video_file else None,
+            materials_uploaded_at=datetime.now() if pdf_file else None
         )
         
         db_session.add(module)
@@ -2537,6 +2575,10 @@ def teacher_edit_module(module_id):
         module.content = request.form.get("content")
         module.status = request.form.get("status")
         
+        # Update download permissions
+        module.video_downloadable = request.form.get("video_downloadable") == "on"
+        module.materials_downloadable = request.form.get("materials_downloadable") == "on"
+        
         pdf_upload = request.files.get("pdf_file")
         if pdf_upload and pdf_upload.filename:
             if not pdf_upload.filename.lower().endswith(".pdf"):
@@ -2548,6 +2590,7 @@ def teacher_edit_module(module_id):
             os.makedirs(pdf_folder, exist_ok=True)
             pdf_upload.save(os.path.join(pdf_folder, filename))
             module.pdf_file = filename
+            module.materials_uploaded_at = datetime.now()
 
         video_upload = request.files.get("video_file")
         if video_upload and video_upload.filename:
@@ -2560,6 +2603,7 @@ def teacher_edit_module(module_id):
             os.makedirs(video_folder, exist_ok=True)
             video_upload.save(os.path.join(video_folder, filename))
             module.video_file = filename
+            module.video_uploaded_at = datetime.now()
         
         meeting_link = request.form.get("meeting_link")
         if meeting_link:

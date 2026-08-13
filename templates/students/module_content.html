@@ -221,6 +221,164 @@
             margin: 15px 0;
         }
 
+        /* ===== RESOURCES SECTION ===== */
+        .resources-section {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 25px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .resources-section h6 {
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+
+        .resources-section h6 i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        .resource-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .resource-item:hover {
+            background: #e9ecef;
+        }
+
+        .resource-item .resource-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .resource-item .resource-info i {
+            font-size: 1.2rem;
+        }
+
+        .resource-item .resource-info .file-name {
+            font-weight: 500;
+            color: #2d3436;
+        }
+
+        .resource-item .resource-info .upload-date {
+            font-size: 0.8rem;
+            color: #b2bec3;
+        }
+
+        .resource-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .resource-actions .btn-download {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resource-actions .btn-download.enabled {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .resource-actions .btn-download.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            color: white;
+        }
+
+        .resource-actions .btn-download.disabled {
+            background: #b2bec3;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .resource-actions .btn-view {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resource-actions .btn-view:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .download-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+
+        .download-status.allowed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .download-status.disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* ===== VIDEO SECTION ===== */
+        .video-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .video-section h6 {
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 12px;
+        }
+
+        .video-container {
+            background: #000;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .video-container video {
+            border-radius: 6px;
+            width: 100%;
+        }
+
         /* ===== PAGINATION ===== */
         .pagination-nav {
             display: flex;
@@ -330,78 +488,6 @@
             box-shadow: none;
         }
 
-        /* ===== RESOURCES SECTION ===== */
-        .resources-section {
-            background: white;
-            border-radius: 16px;
-            padding: 20px 25px;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-            margin-bottom: 25px;
-        }
-
-        .resources-section h6 {
-            font-weight: 700;
-            color: #2d3436;
-            margin-bottom: 12px;
-        }
-
-        .resources-section h6 i {
-            color: #667eea;
-            margin-right: 8px;
-        }
-
-        .resource-links {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .resource-links a {
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .resource-links a:hover {
-            transform: translateY(-2px);
-        }
-
-        .resource-links .pdf-link {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .resource-links .pdf-link:hover {
-            background: #c0392b;
-            color: white;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-
-        .resource-links .video-link {
-            background: #667eea;
-            color: white;
-        }
-
-        .resource-links .video-link:hover {
-            background: #5a67d8;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .resource-links .meeting-link {
-            background: #25D366;
-            color: white;
-        }
-
-        .resource-links .meeting-link:hover {
-            background: #128C7E;
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
-        }
-
         /* ===== FLASH MESSAGES ===== */
         .alert-custom {
             border-radius: 12px;
@@ -467,12 +553,15 @@
                 text-align: center;
             }
 
-            .resources-section .resource-links {
+            .resource-item {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
 
-            .resources-section .resource-links a {
-                text-align: center;
+            .resource-actions {
+                width: 100%;
+                justify-content: flex-start;
             }
         }
 
@@ -593,37 +682,110 @@
             </div>
         </div>
 
-        <!-- ===== RESOURCES ===== -->
-        {% if module.pdf_file or module.video_file or module.meeting_link %}
-        <div class="resources-section fade-in">
-            <h6><i class="fas fa-paperclip"></i> Module Resources</h6>
-            <div class="resource-links">
-                {% if module.pdf_file %}
-                <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" target="_blank" class="pdf-link">
-                    <i class="fas fa-file-pdf"></i> Download PDF Notes
-                </a>
-                {% endif %}
-                {% if module.video_file %}
-                <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" target="_blank" class="video-link">
-                    <i class="fas fa-video"></i> Watch Video
-                </a>
-                {% endif %}
-                {% if module.meeting_link %}
-                <a href="{{ module.meeting_link }}" target="_blank" class="meeting-link">
-                    <i class="fas fa-video"></i> Join Live Class
-                </a>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
-
         <!-- ===== CONTENT ===== -->
         <div class="content-area fade-in">
             <div class="content-text">
                 {{ current_content|safe }}
             </div>
 
-            <!-- Pagination -->
+            <!-- ===== VIDEO SECTION ===== -->
+            {% if module.video_file %}
+            <div class="video-section">
+                <h6><i class="fas fa-video text-info"></i> Video Content</h6>
+                <div class="video-container">
+                    <video controls>
+                        <source src="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    {% if module.can_download_video %}
+                        <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" download class="btn-download enabled">
+                            <i class="fas fa-download"></i> Download Video
+                        </a>
+                        <span class="download-status allowed">
+                            <i class="fas fa-check-circle"></i> Download available
+                        </span>
+                        {% if module.video_uploaded_at %}
+                            <span class="text-muted" style="font-size: 0.8rem;">
+                                <i class="far fa-clock"></i> Uploaded: {{ module.video_uploaded_at.strftime('%b %d, %Y') }}
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <button class="btn-download disabled" disabled>
+                            <i class="fas fa-download"></i> Download Disabled
+                        </button>
+                        <span class="download-status disabled">
+                            <i class="fas fa-exclamation-circle"></i> Teacher has disabled download
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ===== RESOURCES SECTION (Materials/PDF) ===== -->
+            {% if module.pdf_file %}
+            <div class="resources-section fade-in" style="margin-top: 25px;">
+                <h6><i class="fas fa-paperclip"></i> Materials</h6>
+                <div class="resource-item">
+                    <div class="resource-info">
+                        <i class="fas fa-file-pdf text-danger" style="font-size: 1.4rem;"></i>
+                        <div>
+                            <div class="file-name">{{ module.pdf_file }}</div>
+                            {% if module.materials_uploaded_at %}
+                                <div class="upload-date">
+                                    <i class="far fa-clock"></i> Uploaded: {{ module.materials_uploaded_at.strftime('%b %d, %Y') }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="resource-actions">
+                        <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" target="_blank" class="btn-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        {% if module.can_download_materials %}
+                            <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" download class="btn-download enabled">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        {% else %}
+                            <button class="btn-download disabled" disabled>
+                                <i class="fas fa-download"></i> Download Disabled
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if not module.can_download_materials %}
+                    <div class="mt-2">
+                        <span class="download-status disabled">
+                            <i class="fas fa-info-circle"></i> Teacher has disabled download for this material
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ===== MEETING LINK ===== -->
+            {% if module.meeting_link %}
+            <div class="resources-section fade-in" style="margin-top: 25px;">
+                <h6><i class="fas fa-video" style="color: #25D366;"></i> Live Session</h6>
+                <div class="resource-item" style="background: #e8f5e9;">
+                    <div class="resource-info">
+                        <i class="fas fa-video" style="color: #25D366; font-size: 1.4rem;"></i>
+                        <div>
+                            <div class="file-name">Join Live Class</div>
+                            <div class="upload-date">Click the button below to join the live session</div>
+                        </div>
+                    </div>
+                    <div class="resource-actions">
+                        <a href="{{ module.meeting_link }}" target="_blank" class="btn-view" style="background: #25D366;">
+                            <i class="fas fa-video"></i> Join Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ===== PAGINATION ===== -->
             {% if total_pages > 1 %}
             <div class="pagination-nav">
                 <div>

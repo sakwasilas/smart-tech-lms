@@ -120,6 +120,88 @@
             gap: 6px;
         }
         
+        /* ===== SWITCH TOGGLES ===== */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+        .switch-container .switch-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a2639;
+        }
+        .form-switch .form-check-input {
+            width: 2.8rem;
+            height: 1.4rem;
+            cursor: pointer;
+        }
+        .form-switch .form-check-input:checked {
+            background-color: #2edb7a;
+            border-color: #2edb7a;
+        }
+        .form-switch .form-check-input:not(:checked) {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+        .form-check-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1a2639;
+            cursor: pointer;
+        }
+        .form-check .text-muted {
+            font-size: 0.75rem;
+            display: block;
+            margin-left: 2.8rem;
+            color: #9aabbe;
+        }
+
+        .toggle-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .toggle-status.enabled {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .toggle-status.disabled {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+
+        .sub-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px 18px;
+            margin-top: 12px;
+            border: 1px solid #e9ecef;
+        }
+        .sub-section .sub-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3a4b62;
+            margin-bottom: 12px;
+        }
+        .sub-section .sub-title i {
+            margin-right: 8px;
+        }
+
+        .upload-timestamp {
+            font-size: 0.75rem;
+            color: #9aabbe;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .content-preview {
             background: #f8f9fa;
             border-radius: 8px;
@@ -157,6 +239,7 @@
         
         @media (max-width: 768px) {
             .card-modern .card-body-custom { padding: 16px; }
+            .switch-container { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -232,63 +315,120 @@
                             <textarea name="content" id="content" rows="10">{{ module.content or '' }}</textarea>
                             <small class="text-muted">Use the editor to format your content. You can add text, images, tables, and links.</small>
                         </div>
-                        <!-- ===== END CKEDITOR ===== -->
 
                         <hr>
 
-                        <!-- ===== PDF SECTION ===== -->
-                        <div class="mb-3">
-                            <label class="form-label">PDF Notes</label>
-                            {% if module.pdf_file %}
-                            <div class="current-file">
-                                <span class="file-name">
-                                    <i class="fas fa-file-pdf text-danger"></i> {{ module.pdf_file }}
-                                </span>
-                                <span class="file-actions">
-                                    <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" 
-                                       target="_blank" 
-                                       class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                </span>
+                        <!-- ===== VIDEO SECTION WITH DOWNLOAD TOGGLE ===== -->
+                        <div class="sub-section">
+                            <div class="sub-title"><i class="fas fa-video" style="color: #667eea;"></i> Video Content</div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    {% if module.video_file %}
+                                    <div class="current-file">
+                                        <span class="file-name">
+                                            <i class="fas fa-video text-primary"></i> {{ module.video_file }}
+                                            {% if module.video_uploaded_at %}
+                                                <span class="upload-timestamp">
+                                                    <i class="far fa-clock"></i> Uploaded: {{ module.video_uploaded_at.strftime('%b %d, %Y') }}
+                                                </span>
+                                            {% endif %}
+                                        </span>
+                                        <span class="file-actions">
+                                            <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    <label class="form-label">Upload New Video (leave empty to keep current)</label>
+                                    <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
+                                    <small class="text-muted">Supported formats: MP4, AVI, MOV, MKV (Max: 500MB)</small>
+                                </div>
+                                <div class="col-12">
+                                    <div class="switch-container">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="video_downloadable" name="video_downloadable" {% if module.video_downloadable %}checked{% endif %}>
+                                            <label class="form-check-label" for="video_downloadable">
+                                                <i class="fas fa-download" style="color: #2edb7a;"></i> Allow students to download video
+                                            </label>
+                                        </div>
+                                        <span class="toggle-status {% if module.video_downloadable %}enabled{% else %}disabled{% endif %}" id="videoStatus">
+                                            {% if module.video_downloadable %}
+                                                <i class="fas fa-check-circle"></i> Enabled
+                                            {% else %}
+                                                <i class="fas fa-times-circle"></i> Disabled
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.75rem; margin-left: 2.8rem;">
+                                        When enabled, students can download the video file. When disabled, students can only watch online.
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    <label class="form-label">Live Meeting Link</label>
+                                    <input type="url" name="meeting_link" class="form-control-modern" 
+                                           value="{{ module.meeting_link or '' }}" 
+                                           placeholder="https://meet.google.com/... or https://zoom.us/j/...">
+                                    <small class="text-muted">Current: {{ module.meeting_link or 'No link set' }}</small>
+                                </div>
                             </div>
-                            {% endif %}
-                            <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
-                            <small class="text-muted">Upload new PDF to replace (optional)</small>
                         </div>
 
-                        <!-- ===== VIDEO SECTION ===== -->
-                        <div class="mb-3">
-                            <label class="form-label">Video File</label>
-                            {% if module.video_file %}
-                            <div class="current-file">
-                                <span class="file-name">
-                                    <i class="fas fa-file-video text-primary"></i> {{ module.video_file }}
-                                </span>
-                                <span class="file-actions">
-                                    <a href="{{ url_for('static', filename='uploads/videos/' + module.video_file) }}" 
-                                       target="_blank" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                </span>
+                        <!-- ===== MATERIALS SECTION WITH DOWNLOAD TOGGLE ===== -->
+                        <div class="sub-section" style="margin-top: 16px;">
+                            <div class="sub-title"><i class="fas fa-file-pdf" style="color: #e74c3c;"></i> Materials (PDF)</div>
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    {% if module.pdf_file %}
+                                    <div class="current-file">
+                                        <span class="file-name">
+                                            <i class="fas fa-file-pdf text-danger"></i> {{ module.pdf_file }}
+                                            {% if module.materials_uploaded_at %}
+                                                <span class="upload-timestamp">
+                                                    <i class="far fa-clock"></i> Uploaded: {{ module.materials_uploaded_at.strftime('%b %d, %Y') }}
+                                                </span>
+                                            {% endif %}
+                                        </span>
+                                        <span class="file-actions">
+                                            <a href="{{ url_for('static', filename='uploads/pdfs/' + module.pdf_file) }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                    <label class="form-label">Upload New PDF (leave empty to keep current)</label>
+                                    <input type="file" name="pdf_file" class="form-control-modern" accept=".pdf">
+                                    <small class="text-muted">Only PDF files are allowed (Max: 500MB)</small>
+                                </div>
+                                <div class="col-12">
+                                    <div class="switch-container">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="materials_downloadable" name="materials_downloadable" {% if module.materials_downloadable %}checked{% endif %}>
+                                            <label class="form-check-label" for="materials_downloadable">
+                                                <i class="fas fa-download" style="color: #2edb7a;"></i> Allow students to download materials
+                                            </label>
+                                        </div>
+                                        <span class="toggle-status {% if module.materials_downloadable %}enabled{% else %}disabled{% endif %}" id="materialsStatus">
+                                            {% if module.materials_downloadable %}
+                                                <i class="fas fa-check-circle"></i> Enabled
+                                            {% else %}
+                                                <i class="fas fa-times-circle"></i> Disabled
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.75rem; margin-left: 2.8rem;">
+                                        When enabled, students can download the PDF. When disabled, students can only view online.
+                                    </div>
+                                </div>
                             </div>
-                            {% endif %}
-                            <input type="file" name="video_file" class="form-control-modern" accept=".mp4,.avi,.mov,.mkv">
-                            <small class="text-muted">Upload new video to replace (optional)</small>
-                        </div>
-
-                        <!-- ===== MEETING LINK SECTION ===== -->
-                        <div class="mb-3">
-                            <label class="form-label">Meeting Link</label>
-                            <input type="url" name="meeting_link" class="form-control-modern" 
-                                   value="{{ module.meeting_link or '' }}" 
-                                   placeholder="https://meet.google.com/...">
-                            <small class="text-muted">Current: {{ module.meeting_link or 'No link set' }}</small>
                         </div>
 
                         <!-- ===== STATUS SECTION ===== -->
-                        <div class="mb-3">
+                        <div class="mb-3" style="margin-top: 16px;">
                             <label class="form-label">Status</label>
                             <select name="status" class="form-control-modern">
                                 <option value="Active" {% if module.status == 'Active' %}selected{% endif %}>Active</option>
@@ -318,6 +458,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Initialize CKEditor
     ClassicEditor
         .create(document.querySelector('#content'), {
             toolbar: {
@@ -361,6 +502,31 @@
         .catch(error => {
             console.error('CKEditor initialization error:', error);
         });
+
+    // ============================================
+    // TOGGLE STATUS LABELS FOR SWITCHES
+    // ============================================
+    document.getElementById('video_downloadable').addEventListener('change', function() {
+        const status = document.getElementById('videoStatus');
+        if (this.checked) {
+            status.className = 'toggle-status enabled';
+            status.innerHTML = '<i class="fas fa-check-circle"></i> Enabled';
+        } else {
+            status.className = 'toggle-status disabled';
+            status.innerHTML = '<i class="fas fa-times-circle"></i> Disabled';
+        }
+    });
+
+    document.getElementById('materials_downloadable').addEventListener('change', function() {
+        const status = document.getElementById('materialsStatus');
+        if (this.checked) {
+            status.className = 'toggle-status enabled';
+            status.innerHTML = '<i class="fas fa-check-circle"></i> Enabled';
+        } else {
+            status.className = 'toggle-status disabled';
+            status.innerHTML = '<i class="fas fa-times-circle"></i> Disabled';
+        }
+    });
 </script>
 </body>
 </html>
